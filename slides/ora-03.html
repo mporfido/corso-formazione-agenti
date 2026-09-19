@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Ora 3 — Il primo workflow controllato</title>
+<style>
+:root{
+  --paper:#f2efe9;
+  --card:#fbfaf7;
+  --ink:#1d1c1a;
+  --ink-soft:#5c5850;
+  --line:#ddd7cc;
+  --green:#1a3c3a;
+  --green-soft:#e6ece9;
+  --orange:#c0562f;
+  --orange-soft:#f6e7de;
+  --blue:#2f5a8c;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);font-family:var(--sans);color:var(--ink);
+  -webkit-font-smoothing:antialiased;padding:28px 0}
+
+/* ---------- slide frame ---------- */
+.slide{
+  position:relative;width:1280px;height:720px;margin:0 auto 28px;
+  background:var(--card);border:1px solid var(--line);
+  display:grid;grid-template-columns:56px 1fr;overflow:hidden;
+}
+.rail{
+  background:var(--green);color:#f4f1ea;
+  display:flex;align-items:center;justify-content:center;
+}
+.rail span{
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  white-space:nowrap;opacity:.9;
+}
+.body{padding:52px 60px 64px;display:flex;flex-direction:column;min-width:0}
+.kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--orange);font-weight:600;margin-bottom:14px}
+h1{font-family:var(--serif);font-size:56px;line-height:1.08;font-weight:600;
+  letter-spacing:-.01em}
+h2{font-family:var(--serif);font-size:40px;line-height:1.12;font-weight:600;
+  letter-spacing:-.01em;margin-bottom:26px}
+h2 .sub{display:block;font-family:var(--sans);font-size:15px;font-weight:400;
+  color:var(--ink-soft);letter-spacing:0;margin-top:10px;line-height:1.45}
+p{font-size:17px;line-height:1.55;color:var(--ink)}
+.muted{color:var(--ink-soft)}
+.foot{position:absolute;left:56px;right:0;bottom:0;height:40px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 60px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-soft);border-top:1px solid var(--line)}
+.content{flex:0 1 auto;min-height:0}
+code{font-family:var(--mono);font-size:.9em;background:var(--green-soft);padding:1px 5px}
+
+/* ---------- cover ---------- */
+.cover .body{justify-content:center}
+.cover h1{font-size:72px;max-width:980px}
+.cover .lede{margin-top:26px;font-size:19px;color:var(--ink-soft);max-width:700px}
+.rule{width:72px;height:3px;background:var(--orange);margin:32px 0 0}
+.meta{margin-top:38px;display:flex;gap:44px;font-size:13px;color:var(--ink-soft)}
+.meta b{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--green);margin-bottom:6px}
+
+/* ---------- generic layout helpers ---------- */
+.cols{display:grid;gap:22px}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c4{grid-template-columns:repeat(4,1fr)}
+.box{border:1px solid var(--line);background:#fff;padding:22px 24px;
+  display:flex;flex-direction:column;gap:10px;min-width:0}
+.box h3{font-family:var(--serif);font-size:22px;font-weight:600;line-height:1.2}
+.box .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.box p,.box li{font-size:15px;line-height:1.5;color:var(--ink-soft)}
+.box.green{background:var(--green-soft);border-color:#cbd8d3}
+.box.orange{background:var(--orange-soft);border-color:#ecd4c5}
+ul.clean{list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.clean li{position:relative;padding-left:18px;font-size:16px;line-height:1.5}
+ul.clean li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;
+  background:var(--orange)}
+.box ul.clean li{font-size:15px}
+ol.num{list-style:none;counter-reset:n;display:flex;flex-direction:column;gap:16px}
+ol.num li{counter-increment:n;position:relative;padding-left:46px;font-size:17px;
+  line-height:1.5}
+ol.num li::before{content:counter(n,decimal-leading-zero);position:absolute;left:0;top:1px;
+  font-size:13px;font-weight:600;color:var(--green);letter-spacing:.06em}
+ol.num li b{display:block;font-family:var(--serif);font-size:20px;font-weight:600;
+  margin-bottom:4px;color:var(--ink)}
+
+/* ---------- tabella ---------- */
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:12px 16px;font-size:15px;line-height:1.45;
+  border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);
+  font-weight:600;border-bottom:2px solid var(--green)}
+td:first-child{font-weight:600;width:30%}
+td.o{color:var(--orange)}
+td.g{color:var(--green)}
+
+/* ---------- prompt / badge ---------- */
+.prompt{background:var(--green);color:#eef2f0;padding:20px 24px;font-family:var(--sans);
+  font-size:15px;line-height:1.6}
+.prompt .lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;margin-bottom:8px}
+.prompt.plain{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.prompt.plain .lbl{color:var(--orange)}
+.prompt b.k{color:#f1b28f;font-weight:600}
+.badge{display:inline-block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  background:var(--green);color:#fff;padding:4px 9px;align-self:flex-start}
+.badge.o{background:var(--orange)}
+
+/* ---------- catena del workflow ---------- */
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.flow .st{border:1px solid var(--line);background:#fff;padding:18px 16px;
+  display:flex;flex-direction:column;gap:8px;position:relative;min-width:0}
+.flow .st .idx{font-family:var(--serif);font-size:30px;color:var(--green);line-height:1}
+.flow .st h3{font-size:16px;font-weight:700;line-height:1.3}
+.flow .st p{font-size:13px;line-height:1.45;color:var(--ink-soft)}
+.flow .st .who{margin-top:auto;padding-top:8px;border-top:1px solid var(--line);
+  font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--orange)}
+.flow .st.me{background:var(--green-soft);border-color:#cbd8d3}
+.flow .st.me .who{color:var(--green);border-top-color:#cbd8d3}
+
+/* ---------- brief ---------- */
+.brief{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.brief .b{border-top:4px solid var(--green);background:#fff;border-left:1px solid var(--line);
+  border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:16px 18px;
+  display:flex;flex-direction:column;gap:6px;min-width:0}
+.brief .b.last{border-top-color:var(--orange)}
+.brief .b b{font-family:var(--serif);font-size:20px}
+.brief .b span{font-size:13px;line-height:1.45;color:var(--ink-soft)}
+.brief .b i{font-style:normal;font-size:12px;letter-spacing:.04em;color:var(--green);
+  margin-top:4px}
+
+/* ---------- diff ---------- */
+.diff{border:1px solid #bfc9c4;background:#fff;font-family:var(--mono);font-size:13.5px;
+  line-height:1.6}
+.diff .hd{background:var(--green-soft);border-bottom:1px solid #cbd8d3;padding:8px 14px;
+  font-family:var(--sans);font-size:12px;color:var(--green);letter-spacing:.04em}
+.diff .ln{padding:1px 14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.diff .del{background:#fbe9e4;color:#8f3d20}
+.diff .add{background:#e4f1ea;color:#1f5a3a}
+.diff .ctx{color:var(--ink-soft)}
+.diff .ask{border-top:1px solid var(--line);padding:10px 14px;display:flex;gap:10px;
+  align-items:center;font-family:var(--sans);font-size:13px;color:var(--ink)}
+.diff .ask span.btn{border:1px solid var(--line);padding:4px 12px;font-size:12px}
+.diff .ask span.btn.yes{background:var(--green);color:#fff;border-color:var(--green)}
+
+/* ---------- tipi di slide: dimostrazione e laboratorio ----------
+   Basta aggiungere .demo o .lab alla <section class="slide">: cambiano rail,
+   fondo, kicker e compare il timbro. Il link al file sta nel piè di pagina. */
+.slide.demo{background:#eef2f7}
+.slide.lab{background:#fcf2ea}
+.slide.demo .rail{background:var(--blue)}
+.slide.lab .rail{background:var(--orange)}
+.slide.demo .rail span,.slide.lab .rail span{display:none}
+.slide.demo .rail::before,.slide.lab .rail::before{
+  writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;
+  font-size:14px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:#fff}
+.slide.demo .rail::before{content:"Dimostrazione"}
+.slide.lab .rail::before{content:"Laboratorio"}
+.slide.demo::after,.slide.lab::after{
+  position:absolute;top:18px;right:22px;padding:7px 14px;color:#fff;
+  font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase}
+.slide.demo::after{content:"◉\00a0\00a0Guardate lo schermo";background:var(--blue)}
+.slide.lab::after{content:"✎\00a0\00a0Tocca a voi";background:var(--orange)}
+.slide.demo .kicker{color:var(--blue)}
+.slide.demo .foot,.slide.lab .foot{border-top-color:rgba(0,0,0,.08)}
+.foot a.task{display:inline-flex;align-items:center;gap:10px;margin-left:-12px;
+  padding:6px 12px;color:#fff;text-decoration:none;font-weight:700;letter-spacing:.12em}
+.foot a.task b{font-family:var(--mono);font-weight:400;font-size:12px;letter-spacing:0;
+  text-transform:none;opacity:.95}
+.slide.demo .foot a.task{background:var(--blue)}
+.slide.lab .foot a.task{background:var(--orange)}
+.foot a.task:hover{filter:brightness(1.1)}
+
+/* ---------- print ---------- */
+.slide{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:13.333in 7.5in;margin:0}
+@media print{
+  body{background:#fff;padding:0}
+  .slide{margin:0;border:none;page-break-after:always;box-shadow:none}
+  .slide:last-child{page-break-after:auto}
+}
+
+/* ---------- presentation mode ---------- */
+body.present{padding:0;overflow:hidden;background:#000}
+body.present .slide{
+  display:none;margin:0;border:none;
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(var(--scale,1));
+  transform-origin:center center;
+}
+body.present .slide.active{display:grid}
+.present-hint{
+  position:fixed;bottom:14px;right:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.present-hint.show{opacity:1}
+.present-counter{
+  position:fixed;bottom:14px;left:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  display:none;
+}
+body.present .present-counter{display:block}
+
+/* ---------- controllo dimensione testo ---------- */
+:root{--content-zoom:1}
+.body{zoom:var(--content-zoom)}
+.zoom-ctrl{
+  position:fixed;top:14px;right:18px;z-index:60;
+  display:flex;align-items:center;gap:2px;
+  background:rgba(29,28,26,.88);border-radius:4px;padding:4px;
+  font-family:var(--sans);
+}
+.zoom-ctrl button{
+  width:28px;height:28px;border:none;border-radius:3px;background:transparent;
+  color:#f4f1ea;font-size:14px;font-weight:600;cursor:pointer;line-height:1;
+}
+.zoom-ctrl button:hover{background:rgba(255,255,255,.15)}
+.zoom-ctrl .val{
+  min-width:38px;text-align:center;font-size:11px;letter-spacing:.04em;
+  color:#cfcabf;user-select:none;
+}
+body.present .zoom-ctrl{display:none}
+@media print{.zoom-ctrl{display:none}}
+</style>
+</head>
+<body>
+<div class="present-counter" id="presentCounter"></div>
+<div class="present-hint" id="presentHint">Premi P per entrare in modalità presentazione · frecce/spazio per avanzare · Esc per uscire</div>
+<div class="zoom-ctrl">
+  <button id="zoomOut" title="Riduci testo" aria-label="Riduci testo">A−</button>
+  <span class="val" id="zoomVal">100%</span>
+  <button id="zoomIn" title="Aumenta testo" aria-label="Aumenta testo">A+</button>
+</div>
+
+<!-- 01 COVER -->
+<section class="slide cover">
+  <div class="rail"><span>Ora 3 · Il primo workflow controllato</span></div>
+  <div class="body">
+    <div class="kicker">Dalla IA generativa alla IA agentica · Ora 3</div>
+    <h1>Il primo workflow<br>controllato</h1>
+    <div class="rule"></div>
+    <p class="lede">Oggi cominciamo dal computer. Diamo all'agente un compito vero
+      chiedendolo male, guardiamo che cosa succede e da lì costruiamo il modo giusto di
+      chiederlo, di controllarlo e di tornare indietro.</p>
+    <div class="meta">
+      <div><b>Destinatari</b>Docenti di scuola superiore</div>
+      <div><b>Serve</b>L'ambiente aperto nell'ora 2</div>
+      <div><b>Durata</b>Un'ora, pausa compresa</div>
+      <div><b>Modulo</b>3 di 13</div>
+    </div>
+  </div>
+  <div class="foot"><span>Corso agenti IA</span><span>01</span></div>
+</section>
+
+<!-- 02 OBIETTIVI E MAPPA -->
+<section class="slide">
+  <div class="rail"><span>Ora 3 · Il primo workflow controllato</span></div>
+  <div class="body">
+    <div class="kicker">Obiettivi e mappa</div>
+    <h2>Alla fine di quest'ora<span class="sub">Nell'ora 2 avete aperto e guardato
+      la cartella. Adesso l'agente ci lavora, sotto il vostro controllo.</span></h2>
+    <ol class="num" style="margin-bottom:26px">
+      <li><b>Avete portato a termine un piccolo compito agentico</b>
+        L'agente ha modificato un file vero, dall'inizio alla fine.</li>
+      <li><b>Avete mantenuto il controllo</b>
+        Sapete che cosa ha fatto l'agente, perché l'ha fatto e come tornare indietro se serve.</li>
+    </ol>
+    <div class="content cols c4" style="gap:14px">
+      <div class="box orange">
+        <div class="tag">10 min · tocca a voi</div>
+        <h3>Primo tentativo</h3>
+        <p>Una riga sola all'agente, e guardate che cosa fa</p>
+      </div>
+      <div class="box">
+        <div class="tag">8 min</div>
+        <h3>Che cosa è andato storto</h3>
+        <p>Raccogliamo i vostri guai e li mettiamo in fila</p>
+      </div>
+      <div class="box">
+        <div class="tag">17 min</div>
+        <h3>Il workflow</h3>
+        <p>Brief, reti di sicurezza, piano, osservazione, verifica</p>
+      </div>
+      <div class="box orange">
+        <div class="tag">20 min · tocca a voi</div>
+        <h3>Secondo tentativo</h3>
+        <p>Lo stesso compito, fatto bene</p>
+      </div>
+    </div>
+    <p class="muted" style="margin-top:16px">Lo stesso compito, due volte. La seconda volta
+      dovrebbe andare meglio, e voi saprete dire perché.</p>
+  </div>
+  <div class="foot"><span>Obiettivi e mappa</span><span>02</span></div>
+</section>
+
+<!-- 03 LABORATORIO 0 -->
+<section class="slide lab">
+  <div class="rail"><span>Ora 3 · Il primo workflow controllato</span></div>
+  <div class="body">
+    <div class="kicker">Primo tentativo · 10 minuti · piccoli gruppi</div>
+    <h2>«Sistema questa scheda»<span class="sub">Chiedetelo esattamente così, senza
+      aggiungere altro. La scheda <code>05-materiali/scheda-recupero-equazioni.md</code> è una
+      scheda di recupero per la 3ª B, e qualche problema ce l'ha.</span></h2>
+    <div class="content cols c4" style="gap:14px">
+      <div class="box orange">
+        <span class="badge o">1 · 2 min</span>
+        <h3>Prima fate la copia</h3>
+        <p>Copiate la scheda nella stessa cartella, per esempio come
+          <code>…-COPIA.md</code>. Questo passo non si salta.</p>
+      </div>
+      <div class="box">
+        <span class="badge">2 · 1 min</span>
+        <h3>Leggete la scheda</h3>
+        <p>Apritela e scorretela una volta. Vi serve per accorgervi di che cosa cambia.</p>
+      </div>
+      <div class="box">
+        <span class="badge">3 · 5 min</span>
+        <h3>Una riga sola</h3>
+        <p>In modalità manuale scrivete «sistema questa scheda» e confermate quello che
+          propone, leggendolo.</p>
+      </div>
+      <div class="box">
+        <span class="badge">4 · 2 min</span>
+        <h3>Annotate</h3>
+        <p>Che cosa ha cambiato senza chiedervelo? Che cosa vi ha convinto poco? Scrivete
+          due righe.</p>
+      </div>
+    </div>
+    <div class="cols c2" style="margin-top:18px;gap:18px">
+      <div class="box green">
+        <div class="tag">Ruoli nel gruppo</div>
+        <p>Una persona guida l'agente, una legge le modifiche ad alta voce prima del sì, una
+          annota. Chi annota non tocca la tastiera.</p>
+      </div>
+      <div class="box orange">
+        <div class="tag">Se si blocca</div>
+        <p>Se l'agente chiede che cosa intendete, rispondete «decidi tu». Se si ferma a metà,
+          va bene lo stesso: conta quello che ha fatto finora.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../consegne/ora-03-lab-workflow.md" target="_blank">Consegna su Classroom <b>ora-03-lab-workflow.md</b></a><span>03</span></div>
+</section>
+
+<!-- 04 RACCOLTA -->
+<section class="slide">
+  <div class="rail"><span>Ora 3 · Il primo workflow controllato</span></div>
+  <div class="body">
+    <div class="kicker">Mettiamo insieme · a voce</div>
+    <h2>Che cosa è successo ai vostri gruppi<span class="sub">Raccontate un cambiamento che
+      non avevate chiesto. Poi guardiamo se ricorre anche negli altri gruppi.</span></h2>
+    <div class="content cols c2" style="gap:22px;align-items:start">
+      <div class="box">
+        <div class="tag">Le domande</div>
+        <ul class="clean">
+          <li>Che cosa ha cambiato <b>oltre</b> ai refusi?</li>
+          <li>Ha toccato <b>gli esercizi o i risultati</b>?</li>
+          <li>Che fine ha fatto <b>la regola di consegna</b>?</li>
+          <li>Come <b>ha chiuso</b>: vi ha detto che cosa ha fatto, o solo «fatto»?</li>
+          <li>Sapreste dire <b>adesso</b> se il lavoro è finito?</li>
+        </ul>
+      </div>
+      <div class="box orange">
+        <div class="tag">Quello che di solito succede</div>
+        <ul class="clean">
+          <li>Riscrive parti che andavano bene, perché «sistemare» non vuol dire niente.</li>
+          <li>Tocca la regola di consegna, che a lui sembra un refuso.</li>
+          <li>Riempie la tabella vuota con le soluzioni, e le soluzioni erano per gli
+            studenti.</li>
+          <li>Trasforma «x2» in «x²», e nessuno aveva deciso se era una modifica di forma.</li>
+          <li>Dice «fatto» senza elencare niente.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box green" style="margin-top:20px">
+      <p><b>Nessuno di questi è un errore dell'agente.</b> Sono tutte decisioni che avete
+        lasciato prendere a lui. Nel resto dell'ora ce le riprendiamo, una alla volta.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Che cosa è andato storto</span><span>04</span></div>
+</section>
+
+<!-- 05 IL WORKFLOW -->
+<section class="slide">
+  <div class="rail"><span>Ora 3 · Il primo workflow controllato</span></div>
+  <div class="body">
+    <div class="kicker">Il filo dell'ora</div>
+    <h2>Il workflow ha cinque passi e tre spettano a voi<span class="sub">È il ciclo
+      dell'ora 1: osserva, pianifica, agisce, verifica. Nel primo tentativo avete fatto solo
+      il passo 3. Adesso mettiamo gli altri.</span></h2>
+    <div class="content">
+      <div class="flow">
+        <div class="st me">
+          <div class="idx">0</div>
+          <h3>Copia di sicurezza</h3>
+          <p>L'avete già fatta. Da qui in poi è la vostra strada per tornare indietro.</p>
+          <div class="who">Voi</div>
+        </div>
+        <div class="st me">
+          <div class="idx">1</div>
+          <h3>Brief</h3>
+          <p>Obiettivo, contesto, vincoli e criterio di completamento, scritti prima.</p>
+          <div class="who">Voi · mancava</div>
+        </div>
+        <div class="st">
+          <div class="idx">2</div>
+          <h3>Piano</h3>
+          <p>L'agente propone che cosa farà. Voi leggete, correggete e approvate.</p>
+          <div class="who">Mancava</div>
+        </div>
+        <div class="st">
+          <div class="idx">3</div>
+          <h3>Esecuzione</h3>
+          <p>L'agente legge e modifica i file e chiede conferma. Voi guardate.</p>
+          <div class="who">Questo l'avete fatto</div>
+        </div>
+        <div class="st me">
+          <div class="idx">4</div>
+          <h3>Verifica</h3>
+          <p>Confrontate il risultato con il criterio scritto al passo 1.</p>
+          <div class="who">Voi · mancava</div>
+        </div>
+      </div>
+      <div class="box orange" style="margin-top:22px">
+        <p>Il primo tentativo è saltato dal compito all'esecuzione. <b>I tre passi che
+          mancavano sono proprio quelli in cui decidete voi</b>, e sono quelli che
+          costruiamo adesso.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Il workflow</span><span>05</span></div>
+</section>
+
+<!-- 06 IL BRIEF -->
+<section class="slide">
+  <div class="rail"><span>Ora 3 · Il primo workflow controllato</span></div>
+  <div class="body">
+    <div class="kicker">Passo 1 · chiedere</div>
+    <h2>Il brief in quattro righe<span class="sub">Ogni riga risponde a un guaio che avete
+      appena visto. Scrivetelo come se parlaste a un collega supplente, e non a un motore di
+      ricerca.</span></h2>
+    <div class="content">
+      <div class="brief">
+        <div class="b"><b>Obiettivo</b>
+          <span>Che cosa volete ottenere e per chi.</span>
+          <i>Contro il «sistemare» che non vuol dire niente</i></div>
+        <div class="b"><b>Contesto</b>
+          <span>Che cosa deve sapere e dove lo trova.</span>
+          <i>Contro la tabella riempita con le soluzioni</i></div>
+        <div class="b"><b>Vincoli</b>
+          <span>Che cosa non deve fare, o non deve toccare.</span>
+          <i>Contro la regola di consegna riscritta</i></div>
+        <div class="b last"><b>Completamento</b>
+          <span>Come capirete che il lavoro è finito.</span>
+          <i>Contro il «fatto» senza elenco</i></div>
+      </div>
+      <div class="prompt" style="margin-top:22px">
+        <div class="lbl">Tutto insieme</div>
+        <b class="k">Obiettivo:</b> sistemare <code style="background:#2c4a47;color:#eef2f0">05-materiali/scheda-recupero-equazioni.md</code>.
+        <b class="k">Contesto:</b> è una scheda per la 3ª B, piena di refusi, con una tabella rotta.
+        <b class="k">Vincoli:</b> non cambiare esercizi, risultati e regole di consegna; solo forma e refusi.
+        <b class="k">Completamento:</b> nessun refuso, la tabella si vede bene in anteprima, e mi elenchi
+        ogni modifica fatta.
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Il brief</span><span>06</span></div>
+</section>
+
+<!-- 07 CRITERIO DI COMPLETAMENTO -->
+<section class="slide">
+  <div class="rail"><span>Ora 3 · Il primo workflow controllato</span></div>
+  <div class="body">
+    <div class="kicker">Passo 1 · la quarta riga</div>
+    <h2>Decidete prima come saprete che è finito<span class="sub">Poco fa nessuno sapeva
+      dire se il lavoro era finito. Il criterio serve a questo, e funziona se un'altra persona
+      sa rispondere sì o no.</span></h2>
+    <div class="content">
+      <table>
+        <tr><th>Criterio vago</th><th>Criterio controllabile</th></tr>
+        <tr><td style="font-weight:400">«Sistemala bene»</td>
+          <td class="g">Nessun refuso; la tabella si vede in anteprima; esercizi identici</td></tr>
+        <tr><td style="font-weight:400">«Fammi una bella verifica»</td>
+          <td class="g">Sei esercizi, due per livello, con le soluzioni in un file separato</td></tr>
+        <tr><td style="font-weight:400">«Riassumi il documento»</td>
+          <td class="g">Una pagina al massimo, con il numero di pagina per ogni affermazione</td></tr>
+        <tr><td style="font-weight:400">«Controlla i voti»</td>
+          <td class="g">Per ogni voto diverso fra riepilogo e griglia: studente, prova, i due valori</td></tr>
+      </table>
+      <div class="box orange" style="margin-top:22px">
+        <p><b>Due richieste da aggiungere sempre:</b> «elencami ogni modifica fatta» e «dimmi
+          che cosa non sei riuscito a fare». La prima rende il lavoro tracciabile. La seconda
+          fa emergere quello che l'agente altrimenti non direbbe.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Criterio di completamento</span><span>07</span></div>
+</section>
+
+<!-- 08 LE RETI -->
+<section class="slide">
+  <div class="rail"><span>Ora 3 · Il primo workflow controllato</span></div>
+  <div class="body">
+    <div class="kicker">Passo 0 · perché vi ho fatto fare la copia</div>
+    <h2>Tre reti di sicurezza<span class="sub">La copia che avete fatto dieci minuti fa è
+      l'unica ragione per cui possiamo rifare il compito da capo. Chiedere all'agente di
+      «tornare com'era» non basta, perché ricostruisce il file a memoria.</span></h2>
+    <div class="content cols c3">
+      <div class="box orange">
+        <div class="tag">Prima</div>
+        <h3>La copia</h3>
+        <p>Copiate il file, o la cartella intera, prima di cominciare. Bastano trenta
+          secondi in Esplora file, e questa rete funziona sempre.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Durante</div>
+        <h3>Il permesso</h3>
+        <p>In modalità manuale ogni modifica passa da voi. Date il vostro «sì» solo dopo
+          aver letto le righe rosse e verdi.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Dopo</div>
+        <h3>L'annullamento</h3>
+        <p>Alcune app permettono di annullare le ultime modifiche. È comodo, ma non deve
+          essere la vostra unica rete.</p>
+      </div>
+    </div>
+    <div class="box green" style="margin-top:22px">
+      <p><b>Chi andrà avanti userà Git.</b> Git è un diario di bordo che conserva una copia
+        fedele del progetto a ogni cambiamento e la ripristina esattamente. Lo gestisce l'agente,
+        su vostra richiesta. Lo incontreremo nelle ultime ore del corso.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Reti di sicurezza</span><span>08</span></div>
+</section>
+
+<!-- 09 IL PIANO -->
+<section class="slide">
+  <div class="rail"><span>Ora 3 · Il primo workflow controllato</span></div>
+  <div class="body">
+    <div class="kicker">Passo 2 · il piano</div>
+    <h2>Prima approvate il piano, poi l'agente lavora<span class="sub">Nel primo tentativo
+      l'agente ha deciso da solo e voi l'avete scoperto una modifica alla volta. In modalità
+      piano esplora, fa domande e propone, e non tocca niente finché non dite sì.</span></h2>
+    <div class="content cols" style="grid-template-columns:1fr 1fr;align-items:start">
+      <div class="box">
+        <h3>Che cosa c'è in un buon piano</h3>
+        <ul class="clean">
+          <li><b>Quali file</b> leggerà, e quali modificherà</li>
+          <li><b>Che cosa cambierà</b>, punto per punto</li>
+          <li><b>Che cosa non toccherà</b>: deve ripetere i vostri vincoli</li>
+          <li><b>Le domande</b> che gli restano: rispondete prima di approvare</li>
+        </ul>
+        <p style="margin-top:6px">Correggere un piano costa una riga. Correggere un lavoro
+          finito costa un'altra sessione.</p>
+      </div>
+      <div class="box green">
+        <div class="tag">Nei tre prodotti</div>
+        <table style="margin-top:2px">
+          <tr><td style="width:40%;padding:9px 0">Claude Code</td>
+            <td style="padding:9px 0">Modalità piano, dal selettore delle modalità</td></tr>
+          <tr><td style="padding:9px 0">Codex</td>
+            <td style="padding:9px 0">Modalità piano disponibile</td></tr>
+          <tr><td style="padding:9px 0;border-bottom:none">Antigravity</td>
+            <td style="padding:9px 0;border-bottom:none">Non c'è, ma si può chiedere a
+              parole (vedi sotto)</td></tr>
+        </table>
+        <div class="prompt" style="margin-top:8px;padding:14px 16px;font-size:14px">
+          «Prima di fare qualunque cosa, intervistami per capire che cosa mi serve, poi
+          proponimi un piano e aspetta il mio via.»
+        </div>
+        <p style="font-size:12px" class="muted">Stato: fonti di luglio–agosto 2026. Il prompt
+          funziona in tutti e tre.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Il piano</span><span>09</span></div>
+</section>
+
+<!-- 10 MODALITA -->
+<section class="slide">
+  <div class="rail"><span>Ora 3 · Il primo workflow controllato</span></div>
+  <div class="body">
+    <div class="kicker">Passo 3 · i permessi</div>
+    <h2>Le modalità: quanto lo lascio fare da solo<span class="sub">Nel primo tentativo
+      avete usato la modalità manuale. Ogni strumento usa nomi diversi, ma la scala è la
+      stessa: è la manopola dell'ora 1 e la zona 4 dell'ora 2.</span></h2>
+    <div class="content">
+      <table>
+        <tr><th>Modalità</th><th>Cosa fa</th><th>Quando usarla</th></tr>
+        <tr><td>Manuale</td><td>Chiede conferma prima di ogni azione</td>
+          <td>Sempre, all'inizio. Vi aiuta a capire cosa sta facendo.</td></tr>
+        <tr><td>Piano</td><td>Esplora, fa domande e propone un piano <i>prima</i> di agire</td>
+          <td class="o">Sui lavori lunghi o poco chiari: fa risparmiare tempo e correzioni.</td></tr>
+        <tr><td>Automatica</td><td>Procede da solo, si ferma sulle azioni rischiose</td>
+          <td>Quando conoscete il compito e la cartella è sotto controllo.</td></tr>
+        <tr><td>Autonoma</td><td>Non chiede conferme e toglie le barriere</td>
+          <td>Solo su attività circoscritte e senza conseguenze, dopo una copia di sicurezza.</td></tr>
+      </table>
+      <div class="box green" style="margin-top:22px">
+        <p><b>Nel secondo tentativo usate prima la modalità piano, poi quella manuale.</b> Le
+          azioni <b>irreversibili</b> (cancellare, inviare, pubblicare) richiedono sempre una
+          conferma. Più avanti potrete lasciare più libertà sulle azioni che non fanno danni.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Modalità e permessi</span><span>10</span></div>
+</section>
+
+<!-- 11 GUARDARE MENTRE LAVORA -->
+<section class="slide">
+  <div class="rail"><span>Ora 3 · Il primo workflow controllato</span></div>
+  <div class="body">
+    <div class="kicker">Passo 3 · guardare mentre lavora</div>
+    <h2>Il rosso indica cosa esce, il verde cosa entra<span class="sub">Questa schermata
+      l'avete già vista poco fa. Adesso però avete i vincoli scritti, e potete controllarla
+      davvero.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.3fr 1fr;gap:26px;align-items:start">
+      <div class="diff">
+        <div class="hd">05-materiali/scheda-recupero-equazioni.md</div>
+        <div class="ln ctx">  ## ripasso veloce</div>
+        <div class="ln del">- un equazione di secondo grado si scrive nella forma ax2+bx+c=0</div>
+        <div class="ln add">+ Un'equazione di secondo grado si scrive nella forma ax² + bx + c = 0</div>
+        <div class="ln del">- Il discriminante e delta = b2-4ac</div>
+        <div class="ln add">+ Il discriminante è Δ = b² − 4ac</div>
+        <div class="ln del">- se delta > 0 ci sono due sluzioni distinte</div>
+        <div class="ln add">+ Se Δ > 0 ci sono due soluzioni distinte.</div>
+        <div class="ask">Consentire la modifica?
+          <span class="btn yes">Sì</span><span class="btn">No</span><span class="btn">Sì, per questa sessione</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;min-width:0">
+        <div class="box">
+          <div class="tag">Tre domande, a ogni conferma</div>
+          <ul class="clean">
+            <li><b>È il file giusto?</b> Il nome è in cima.</li>
+            <li><b>Le righe rosse</b> dovevano davvero sparire?</li>
+            <li><b>Le righe verdi</b> rispettano i vincoli del brief?</li>
+          </ul>
+        </div>
+        <div class="box orange">
+          <div class="tag">Quando fermarlo</div>
+          <ul class="clean">
+            <li>Tocca file che non c'entrano</li>
+            <li>Propone di cancellare, spostare fuori dalla cartella o installare</li>
+            <li>Si allontana dal piano senza dirlo</li>
+          </ul>
+          <p style="margin-top:2px"><b>Il pulsante di stop interrompe il lavoro.</b> Poi
+            ripartite con un'istruzione più chiara.</p>
+        </div>
+      </div>
+    </div>
+    <p class="muted" style="margin-top:16px">«x2» è diventato «x²». È una modifica di forma
+      o di contenuto? Poco fa l'ha deciso l'agente. Adesso lo decidete voi, nel brief.</p>
+  </div>
+  <div class="foot"><span>Leggere una modifica</span><span>11</span></div>
+</section>
+
+<!-- 12 VERIFICARE -->
+<section class="slide">
+  <div class="rail"><span>Ora 3 · Il primo workflow controllato</span></div>
+  <div class="body">
+    <div class="kicker">Passo 4 · la verifica</div>
+    <h2>Siete voi a decidere quando il lavoro è finito<span class="sub">Controllate il
+      risultato con il criterio del brief, riga per riga. L'impressione che il lavoro sia
+      buono non basta.</span></h2>
+    <div class="content cols c3">
+      <div class="box">
+        <span class="badge">1</span>
+        <h3>Il criterio, punto per punto</h3>
+        <p>Nessun refuso? Tabella in anteprima? Esercizi identici? Rispondete sì o no a ogni
+          voce.</p>
+      </div>
+      <div class="box">
+        <span class="badge">2</span>
+        <h3>Le modifiche dichiarate</h3>
+        <p>Confrontate l'elenco dell'agente con il file e con la copia: ci sono modifiche
+          che non ha dichiarato?</p>
+      </div>
+      <div class="box">
+        <span class="badge">3</span>
+        <h3>Ciò che non ha fatto</h3>
+        <p>«Che cosa non sei riuscito a fare, o hai lasciato in dubbio?» La risposta è
+          spesso la parte più utile.</p>
+      </div>
+    </div>
+    <div class="box green" style="margin-top:22px">
+      <p><b>Se qualcosa non va, non serve ricominciare da capo.</b> Nella stessa sessione
+        dite che cosa correggere, per esempio «hai cambiato la regola di consegna: rimettila
+        com'era». Poi verificate di nuovo.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Verifica</span><span>12</span></div>
+</section>
+
+<!-- 13 LABORATORIO 2 -->
+<section class="slide lab">
+  <div class="rail"><span>Ora 3 · Il primo workflow controllato</span></div>
+  <div class="body">
+    <div class="kicker">Secondo tentativo · 20 minuti · piccoli gruppi</div>
+    <h2>Lo stesso compito, fatto bene<span class="sub">Ripartite dalla copia intatta e
+      rifate la scheda con tutti e cinque i passi. Alla fine confrontate i due risultati.</span></h2>
+    <div class="content cols c4" style="gap:14px">
+      <div class="box">
+        <span class="badge">0-1 · 6 min</span>
+        <h3>Ripartenza e brief</h3>
+        <p>Rimettete la scheda com'era dalla copia, poi scrivete le quattro righe prima di
+          parlare con l'agente.</p>
+      </div>
+      <div class="box">
+        <span class="badge">2 · 4 min</span>
+        <h3>Piano</h3>
+        <p>In modalità piano incollate il brief. Leggete il piano, correggetelo e solo
+          allora approvate.</p>
+      </div>
+      <div class="box">
+        <span class="badge">3 · 5 min</span>
+        <h3>Esecuzione</h3>
+        <p>In modalità manuale leggete ogni modifica prima del sì. Chi osserva annota i
+          passi.</p>
+      </div>
+      <div class="box">
+        <span class="badge">4 · 5 min</span>
+        <h3>Verifica e confronto</h3>
+        <p>Criterio punto per punto, poi «che cosa non sei riuscito a fare?». Infine
+          confrontate con il primo tentativo.</p>
+      </div>
+    </div>
+    <div class="cols c2" style="margin-top:18px;gap:18px">
+      <div class="box green">
+        <div class="tag">La domanda del confronto</div>
+        <p>Quale riga del brief ha evitato quale guaio del primo tentativo? Rispondete con
+          un esempio preciso, non con un'impressione.</p>
+      </div>
+      <div class="box orange">
+        <div class="tag">Da controllare alla fine</div>
+        <p>La regola «chi non la consegna non viene ammesso» è rimasta com'era?
+          «x2» è diventato «x²»? L'avevate previsto nel brief?</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../consegne/ora-03-lab-workflow.md" target="_blank">Consegna su Classroom <b>ora-03-lab-workflow.md</b></a><span>13</span></div>
+</section>
+
+<!-- 14 REVERSIBILE O NO -->
+<section class="slide">
+  <div class="rail"><span>Ora 3 · Il primo workflow controllato</span></div>
+  <div class="body">
+    <div class="kicker">Da tenere · scheda di riferimento</div>
+    <h2>Si torna indietro?<span class="sub">Oggi si tornava indietro, perché avevate la
+      copia. Fatevi questa domanda prima di ogni «sì»: la risposta cambia molto da un'azione
+      all'altra.</span></h2>
+    <div class="content">
+      <table>
+        <tr><th>Azione</th><th>Si torna indietro?</th><th>Che cosa fare</th></tr>
+        <tr><td>Modificare un file nella cartella</td><td class="g">Sì</td>
+          <td>Dalla copia di sicurezza</td></tr>
+        <tr><td>Creare file nuovi</td><td class="g">Sì</td><td>Si cancellano</td></tr>
+        <tr><td>Sovrascrivere un file</td><td>Solo se c'è una copia</td>
+          <td>La copia va fatta prima</td></tr>
+        <tr><td>Cancellare dal terminale</td><td class="o">No: non passa dal cestino</td>
+          <td>Conferma sempre, e copia prima</td></tr>
+        <tr><td>Inviare, pubblicare, condividere</td><td class="o">No</td>
+          <td>Conferma sempre, dopo aver riletto</td></tr>
+        <tr><td>Installare programmi</td><td>Con fatica</td>
+          <td>Chiedere prima che cosa installa, e perché</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="foot"><span>Reversibile o no</span><span>14</span></div>
+</section>
+
+<!-- 15 CHIUSURA -->
+<section class="slide">
+  <div class="rail"><span>Ora 3 · Il primo workflow controllato</span></div>
+  <div class="body">
+    <div class="kicker">Chiusura</div>
+    <h2>Quattro cose da portare a casa</h2>
+    <div class="content">
+      <ol class="num">
+        <li><b>Il brief si scrive prima.</b>
+          Oggi l'avete visto in due tentativi sullo stesso file: le quattro righe valgono più
+          di dieci correzioni.</li>
+        <li><b>Il piano si legge prima del sì.</b>
+          Correggere un piano costa una riga, mentre correggere un lavoro finito costa una sessione.</li>
+        <li><b>Siete voi a decidere quando il lavoro è finito.</b>
+          Controllate il criterio riga per riga e chiedete sempre che cosa l'agente non è
+          riuscito a fare.</li>
+        <li><b>Prima di ogni sì, chiedetevi se si torna indietro.</b>
+          La copia del primo tentativo vi ha permesso di rifare tutto. Senza quella, il
+          secondo tentativo non ci sarebbe stato.</li>
+      </ol>
+      <div class="cols c2" style="margin-top:22px;gap:18px">
+        <div class="box green">
+          <div class="tag">In fondo alla consegna</div>
+          <p>Due scorciatoie che accorciano il brief: mostrare un esempio già scritto da voi,
+            e usare una parola-guida come «asciutto». Le trovate nella consegna, con gli
+            esempi.</p>
+        </div>
+        <div class="box orange">
+          <div class="tag">Prossima ora</div>
+          <p>Context engineering e memoria permanente. Oggi le regole stavano nel brief e
+            valevano per una sola sessione. La prossima volta le scriverete in un file e
+            varranno sempre.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Chiusura</span><span>15</span></div>
+</section>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var body = document.body;
+  var counter = document.getElementById('presentCounter');
+  var hint = document.getElementById('presentHint');
+  var idx = 0;
+  var presenting = false;
+
+  function fitScale(){
+    var s = Math.min(window.innerWidth/1280, window.innerHeight/720);
+    document.documentElement.style.setProperty('--scale', s);
+  }
+
+  function render(){
+    slides.forEach(function(s,i){ s.classList.toggle('active', i===idx); });
+    counter.textContent = (idx+1) + ' / ' + slides.length;
+  }
+
+  function enter(){
+    presenting = true;
+    body.classList.add('present');
+    fitScale();
+    render();
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(function(){});
+    }
+  }
+
+  function exit(){
+    presenting = false;
+    body.classList.remove('present');
+    if (document.fullscreenElement) document.exitFullscreen().catch(function(){});
+  }
+
+  function next(){ if (idx < slides.length-1){ idx++; render(); } }
+  function prev(){ if (idx > 0){ idx--; render(); } }
+
+  document.addEventListener('keydown', function(e){
+    if (!presenting){
+      if (e.key === 'p' || e.key === 'P') enter();
+      return;
+    }
+    switch(e.key){
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown':
+        e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+        e.preventDefault(); prev(); break;
+      case 'Home':
+        e.preventDefault(); idx = 0; render(); break;
+      case 'End':
+        e.preventDefault(); idx = slides.length-1; render(); break;
+      case 'Escape':
+        exit(); break;
+    }
+  });
+
+  document.addEventListener('click', function(e){
+    if (!presenting) return;
+    if (e.target.closest('a')) return;
+    if (e.clientX > window.innerWidth/2) next(); else prev();
+  });
+
+  document.addEventListener('fullscreenchange', function(){
+    if (!document.fullscreenElement && presenting) exit();
+  });
+
+  window.addEventListener('resize', fitScale);
+
+  hint.classList.add('show');
+  setTimeout(function(){ hint.classList.remove('show'); }, 4000);
+
+  // ---- controllo dimensione testo ----
+  var ZOOM_MIN = 0.8, ZOOM_MAX = 1.4, ZOOM_STEP = 0.1;
+  var zoomVal = document.getElementById('zoomVal');
+  var zoomIn = document.getElementById('zoomIn');
+  var zoomOut = document.getElementById('zoomOut');
+  var zoom = 1;
+  try { zoom = parseFloat(localStorage.getItem('slideZoom')) || 1; } catch(e){}
+
+  function applyZoom(){
+    zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom));
+    document.documentElement.style.setProperty('--content-zoom', zoom);
+    zoomVal.textContent = Math.round(zoom * 100) + '%';
+    try { localStorage.setItem('slideZoom', zoom); } catch(e){}
+  }
+
+  zoomIn.addEventListener('click', function(){ zoom += ZOOM_STEP; applyZoom(); });
+  zoomOut.addEventListener('click', function(){ zoom -= ZOOM_STEP; applyZoom(); });
+
+  document.addEventListener('keydown', function(e){
+    if (presenting) return;
+    if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '=')){
+      e.preventDefault(); zoom += ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '-'){
+      e.preventDefault(); zoom -= ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '0'){
+      e.preventDefault(); zoom = 1; applyZoom();
+    }
+  });
+
+  applyZoom();
+})();
+</script>
+
+</body>
+</html>

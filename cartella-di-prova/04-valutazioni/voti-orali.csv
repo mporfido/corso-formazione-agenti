@@ -1,0 +1,38 @@
+id;cognome;nome;prova;data;argomento;voto;descrittore_griglia
+S01;Bianchi;Alessandro;O1;14/11/2025;Equazioni e disequazioni di secondo grado;7,0;Conosce i contenuti principali, procede correttamente se guidato sui passaggi finali.
+S01;Bianchi;Alessandro;O2;21/01/2026;Retta e sistemi lineari;6,0;Conoscenze essenziali, esposizione semplice, calcoli corretti nei casi standard.
+S02;Bruno;Chiara;O1;28/11/2025;Equazioni e disequazioni di secondo grado;8,5;Conoscenze solide, esposizione ordinata, qualche imprecisione lessicale.
+S02;Bruno;Chiara;O2;26/01/2026;Retta e sistemi lineari;7,5;Conosce i contenuti principali, procede correttamente se guidato sui passaggi finali.
+S03;Caruso;Matteo;O1;14/11/2025;Equazioni e disequazioni di secondo grado;6,0;Conoscenze essenziali, esposizione semplice, calcoli corretti nei casi standard.
+S04;Colombo;Sofia;O1;10/11/2025;Equazioni e disequazioni di secondo grado;8,5;Conoscenze solide, esposizione ordinata, qualche imprecisione lessicale.
+S04;Colombo;Sofia;O2;09/01/2026;Retta e sistemi lineari;9,0;Espone con sicurezza, collega gli argomenti, usa il linguaggio formale in modo preciso.
+S05;Conti;Lorenzo;O1;17/11/2025;Equazioni e disequazioni di secondo grado;5,5;Conoscenze frammentarie, necessita di domande di appoggio, errori nei passaggi.
+S05;Conti;Lorenzo;O2;28/01/2026;Retta e sistemi lineari;5,5;Conoscenze frammentarie, necessita di domande di appoggio, errori nei passaggi.
+S06;De Angelis;Giulia;O1;14/11/2025;Equazioni e disequazioni di secondo grado;7,0;Conosce i contenuti principali, procede correttamente se guidato sui passaggi finali.
+S06;De Angelis;Giulia;O2;26/01/2026;Retta e sistemi lineari;7,0;Conosce i contenuti principali, procede correttamente se guidato sui passaggi finali.
+S07;Esposito;Davide;O2;12/01/2026;Retta e sistemi lineari;4,5;Conoscenze molto lacunose, non riconosce la procedura da applicare.
+S08;Ferrari;Martina;O1;21/11/2025;Equazioni e disequazioni di secondo grado;8,5;Conoscenze solide, esposizione ordinata, qualche imprecisione lessicale.
+S08;Ferrari;Martina;O2;14/01/2026;Retta e sistemi lineari;8,5;Conoscenze solide, esposizione ordinata, qualche imprecisione lessicale.
+S09;Fontana;Simone;O1;21/11/2025;Equazioni e disequazioni di secondo grado;6,5;Conoscenze essenziali, esposizione semplice, calcoli corretti nei casi standard.
+S09;Fontana;Simone;O2;21/01/2026;Retta e sistemi lineari;6,5;Conoscenze essenziali, esposizione semplice, calcoli corretti nei casi standard.
+S10;Galli;Elisa;O1;17/11/2025;Equazioni e disequazioni di secondo grado;7,0;Conosce i contenuti principali, procede correttamente se guidato sui passaggi finali.
+S10;Galli;Elisa;O2;28/01/2026;Retta e sistemi lineari;7,0;Conosce i contenuti principali, procede correttamente se guidato sui passaggi finali.
+S11;Greco;Nicolo;O1;12/11/2025;Equazioni e disequazioni di secondo grado;5,0;Conoscenze frammentarie, necessita di domande di appoggio, errori nei passaggi.
+S12;Longo;Aurora;O1;24/11/2025;Equazioni e disequazioni di secondo grado;8,0;Conoscenze solide, esposizione ordinata, qualche imprecisione lessicale.
+S12;Longo;Aurora;O2;19/01/2026;Retta e sistemi lineari;8,0;Conoscenze solide, esposizione ordinata, qualche imprecisione lessicale.
+S13;Marchetti;Federico;O1;14/11/2025;Equazioni e disequazioni di secondo grado;5,0;Conoscenze frammentarie, necessita di domande di appoggio, errori nei passaggi.
+S14;Mariani;Beatrice;O1;19/11/2025;Equazioni e disequazioni di secondo grado;9,0;Espone con sicurezza, collega gli argomenti, usa il linguaggio formale in modo preciso.
+S14;Mariani;Beatrice;O2;21/01/2026;Retta e sistemi lineari;9,0;Espone con sicurezza, collega gli argomenti, usa il linguaggio formale in modo preciso.
+S15;Moretti;Riccardo;O1;21/11/2025;Equazioni e disequazioni di secondo grado;7,0;Conosce i contenuti principali, procede correttamente se guidato sui passaggi finali.
+S15;Moretti;Riccardo;O2;28/01/2026;Retta e sistemi lineari;7,0;Conosce i contenuti principali, procede correttamente se guidato sui passaggi finali.
+S16;Neri;Camilla;O1;28/11/2025;Equazioni e disequazioni di secondo grado;7,0;Conosce i contenuti principali, procede correttamente se guidato sui passaggi finali.
+S16;Neri;Camilla;O2;12/01/2026;Retta e sistemi lineari;7,5;Conosce i contenuti principali, procede correttamente se guidato sui passaggi finali.
+S17;Parisi;Tommaso;O1;28/11/2025;Equazioni e disequazioni di secondo grado;5,5;Conoscenze frammentarie, necessita di domande di appoggio, errori nei passaggi.
+S17;Parisi;Tommaso;O2;19/01/2026;Retta e sistemi lineari;6,0;Conoscenze essenziali, esposizione semplice, calcoli corretti nei casi standard.
+S18;Rizzo;Ludovica;O1;19/11/2025;Equazioni e disequazioni di secondo grado;7,5;Conosce i contenuti principali, procede correttamente se guidato sui passaggi finali.
+S18;Rizzo;Ludovica;O2;14/01/2026;Retta e sistemi lineari;8,0;Conoscenze solide, esposizione ordinata, qualche imprecisione lessicale.
+S19;Sanna;Gabriele;O1;28/11/2025;Equazioni e disequazioni di secondo grado;6,5;Conoscenze essenziali, esposizione semplice, calcoli corretti nei casi standard.
+S19;Sanna;Gabriele;O2;28/01/2026;Retta e sistemi lineari;6,5;Conoscenze essenziali, esposizione semplice, calcoli corretti nei casi standard.
+S20;Serra;Noemi;O1;21/11/2025;Equazioni e disequazioni di secondo grado;8,5;Conoscenze solide, esposizione ordinata, qualche imprecisione lessicale.
+S20;Serra;Noemi;O2;21/01/2026;Retta e sistemi lineari;8,0;Conoscenze solide, esposizione ordinata, qualche imprecisione lessicale.
+S21;Villa;Jacopo;O1;24/11/2025;Equazioni e disequazioni di secondo grado;5,5;Conoscenze frammentarie, necessita di domande di appoggio, errori nei passaggi.

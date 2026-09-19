@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Ora 2 — Orientarsi negli ambienti agentici</title>
+<style>
+:root{
+  --paper:#f2efe9;
+  --card:#fbfaf7;
+  --ink:#1d1c1a;
+  --ink-soft:#5c5850;
+  --line:#ddd7cc;
+  --green:#1a3c3a;
+  --green-soft:#e6ece9;
+  --orange:#c0562f;
+  --orange-soft:#f6e7de;
+  --blue:#2f5a8c;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);font-family:var(--sans);color:var(--ink);
+  -webkit-font-smoothing:antialiased;padding:28px 0}
+
+/* ---------- slide frame ---------- */
+.slide{
+  position:relative;width:1280px;height:720px;margin:0 auto 28px;
+  background:var(--card);border:1px solid var(--line);
+  display:grid;grid-template-columns:56px 1fr;overflow:hidden;
+}
+.rail{
+  background:var(--green);color:#f4f1ea;
+  display:flex;align-items:center;justify-content:center;
+}
+.rail span{
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  white-space:nowrap;opacity:.9;
+}
+.body{padding:52px 60px 64px;display:flex;flex-direction:column;min-width:0}
+.kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--orange);font-weight:600;margin-bottom:14px}
+h1{font-family:var(--serif);font-size:56px;line-height:1.08;font-weight:600;
+  letter-spacing:-.01em}
+h2{font-family:var(--serif);font-size:40px;line-height:1.12;font-weight:600;
+  letter-spacing:-.01em;margin-bottom:26px}
+h2 .sub{display:block;font-family:var(--sans);font-size:15px;font-weight:400;
+  color:var(--ink-soft);letter-spacing:0;margin-top:10px;line-height:1.45}
+p{font-size:17px;line-height:1.55;color:var(--ink)}
+.muted{color:var(--ink-soft)}
+.foot{position:absolute;left:56px;right:0;bottom:0;height:40px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 60px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-soft);border-top:1px solid var(--line)}
+.content{flex:0 1 auto;min-height:0}
+code{font-family:var(--mono);font-size:.9em;background:var(--green-soft);padding:1px 5px}
+
+/* ---------- cover ---------- */
+.cover .body{justify-content:center}
+.cover h1{font-size:72px;max-width:980px}
+.cover .lede{margin-top:26px;font-size:19px;color:var(--ink-soft);max-width:700px}
+.rule{width:72px;height:3px;background:var(--orange);margin:32px 0 0}
+.meta{margin-top:38px;display:flex;gap:44px;font-size:13px;color:var(--ink-soft)}
+.meta b{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--green);margin-bottom:6px}
+
+/* ---------- generic layout helpers ---------- */
+.cols{display:grid;gap:22px}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c4{grid-template-columns:repeat(4,1fr)}
+.box{border:1px solid var(--line);background:#fff;padding:22px 24px;
+  display:flex;flex-direction:column;gap:10px;min-width:0}
+.box h3{font-family:var(--serif);font-size:22px;font-weight:600;line-height:1.2}
+.box .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.box p,.box li{font-size:15px;line-height:1.5;color:var(--ink-soft)}
+.box.green{background:var(--green-soft);border-color:#cbd8d3}
+.box.orange{background:var(--orange-soft);border-color:#ecd4c5}
+ul.clean{list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.clean li{position:relative;padding-left:18px;font-size:16px;line-height:1.5}
+ul.clean li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;
+  background:var(--orange)}
+.box ul.clean li{font-size:15px}
+ol.num{list-style:none;counter-reset:n;display:flex;flex-direction:column;gap:16px}
+ol.num li{counter-increment:n;position:relative;padding-left:46px;font-size:17px;
+  line-height:1.5}
+ol.num li::before{content:counter(n,decimal-leading-zero);position:absolute;left:0;top:1px;
+  font-size:13px;font-weight:600;color:var(--green);letter-spacing:.06em}
+ol.num li b{display:block;font-family:var(--serif);font-size:20px;font-weight:600;
+  margin-bottom:4px;color:var(--ink)}
+.box ol.num{gap:12px}
+.box ol.num li{font-size:15px;color:var(--ink-soft);padding-left:38px}
+.box ol.num li b{font-size:17px}
+
+/* ---------- tabella ---------- */
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:13px 16px;font-size:15px;line-height:1.45;
+  border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);
+  font-weight:600;border-bottom:2px solid var(--green)}
+td:first-child{font-weight:600;width:24%}
+td.o{color:var(--orange)}
+
+/* ---------- prompt / badge ---------- */
+.prompt{background:var(--green);color:#eef2f0;padding:20px 24px;font-family:var(--sans);
+  font-size:15px;line-height:1.6}
+.prompt .lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;margin-bottom:8px}
+.badge{display:inline-block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  background:var(--green);color:#fff;padding:4px 9px;align-self:flex-start}
+.badge.o{background:var(--orange)}
+
+/* ---------- barra contesto ---------- */
+.gauge{height:26px;background:#fff;border:1px solid var(--line);display:flex;
+  overflow:hidden}
+.gauge i{display:block;height:100%}
+.g-legend{display:flex;gap:22px;font-size:13px;color:var(--ink-soft);margin-top:10px;
+  flex-wrap:wrap}
+.g-legend span{display:flex;align-items:center;gap:7px}
+.g-legend b{width:10px;height:10px;display:inline-block}
+
+/* ---------- sondaggio ---------- */
+.survey{display:flex;flex-direction:column;border:1px solid var(--line);background:#fff}
+.survey .q{display:grid;grid-template-columns:1fr 330px;align-items:center;gap:20px;
+  padding:13px 22px;border-bottom:1px solid var(--line)}
+.survey .q:last-child{border-bottom:none}
+.survey .q span{font-size:16px;line-height:1.4}
+.survey .q .scale3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.survey .q .scale3 i{font-style:normal;font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;text-align:center;padding:6px 4px;border:1px solid var(--line);
+  color:var(--ink-soft)}
+
+/* ---------- schema della finestra ---------- */
+.mock{border:1px solid #bfc9c4;background:#fff;display:grid;
+  grid-template-columns:220px 1fr;grid-template-rows:34px 1fr 58px;height:380px}
+.mock .bar{grid-column:1/3;background:var(--green-soft);border-bottom:1px solid #cbd8d3;
+  display:flex;align-items:center;justify-content:space-between;padding:0 14px}
+.mock .dots{display:flex;gap:6px}
+.mock .dots i{width:9px;height:9px;border-radius:50%;background:#c5cfca;display:block}
+.mock .side{grid-row:2/4;border-right:1px solid var(--line);padding:14px;
+  font-family:var(--mono);font-size:12px;line-height:1.9;color:var(--ink-soft);
+  position:relative}
+.mock .chat{padding:16px 20px;display:flex;flex-direction:column;gap:10px;position:relative}
+.mock .msg{font-size:13px;line-height:1.45;padding:9px 12px;max-width:80%}
+.mock .msg.me{align-self:flex-end;background:var(--green-soft)}
+.mock .msg.ag{background:#f5f3ee;color:var(--ink-soft)}
+.mock .msg.ag code{background:#fff}
+.mock .input{border-top:1px solid var(--line);display:flex;align-items:center;gap:10px;
+  padding:0 14px;position:relative}
+.mock .input .field{flex:1;font-size:13px;color:#a09b92;border:1px solid var(--line);
+  padding:8px 10px}
+.mock .chip{font-size:11px;border:1px solid var(--line);padding:5px 9px;
+  color:var(--ink-soft);white-space:nowrap}
+.pin{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;
+  border-radius:50%;background:var(--orange);color:#fff;font-size:12px;font-weight:700;
+  font-family:var(--sans);flex:none}
+.mock .side .pin,.mock .chat .pin{position:absolute;top:10px;right:10px}
+.mock .meter{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--ink-soft)}
+.mock .meter .mbar{width:70px;height:8px;border:1px solid #bfc9c4;background:#fff;
+  display:block;position:relative}
+.mock .meter .mbar::after{content:"";position:absolute;left:0;top:0;bottom:0;width:42%;
+  background:var(--green)}
+.legend{display:flex;flex-direction:column;gap:16px}
+.legend > div{display:grid;grid-template-columns:22px 1fr;gap:12px;align-items:start}
+.legend > div > div b{display:block;font-family:var(--serif);font-size:18px;line-height:1.25}
+.legend > div > div span{display:block;font-size:14px;line-height:1.45;color:var(--ink-soft);
+  margin-top:2px}
+
+/* ---------- scheda piattaforma ---------- */
+.scheda{border:1px solid #cbd8d3;background:#fff}
+.scheda .concept{background:var(--green);color:#eef2f0;padding:14px 20px;
+  display:grid;grid-template-columns:170px 1fr;gap:16px;align-items:baseline}
+.scheda .concept b{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;font-weight:600}
+.scheda .concept span{font-size:16px;line-height:1.45}
+.scheda table th{padding:11px 16px}
+.scheda table td{padding:10px 16px;font-size:14px;line-height:1.4}
+.scheda table td:first-child{width:18%;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--green);padding-top:13px}
+.scheda .stamp{display:flex;justify-content:space-between;gap:20px;padding:9px 16px;
+  font-size:11px;letter-spacing:.08em;color:var(--ink-soft);background:#f7f5f0}
+.check{color:var(--orange);border-bottom:1px dashed var(--orange)}
+
+/* ---------- screenshot con zone ---------- */
+.shotwrap{position:relative;border:1px solid #bfc9c4;line-height:0}
+.shotwrap img{width:100%;display:block}
+.shotwrap .pin{position:absolute;transform:translate(-50%,-50%);
+  box-shadow:0 0 0 2px #fff,0 1px 4px rgba(0,0,0,.35)}
+.legend.small{gap:12px}
+.legend.small > div > div b{font-size:16px}
+.legend.small > div > div span{font-size:13px}
+
+/* ---------- screenshot da inserire ---------- */
+.shot{border:2px dashed #b9c4bf;background:repeating-linear-gradient(135deg,#fff 0 12px,#f7f5f0 12px 24px);
+  display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;
+  text-align:center;padding:20px;min-height:250px}
+.shot b{font-family:var(--serif);font-size:22px}
+.shot span{font-size:13px;line-height:1.45;color:var(--ink-soft);max-width:300px}
+.shot .pins{display:flex;gap:6px;margin-top:6px}
+
+/* ---------- percorso ---------- */
+.path{display:flex;flex-wrap:wrap;font-family:var(--mono);font-size:19px;
+  border:1px solid var(--line);background:#fff;padding:18px 20px;row-gap:28px}
+.path span{position:relative;padding:4px 2px 6px}
+.path span::after{content:attr(data-l);position:absolute;left:2px;top:100%;
+  font-family:var(--sans);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  white-space:nowrap}
+.path .d{color:var(--ink-soft)}
+.path .d::after{color:var(--ink-soft)}
+.path .d2::after{left:22px}
+.path .f{color:var(--green);border-bottom:3px solid #cbd8d3}
+.path .f::after{color:var(--green)}
+.path .n{color:var(--ink);border-bottom:3px solid var(--line)}
+.path .n::after{color:var(--ink-soft)}
+.path .e{color:var(--orange);border-bottom:3px solid var(--orange)}
+.path .e::after{color:var(--orange)}
+.path .sep{color:#b0aa9f;padding:4px 0 6px}
+
+/* ---------- markdown ---------- */
+.src{background:#1f2624;color:#dfe6e3;font-family:var(--mono);font-size:13.5px;
+  line-height:1.65;padding:20px 22px;white-space:pre-wrap;overflow-wrap:anywhere}
+.src .h{color:#f1b28f}
+.src .k{color:#9fd3c2}
+.render{border:1px solid var(--line);background:#fff;padding:20px 24px}
+.render h4{font-family:var(--serif);font-size:24px;font-weight:600;margin-bottom:8px}
+.render h5{font-family:var(--serif);font-size:18px;font-weight:600;margin:12px 0 6px}
+.render p{font-size:14px;line-height:1.5}
+.render ul{margin:0 0 0 20px;font-size:14px;line-height:1.6}
+.render table{margin-top:10px}
+.render th,.render td{padding:6px 10px;font-size:13px}
+.render td:first-child{width:auto}
+.render a{color:var(--green)}
+
+/* ---------- tipi di slide: dimostrazione e laboratorio ----------
+   Basta aggiungere .demo o .lab alla <section class="slide">: cambiano rail,
+   fondo, kicker e compare il timbro. Il link al file sta nel piè di pagina. */
+.slide.demo{background:#eef2f7}
+.slide.lab{background:#fcf2ea}
+.slide.demo .rail{background:var(--blue)}
+.slide.lab .rail{background:var(--orange)}
+.slide.demo .rail span,.slide.lab .rail span{display:none}
+.slide.demo .rail::before,.slide.lab .rail::before{
+  writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;
+  font-size:14px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:#fff}
+.slide.demo .rail::before{content:"Dimostrazione"}
+.slide.lab .rail::before{content:"Laboratorio"}
+.slide.demo::after,.slide.lab::after{
+  position:absolute;top:18px;right:22px;padding:7px 14px;color:#fff;
+  font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase}
+.slide.demo::after{content:"◉\00a0\00a0Guardate lo schermo";background:var(--blue)}
+.slide.lab::after{content:"✎\00a0\00a0Tocca a voi";background:var(--orange)}
+.slide.demo .kicker{color:var(--blue)}
+.slide.demo .foot,.slide.lab .foot{border-top-color:rgba(0,0,0,.08)}
+.foot a.task{display:inline-flex;align-items:center;gap:10px;margin-left:-12px;
+  padding:6px 12px;color:#fff;text-decoration:none;font-weight:700;letter-spacing:.12em}
+.foot a.task b{font-family:var(--mono);font-weight:400;font-size:12px;letter-spacing:0;
+  text-transform:none;opacity:.95}
+.slide.demo .foot a.task{background:var(--blue)}
+.slide.lab .foot a.task{background:var(--orange)}
+.foot a.task:hover{filter:brightness(1.1)}
+
+/* ---------- print ---------- */
+.slide{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:13.333in 7.5in;margin:0}
+@media print{
+  body{background:#fff;padding:0}
+  .slide{margin:0;border:none;page-break-after:always;box-shadow:none}
+  .slide:last-child{page-break-after:auto}
+}
+
+/* ---------- presentation mode ---------- */
+body.present{padding:0;overflow:hidden;background:#000}
+body.present .slide{
+  display:none;margin:0;border:none;
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(var(--scale,1));
+  transform-origin:center center;
+}
+body.present .slide.active{display:grid}
+.present-hint{
+  position:fixed;bottom:14px;right:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.present-hint.show{opacity:1}
+.present-counter{
+  position:fixed;bottom:14px;left:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  display:none;
+}
+body.present .present-counter{display:block}
+
+/* ---------- controllo dimensione testo ---------- */
+:root{--content-zoom:1}
+.body{zoom:var(--content-zoom)}
+.zoom-ctrl{
+  position:fixed;top:14px;right:18px;z-index:60;
+  display:flex;align-items:center;gap:2px;
+  background:rgba(29,28,26,.88);border-radius:4px;padding:4px;
+  font-family:var(--sans);
+}
+.zoom-ctrl button{
+  width:28px;height:28px;border:none;border-radius:3px;background:transparent;
+  color:#f4f1ea;font-size:14px;font-weight:600;cursor:pointer;line-height:1;
+}
+.zoom-ctrl button:hover{background:rgba(255,255,255,.15)}
+.zoom-ctrl .val{
+  min-width:38px;text-align:center;font-size:11px;letter-spacing:.04em;
+  color:#cfcabf;user-select:none;
+}
+body.present .zoom-ctrl{display:none}
+@media print{.zoom-ctrl{display:none}}
+</style>
+</head>
+<body>
+<div class="present-counter" id="presentCounter"></div>
+<div class="present-hint" id="presentHint">Premi P per entrare in modalità presentazione · frecce/spazio per avanzare · Esc per uscire</div>
+<div class="zoom-ctrl">
+  <button id="zoomOut" title="Riduci testo" aria-label="Riduci testo">A−</button>
+  <span class="val" id="zoomVal">100%</span>
+  <button id="zoomIn" title="Aumenta testo" aria-label="Aumenta testo">A+</button>
+</div>
+
+<!-- 01 COVER -->
+<section class="slide cover">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">Dalla IA generativa alla IA agentica · Ora 2</div>
+    <h1>Orientarsi negli<br>ambienti agentici</h1>
+    <div class="rule"></div>
+    <p class="lede">I tre prodotti si basano sulla stessa idea: un agente lavora dentro una
+      cartella. Oggi aprite quella cartella per la prima volta.</p>
+    <div class="meta">
+      <div><b>Destinatari</b>Docenti di scuola superiore</div>
+      <div><b>Serve</b>Un portatile e un account</div>
+      <div><b>Durata</b>Un'ora, pausa compresa</div>
+      <div><b>Modulo</b>2 di 13</div>
+    </div>
+  </div>
+  <div class="foot"><span>Corso agenti IA</span><span>01</span></div>
+</section>
+
+<!-- 02 OBIETTIVI E MAPPA -->
+<section class="slide">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">Obiettivi e mappa</div>
+    <h2>Alla fine di quest'ora<span class="sub">Nell'ora 1 abbiamo visto che cos'è un agente.
+      Adesso lavorate voi al computer.</span></h2>
+    <ol class="num" style="margin-bottom:28px">
+      <li><b>Avete aperto un ambiente agentico</b>
+        Lo avete fatto sul vostro computer, con il vostro account, sulla cartella della classe di prova.</li>
+      <li><b>Avete il modello mentale giusto</b>
+        Sapete che l'agente lavora dentro una cartella di progetto e legge file di testo.
+        Il resto del computer non lo vede.</li>
+    </ol>
+    <div class="content cols c4" style="gap:16px">
+      <div class="box">
+        <div class="tag">5 min</div>
+        <h3>Da dove partiamo</h3>
+        <p>Sondaggio e terminale</p>
+      </div>
+      <div class="box">
+        <div class="tag">15 min</div>
+        <h3>Gli ambienti</h3>
+        <p>La finestra, i tre prodotti, account e quote</p>
+      </div>
+      <div class="box">
+        <div class="tag">10 min</div>
+        <h3>File e cartelle</h3>
+        <p>Percorsi, estensioni, Markdown</p>
+      </div>
+      <div class="box orange">
+        <div class="tag">20 min</div>
+        <h3>Primo avvio</h3>
+        <p>Gruppi e laboratorio</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Obiettivi e mappa</span><span>02</span></div>
+</section>
+
+<!-- 03 SONDAGGIO -->
+<section class="slide lab">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">Laboratorio · 3 minuti · sondaggio, da soli</div>
+    <h2>Da dove partiamo<span class="sub">Nessuna risposta è sbagliata. Il sondaggio serve a
+      formare i gruppi e a capire quanto spiegare sui file.</span></h2>
+    <div class="content">
+      <div class="survey">
+        <div class="q"><span>Uso ChatGPT, Gemini o Claude per il mio lavoro</span>
+          <div class="scale3"><i>Mai</i><i>A volte</i><i>Spesso</i></div></div>
+        <div class="q"><span>Quando scarico un file, so in quale cartella finisce</span>
+          <div class="scale3"><i>Mai</i><i>A volte</i><i>Sempre</i></div></div>
+        <div class="q"><span>So riconoscere un file dalla sua estensione (<code>.pdf</code>,
+          <code>.docx</code>, <code>.csv</code>)</span>
+          <div class="scale3"><i>No</i><i>Più o meno</i><i>Sì</i></div></div>
+        <div class="q"><span>Ho aperto almeno una volta il terminale o il prompt dei comandi</span>
+          <div class="scale3"><i>Mai</i><i>Una volta</i><i>Spesso</i></div></div>
+        <div class="q"><span>Ho già un account a pagamento con OpenAI, Google o Anthropic</span>
+          <div class="scale3"><i>No</i><i>Gratuito</i><i>A pagamento</i></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../consegne/ora-02-lab-sondaggio.md" target="_blank">Consegna su Classroom <b>ora-02-lab-sondaggio.md</b></a><span>03</span></div>
+</section>
+
+<!-- 04 TERMINALE -->
+<section class="slide">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">La riga di comando</div>
+    <h2>L'agente usa il terminale e voi lo osservate<span class="sub">Se avete risposto «mai»
+      alla quarta domanda, va benissimo. Non dovrete usarlo nemmeno in futuro.</span></h2>
+    <div class="content cols c2">
+      <div class="box">
+        <h3>Che cos'è</h3>
+        <p>È una finestra in cui si danno ordini al computer scrivendo, invece di cliccare:
+          «crea questa cartella», «copia questo file», «esegui questo programma».</p>
+        <p>È la leva con cui l'agente agisce sul vostro computer. Per questo lo vedrete
+          comparire nei suoi passaggi.</p>
+      </div>
+      <div class="box green">
+        <h3>Che cosa vedrete</h3>
+        <ul class="clean">
+          <li><b>Righe di comando</b> proposte dall'agente. Non dovete saperle scrivere, ma
+            è utile capire più o meno che cosa fanno. Potete chiedere: «che cosa fa questo comando?»</li>
+          <li><b>La richiesta di conferma</b> prima dell'esecuzione. Con questa potete fermarlo.</li>
+          <li><b>L'esito</b>, a volte con messaggi d'errore. L'agente li legge e li risolve da solo.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:22px">
+      <p><b>Una regola da subito:</b> un comando che cancella, sposta fuori dalla cartella o
+        installa qualcosa non si approva «tanto per andare avanti». Prima si chiede che cosa fa.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Il terminale</span><span>04</span></div>
+</section>
+
+<!-- 05 ANATOMIA DELLA FINESTRA -->
+<section class="slide">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">Panoramica</div>
+    <h2>I tre prodotti hanno la stessa finestra<span class="sub">I nomi e la grafica cambiano,
+      ma le cinque zone ci sono sempre. Imparate a riconoscerle.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.45fr 1fr;gap:34px;align-items:start">
+      <div class="mock">
+        <div class="bar">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <div class="meter"><span class="pin">5</span>contesto <span class="mbar"></span></div>
+        </div>
+        <div class="side"><span class="pin">1</span>▾ cartella-di-prova<br>
+          &nbsp;&nbsp;▸ 01-classe<br>&nbsp;&nbsp;▸ 02-programmazione<br>
+          &nbsp;&nbsp;▸ 03-verifiche<br>&nbsp;&nbsp;▸ 04-valutazioni<br>
+          &nbsp;&nbsp;▸ 05-materiali<br>&nbsp;&nbsp;&nbsp;&nbsp;AGENTS.md<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;README.md</div>
+        <div class="chat"><span class="pin">2</span>
+          <div class="msg me">Dimmi cosa c'è in questa cartella.</div>
+          <div class="msg ag">Leggo <code>AGENTS.md</code> e <code>README.md</code>…<br>
+            Apro <code>04-valutazioni/</code>…</div>
+          <div class="msg ag">È il materiale di Matematica della 3ª B: cinque cartelle…</div>
+        </div>
+        <div class="input">
+          <div class="field">Scrivete qui la richiesta…</div>
+          <span class="pin">3</span><span class="chip">Modello ▾</span>
+          <span class="pin">4</span><span class="chip">Chiedi prima ▾</span>
+        </div>
+      </div>
+      <div class="legend">
+        <div><span class="pin">1</span><div><b>Il progetto</b>
+          <span>È la cartella aperta: l'agente vede questa e le sue sottocartelle.</span></div></div>
+        <div><span class="pin">2</span><div><b>La sessione</b>
+          <span>È la conversazione di lavoro, con i passi che l'agente compie.</span></div></div>
+        <div><span class="pin">3</span><div><b>Il modello</b>
+          <span>È il motore, leggero, intermedio o di punta. Potete cambiarlo mentre lavorate.</span></div></div>
+        <div><span class="pin">4</span><div><b>Modalità e permessi</b>
+          <span>Decidono quanto lo lasciate fare da solo. Ci torniamo nell'ora 3.</span></div></div>
+        <div><span class="pin">5</span><div><b>I contatori</b>
+          <span>Mostrano il contesto occupato e la quota del piano. A volte sono nascosti nelle impostazioni.</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Anatomia della finestra</span><span>05</span></div>
+</section>
+
+<!-- 06 SCREENSHOT CLAUDE CODE -->
+<section class="slide">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">Panoramica grafica · 1 di 3</div>
+    <h2>Claude Code<span class="sub">È l'app desktop di Anthropic. Ritrovate le cinque zone
+      dello schema, con i nomi che usa questo prodotto.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.75fr 1fr;gap:28px;align-items:start">
+      <div class="shotwrap">
+        <img src="img/ora-02-claude-code.png" alt="Schermata di Claude Code nell'app desktop">
+        <span class="pin" style="left:13%;top:28.4%">1</span>
+        <span class="pin" style="left:23.2%;top:32.3%">2</span>
+        <span class="pin" style="left:83.2%;top:90%">3</span>
+        <span class="pin" style="left:29.6%;top:97%">4</span>
+        <span class="pin" style="left:92.3%;top:90%">5</span>
+      </div>
+      <div class="legend small">
+        <div><span class="pin">1</span><div><b>Il progetto</b>
+          <span>Le cartelle aperte sono a sinistra. Sotto la casella compare la cartella su
+            cui state lavorando.</span></div></div>
+        <div><span class="pin">2</span><div><b>La sessione</b>
+          <span>Ogni sessione ha una riga sotto la sua cartella. «Nuovo» apre una sessione.</span></div></div>
+        <div><span class="pin">3</span><div><b>Il modello</b>
+          <span>«Opus 5 · Medio» indica il modello e lo sforzo di ragionamento.</span></div></div>
+        <div><span class="pin">4</span><div><b>Modalità e permessi</b>
+          <span>Da «Auto» si passa alla modalità manuale o alla modalità piano.</span></div></div>
+        <div><span class="pin">5</span><div><b>I contatori</b>
+          <span>Il cerchio accanto al modello si riempie con il contesto.</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Panoramica · Claude Code</span><span>06</span></div>
+</section>
+
+<!-- 07 SCREENSHOT CODEX -->
+<section class="slide">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">Panoramica grafica · 2 di 3</div>
+    <h2>Codex<span class="sub">È l'app desktop di OpenAI, con la cartella di prova appena
+      aperta. Si accede con l'account ChatGPT.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.75fr 1fr;gap:28px;align-items:start">
+      <div class="shotwrap">
+        <img src="img/ora-02-codex.png" alt="Schermata di Codex nell'app desktop">
+        <span class="pin" style="left:16%;top:44.2%">1</span>
+        <span class="pin" style="left:64.6%;top:35.5%">2</span>
+        <span class="pin" style="left:78.5%;top:88.8%">3</span>
+        <span class="pin" style="left:46.8%;top:94.6%">4</span>
+        <span class="pin" style="left:2.4%;top:92.6%">5</span>
+      </div>
+      <div class="legend small">
+        <div><span class="pin">1</span><div><b>Il progetto</b>
+          <span>In «Progetti» trovate le cartelle aperte. Sopra la casella compare la cartella in uso.</span></div></div>
+        <div><span class="pin">2</span><div><b>La sessione</b>
+          <span>Qui la sessione si chiama «chat». «Nuova chat» ne apre una.</span></div></div>
+        <div><span class="pin">3</span><div><b>Il modello</b>
+          <span>«GPT-5.6 Terra · Alto» indica il modello e il livello di effort.</span></div></div>
+        <div><span class="pin">4</span><div><b>Modalità e permessi</b>
+          <span>Il pulsante con lo scudo, «Approva per me», indica il livello di permesso.</span></div></div>
+        <div><span class="pin">5</span><div><b>I contatori</b>
+          <span>Il consumo si legge dall'account, in basso a sinistra: «Utilizzo
+            rimanente».</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Panoramica · Codex</span><span>07</span></div>
+</section>
+
+<!-- 08 SCREENSHOT ANTIGRAVITY -->
+<section class="slide">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">Panoramica grafica · 3 di 3</div>
+    <h2>Antigravity<span class="sub">È l'app desktop di Google e l'interfaccia è in inglese.
+      Due zone su cinque sono nascoste nelle impostazioni.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.75fr 1fr;gap:28px;align-items:start">
+      <div class="shotwrap">
+        <img src="img/ora-02-antigravity.png" alt="Schermata di Antigravity nell'app desktop">
+        <span class="pin" style="left:15.2%;top:45.4%">1</span>
+        <span class="pin" style="left:59.9%;top:24.8%">2</span>
+        <span class="pin" style="left:46.8%;top:56.7%">3</span>
+        <span class="pin" style="left:9.6%;top:96.4%">4</span>
+        <span class="pin" style="left:12.3%;top:96.4%">5</span>
+      </div>
+      <div class="legend small">
+        <div><span class="pin">1</span><div><b>Il progetto</b>
+          <span>In «Projects» trovate le cartelle aperte. Sopra la casella compare la cartella in uso.</span></div></div>
+        <div><span class="pin">2</span><div><b>La sessione</b>
+          <span>Qui si chiama «Conversation», ma è una sessione di lavoro.</span></div></div>
+        <div><span class="pin">3</span><div><b>Il modello</b>
+          <span>«Gemini 3.6 Flash (High)» indica il modello e il livello di ragionamento.</span></div></div>
+        <div><span class="pin">4</span><div><b>Modalità e permessi</b>
+          <span>Non si vedono nella finestra. Stanno in Settings, nel pannello Agent.</span></div></div>
+        <div><span class="pin">5</span><div><b>I contatori</b>
+          <span>Non si vedono nella finestra. I limiti d'uso stanno in Settings → Modelli.</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Panoramica · Antigravity</span><span>08</span></div>
+</section>
+
+<!-- 07 SCHEDA · AMBIENTE -->
+<section class="slide">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">Scheda piattaforma · 1</div>
+    <h2>L'ambiente di lavoro</h2>
+    <div class="content scheda">
+      <div class="concept"><b>Concetto stabile</b>
+        <span>È un programma che apre una cartella, riceve una richiesta e ci lavora dentro
+          con file, terminale e un modello linguistico.</span></div>
+      <table>
+        <tr><th></th><th>Claude Code</th><th>Codex</th><th>Antigravity</th></tr>
+        <tr><td>Chi lo fa</td><td>Anthropic</td><td>OpenAI</td><td>Google</td></tr>
+        <tr><td>Come si usa</td><td>App desktop, terminale, estensioni per editor</td>
+          <td>App desktop, terminale, estensione per VS Code</td>
+          <td>App desktop (Mac e PC), oppure dentro un editor dedicato</td></tr>
+        <tr><td>Modelli</td><td>Haiku · Sonnet · Opus</td><td>Luna · Terra · Sol, più il
+          livello di «effort»</td><td>Gemini, e anche modelli di altri produttori</td></tr>
+        <tr><td>File-guida</td><td><code>CLAUDE.md</code>, che può rimandare ad
+          <code>AGENTS.md</code></td><td><code>AGENTS.md</code></td>
+          <td><code>GEMINI.md</code>, che può rimandare ad <code>AGENTS.md</code></td></tr>
+      </table>
+      <div class="stamp"><span>Stato: fonti di luglio–agosto 2026</span>
+        <span class="check">Da ricontrollare la settimana della lezione</span></div>
+    </div>
+    <p class="muted" style="margin-top:16px;font-size:15px">Nella cartella di prova c'è un
+      solo file-guida vero, <code>AGENTS.md</code>. Gli altri due rimandano a quel file, così
+      la cartella funziona con tutti e tre i prodotti.</p>
+  </div>
+  <div class="foot"><span>Scheda · ambiente di lavoro</span><span>09</span></div>
+</section>
+
+<!-- 08 SCHEDA · ACCOUNT E QUOTE -->
+<section class="slide">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">Scheda piattaforma · 2</div>
+    <h2>Account, quote e abbonamenti</h2>
+    <div class="content scheda">
+      <div class="concept"><b>Concetto stabile</b>
+        <span>Un piano è una quota di lavoro che si consuma e si ricarica ogni poche ore e,
+          spesso, anche ogni settimana. Il piano gratuito basta per provare. Per lavorare
+          serve un abbonamento.</span></div>
+      <table>
+        <tr><th></th><th>Claude Code</th><th>Codex</th><th>Antigravity</th></tr>
+        <tr><td>Account</td><td>Account Claude</td><td>Account ChatGPT</td><td>Account Google</td></tr>
+        <tr><td>Piano gratuito</td><td class="o">No: serve un abbonamento</td>
+          <td>Sì, con poche sessioni di lavoro</td><td>Sì, con sessioni limitate</td></tr>
+        <tr><td>A pagamento</td><td>Più lavoro a seconda del piano</td>
+          <td>Più sessioni a seconda del piano</td>
+          <td>Più sessioni, ma sempre con un tetto</td></tr>
+        <tr><td>Dove si legge il consumo</td><td><span class="check">Impostazioni → Utilizzo</span></td>
+          <td>Account → Utilizzo rimanente</td><td>Impostazioni → Modelli</td></tr>
+      </table>
+      <div class="stamp"><span>Stato: fonti di luglio–agosto 2026</span>
+        <span class="check">Prezzi e quote cambiano spesso: ricontrollare</span></div>
+    </div>
+    <div class="box orange" style="margin-top:16px">
+      <p><b>Consiglio per iniziare:</b> sceglietene <b>uno</b> e usatelo a fondo per un mese.
+        Potrete combinarli più avanti, quando li conoscerete meglio.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Scheda · account e quote</span><span>10</span></div>
+</section>
+
+<!-- 09 MODELLO -->
+<section class="slide">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">Zona 3 · il modello</div>
+    <h2>Scegliere il modello<span class="sub">Potete cambiare modello anche più
+      volte nella stessa sessione, come se cambiaste motore mentre guidate.</span></h2>
+    <div class="content cols c3">
+      <div class="box">
+        <div class="tag">Leggero</div>
+        <h3>Veloce ed economico</h3>
+        <p>Serve per cercare, classificare, riordinare, fare controlli semplici e compiti
+          ripetitivi.</p>
+      </div>
+      <div class="box green">
+        <div class="tag">Intermedio</div>
+        <h3>Il cavallo da tiro</h3>
+        <p>Regge la maggior parte del lavoro quotidiano: preparare materiali, riscrivere,
+          differenziare, correggere.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Di punta</div>
+        <h3>Per pianificare</h3>
+        <p>Serve per lavori strutturati in più fasi collegate, o quando volete un piano
+          ben fatto prima di partire.</p>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:22px">
+      <p><b>L'errore tipico è usare sempre il modello più potente.</b> Costa più tempo e
+        consuma più in fretta il piano, senza migliorare i risultati sui compiti semplici.
+        Lo stesso vale per lo «sforzo di ragionamento», nei prodotti che lo prevedono.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Scelta del modello</span><span>11</span></div>
+</section>
+
+<!-- 10 CONTATORI -->
+<section class="slide">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">Zona 5 · i contatori</div>
+    <h2>I due contatori da tenere d'occhio</h2>
+    <div class="content cols c2">
+      <div class="box">
+        <div class="tag">Contatore 1</div>
+        <h3>Il contesto della sessione</h3>
+        <p class="muted">Indica quanto della «scrivania» dell'agente è già occupato.</p>
+        <div class="gauge" style="margin-top:6px">
+          <i style="width:38%;background:#1a3c3a"></i>
+          <i style="width:26%;background:#c0562f"></i>
+          <i style="width:36%;background:#fbfaf7"></i>
+        </div>
+        <div class="g-legend">
+          <span><b style="background:#1a3c3a"></b>Istruzioni e file letti</span>
+          <span><b style="background:#c0562f"></b>Conversazione</span>
+          <span><b style="background:#fbfaf7;border:1px solid #ddd7cc"></b>Libero</span>
+        </div>
+        <p style="margin-top:12px"><b>Quando è quasi pieno, non insistete.</b> Salvate cosa
+          avete deciso, chiudete e aprite una sessione nuova. Nell'ora 4 vedremo perché.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Contatore 2</div>
+        <h3>I limiti del piano</h3>
+        <p class="muted">Indica quanta quota vi resta prima del prossimo rinnovo.</p>
+        <ul class="clean" style="margin-top:4px">
+          <li>La quota si consuma <b>a finestre</b>: dopo poche ore si ricarica. Spesso
+            c'è anche un limite settimanale.</li>
+          <li>Il modello di punta consuma <b>molto</b> più di quello leggero. Per questo
+            conviene scegliere il modello con cura.</li>
+          <li>Prima di un lavoro lungo, <b>guardate quanto vi resta</b>. Restare senza
+            quota a metà lavoro è molto frustrante.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Contesto e limiti d'uso</span><span>12</span></div>
+</section>
+
+<!-- 11 IL PROGETTO È UNA CARTELLA -->
+<section class="slide">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">Zona 1 · il progetto</div>
+    <h2>Il progetto è una cartella<span class="sub">La cartella dove tenete i vostri
+      materiali diventa lo spazio di lavoro dell'agente.</span></h2>
+    <div class="content cols c2">
+      <div class="box">
+        <h3>Cosa vede l'agente</h3>
+        <ul class="clean">
+          <li>Tutto ciò che sta <b>dentro</b> quella cartella e nelle sottocartelle.</li>
+          <li>Il <b>file-guida</b>, se c'è. È un promemoria che l'agente rilegge ogni volta
+            (chi siete, di cosa tratta il progetto, come volete le cose).</li>
+          <li>Il resto del computer non lo vede, a meno che non glielo indichiate.</li>
+        </ul>
+      </div>
+      <div class="box green">
+        <h3>Come prepararla</h3>
+        <ul class="clean">
+          <li><b>Usate una cartella per progetto</b> e non il desktop intero. Questa scelta
+            vi protegge già.</li>
+          <li><b>Copiateci dentro</b> i materiali che servono a quel lavoro.</li>
+          <li><b>Fate un backup</b> prima di lavorare su documenti che vi stanno a cuore.</li>
+          <li><b>Lasciate fuori i dati degli studenti</b>: nomi, valutazioni e
+            certificazioni non devono entrare. Per questo lavoriamo su una classe inventata.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Aprire un progetto</span><span>13</span></div>
+</section>
+
+<!-- 12 PERCORSI ED ESTENSIONI -->
+<section class="slide">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">File e cartelle</div>
+    <h2>Ogni file ha un indirizzo<span class="sub">L'agente usa questo indirizzo per
+      dirvi dove ha trovato un'informazione e dove ha scritto.</span></h2>
+    <div class="content">
+      <div class="path">
+        <span class="d" data-l="disco">C:</span><span class="sep">\</span>
+        <span class="d d2" data-l="cartelle personali">Users\docente\Documenti</span><span class="sep">\</span>
+        <span class="f" data-l="progetto">cartella-di-prova</span><span class="sep">\</span>
+        <span class="f" data-l="sottocartella">04-valutazioni</span><span class="sep">\</span>
+        <span class="n" data-l="nome">voti-orali</span><span class="e" data-l="estensione">.csv</span>
+      </div>
+      <p class="muted" style="font-size:14px;margin-top:30px">Su Mac lo stesso indirizzo si
+        scrive con le barre dritte: <code>/Users/docente/Documents/cartella-di-prova/…</code></p>
+      <div class="cols c3" style="margin-top:20px">
+        <div class="box">
+          <div class="tag">L'estensione</div>
+          <p>Dice che tipo di file è. Windows la <b>nasconde</b>, ma potete mostrarla da Esplora file
+            → Visualizza → «Estensioni nomi file».</p>
+        </div>
+        <div class="box green">
+          <div class="tag">Il testo semplice</div>
+          <p>L'agente legge e scrive senza fatica i file <code>.md</code>, <code>.csv</code> e
+            <code>.txt</code>. Gestisce anche <code>.docx</code>, <code>.pdf</code> e
+            <code>.xlsx</code>, ma con più passaggi e più errori.</p>
+        </div>
+        <div class="box">
+          <div class="tag">I nomi</div>
+          <p>Scegliete nomi brevi, minuscoli, senza accenti e con il trattino al posto degli
+            spazi: <code>verifica-02-disequazioni.md</code>. Così si trovano e si citano meglio.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Percorsi ed estensioni</span><span>14</span></div>
+</section>
+
+<!-- 13 MARKDOWN -->
+<section class="slide">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">Markdown essenziale</div>
+    <h2>Il formato in cui l'agente scrive<span class="sub">Il Markdown è testo semplice con
+      pochi segni. Si legge bene così com'è, e in anteprima diventa una pagina ordinata.</span></h2>
+    <div class="content cols c2" style="align-items:start">
+      <div>
+        <div class="tag" style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--orange);font-weight:600;margin-bottom:8px">Come lo scrivete</div>
+        <div class="src"><span class="h"># Cartella di prova — 3ª B</span>
+
+Materiale <span class="k">**completamente inventato**</span>.
+
+<span class="h">## Cosa c'è dentro</span>
+
+<span class="k">-</span> 01-classe: elenco e note
+<span class="k">-</span> 03-verifiche: testi e griglie
+
+<span class="k">| Cartella       | Contenuto      |
+|----------------|----------------|</span>
+<span class="k">|</span> 04-valutazioni <span class="k">|</span> voti e orali   <span class="k">|</span>
+
+<span class="k">[</span>Istruzioni<span class="k">](AGENTS.md)</span></div>
+      </div>
+      <div>
+        <div class="tag" style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);font-weight:600;margin-bottom:8px">Come lo vedete in anteprima</div>
+        <div class="render">
+          <h4>Cartella di prova — 3ª B</h4>
+          <p>Materiale <b>completamente inventato</b>.</p>
+          <h5>Cosa c'è dentro</h5>
+          <ul><li>01-classe: elenco e note</li><li>03-verifiche: testi e griglie</li></ul>
+          <table><tr><th>Cartella</th><th>Contenuto</th></tr>
+            <tr><td>04-valutazioni</td><td>voti e orali</td></tr></table>
+          <p style="margin-top:10px"><a href="#">Istruzioni</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Markdown</span><span>15</span></div>
+</section>
+
+<!-- 14 FIDUCIA -->
+<section class="slide">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">Aprire la cartella</div>
+    <h2>«Ti fidi di questa cartella?»<span class="sub">È la prima domanda che l'agente
+      vi farà, e non è una formalità.</span></h2>
+    <div class="content cols c2">
+      <div class="box">
+        <h3>Perché la fa</h3>
+        <p>Quando apre una cartella, l'agente legge anche i file-guida che trova dentro.
+          Quei file contengono <b>istruzioni per lui</b>.</p>
+        <p>Se la cartella arriva da fuori (scaricata, condivisa, ricevuta da un collega),
+          quelle istruzioni non le avete scritte voi.</p>
+      </div>
+      <div class="box orange">
+        <h3>La regola</h3>
+        <ul class="clean">
+          <li>Do fiducia <b>alle cartelle che ho creato io</b> o di cui conosco il
+            contenuto.</li>
+          <li>Materiale scaricato: prima <b>guardo cosa c'è dentro</b>, poi decido.</li>
+          <li>Nel dubbio, rispondo <b>no</b>: si può sempre riaprire dopo.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box green" style="margin-top:20px">
+      <p><b>Oggi la cartella di prova arriva da noi:</b> prima di dire sì, aprite
+        <code>AGENTS.md</code> e leggetelo. Sono venti righe. Fate lo stesso con ogni
+        cartella che non avete creato voi.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Fiducia nella cartella</span><span>16</span></div>
+</section>
+
+<!-- 15 GRUPPI -->
+<section class="slide">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">Gruppi</div>
+    <h2>Ogni gruppo lavora su una piattaforma<span class="sub">Si lavora in due o in tre, sullo stesso
+      prodotto. I gruppi restano gli stessi fino all'ora 12.</span></h2>
+    <div class="content cols c3">
+      <div class="box">
+        <div class="tag">Criterio 1</div>
+        <h3>L'account che avete</h3>
+        <p>Chi ha già un abbonamento parte da lì. Chi non ne ha, sceglie fra i due
+          prodotti con un piano gratuito.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Criterio 2</div>
+        <h3>Un esperto per gruppo</h3>
+        <p>In base al sondaggio, ogni gruppo ha almeno una persona che sa dove finiscono
+          i file e ha già visto un terminale.</p>
+      </div>
+      <div class="box green">
+        <div class="tag">Criterio 3</div>
+        <h3>Tutti e tre i prodotti</h3>
+        <p>Se possibile, ogni prodotto ha almeno un gruppo. Così confronterete le
+          piattaforme partendo da quello che vedete voi.</p>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:22px">
+      <p><b>Nei gruppi con piano gratuito</b> la quota finisce presto. Una persona sola usa
+        la tastiera e gli altri guardano e annotano. A ogni esercizio si cambia persona.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Gruppi</span><span>17</span></div>
+</section>
+
+<!-- 16 LABORATORIO -->
+<section class="slide lab">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">Laboratorio · 15 minuti · in gruppo, al computer</div>
+    <h2>Prima apertura<span class="sub">Lavorate su <b>cartella-di-prova</b>, una 3ª B
+      di matematica inventata con 21 studenti. Oggi non si modifica niente.</span></h2>
+    <div class="content cols c2" style="gap:18px">
+      <div class="box">
+        <span class="badge">Passo 1</span>
+        <h3>Aprite la cartella</h3>
+        <p>Estraete l'archivio, aprite la cartella con il vostro ambiente, leggete
+          <code>AGENTS.md</code> e rispondete alla domanda di fiducia.</p>
+      </div>
+      <div class="box">
+        <span class="badge">Passo 2</span>
+        <h3>Fatevi guardare intorno</h3>
+        <p>«Dimmi cosa c'è in questa cartella e a cosa serve. Non modificare niente.»
+          Annotate i passi che compie e il loro ordine.</p>
+      </div>
+      <div class="box">
+        <span class="badge">Passo 3</span>
+        <h3>Sorgente e anteprima</h3>
+        <p>Aprite <code>README.md</code> in anteprima e come testo semplice. Ritrovate
+          <code>#</code>, <code>**</code> e la tabella.</p>
+      </div>
+      <div class="box">
+        <span class="badge">Passo 4</span>
+        <h3>Leggete i contatori</h3>
+        <p>Quanto contesto ha occupato una domanda così semplice? Quanta quota vi resta?</p>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:18px">
+      <p><b>Se avanza tempo, provate a cambiare modello.</b> Chiedete «Chi non ha ancora un
+        voto orale nel secondo giro?» prima al modello leggero e poi all'intermedio, in due
+        sessioni nuove.</p>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../consegne/ora-02-lab-prima-apertura.md" target="_blank">Consegna su Classroom <b>ora-02-lab-prima-apertura.md</b></a><span>18</span></div>
+</section>
+
+<!-- 17 CHIUSURA -->
+<section class="slide">
+  <div class="rail"><span>Ora 2 · Orientarsi negli ambienti agentici</span></div>
+  <div class="body">
+    <div class="kicker">Chiusura</div>
+    <h2>Quattro cose da portare a casa</h2>
+    <div class="content">
+      <ol class="num">
+        <li><b>I tre prodotti hanno le stesse cinque zone.</b>
+          Sono progetto, sessione, modello, modalità e contatori. Cercatele in qualunque
+          ambiente vi capiti davanti.</li>
+        <li><b>L'agente vede solo la cartella.</b>
+          Usate una cartella per progetto e metteteci solo ciò che serve. I dati degli
+          studenti restano fuori.</li>
+        <li><b>Il testo semplice è la lingua comune.</b>
+          Voi e l'agente leggete Markdown e CSV senza perdere niente per strada.</li>
+        <li><b>La quota è una risorsa.</b>
+          Usate il modello leggero per il lavoro semplice e controllate i contatori prima
+          dei lavori lunghi.</li>
+      </ol>
+      <div class="box orange" style="margin-top:24px">
+        <p><b>Prossima ora: il primo workflow controllato.</b> L'agente modificherà un file
+          nella cartella che avete aperto. Lo farà con un piano, un permesso e una verifica.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Chiusura</span><span>19</span></div>
+</section>
+
+<!-- 18 ADDENDUM PYTHON -->
+<section class="slide">
+  <div class="rail"><span>Ora 2 · Addendum</span></div>
+  <div class="body">
+    <div class="kicker">Addendum · per chi non ha mai programmato</div>
+    <h2>Un'unica cosa da installare: Python<span class="sub">Non dovete scrivere una riga
+      di codice. Serve solo perché l'agente, quando conta o elabora dati, spesso scrive
+      un piccolo programma e lo esegue lui stesso.</span></h2>
+    <div class="content cols c2">
+      <div class="box green">
+        <h3>Chi scrive e lancia il programma</h3>
+        <p>Lo fa sempre e solo l'agente. Voi non aprite editor, non leggete codice e non
+          lanciate comandi. Chiedete il risultato: l'agente si occupa del resto e vi mostra
+          l'esito.</p>
+        <p class="muted">Python è un attrezzo che l'agente tiene in tasca, come il martello
+          per un muratore. Voi non avete bisogno di saperlo usare.</p>
+      </div>
+      <div class="box">
+        <h3>Come si installa (5 minuti, una volta sola)</h3>
+        <ol class="num">
+          <li><b>Andate su python.org</b>
+            Aprite la sezione Downloads e scaricate la versione per il vostro sistema.</li>
+          <li><b>Avviate il file scaricato</b>
+            Su Windows, spuntate <i>«Add python.exe to PATH»</i> prima di premere Install.</li>
+          <li><b>Confermate fino a «Setup was successful»</b>
+            Non serve cambiare altre opzioni.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:22px">
+      <p><b>Se qualcosa va storto, chiedete aiuto all'agente:</b> «non riesco a far partire
+        uno script, mi aiuti a controllare se Python è installato bene?». L'agente è bravo a
+        diagnosticare questo genere di problemi.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Addendum · Installare Python</span><span>20</span></div>
+</section>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var body = document.body;
+  var counter = document.getElementById('presentCounter');
+  var hint = document.getElementById('presentHint');
+  var idx = 0;
+  var presenting = false;
+
+  function fitScale(){
+    var s = Math.min(window.innerWidth/1280, window.innerHeight/720);
+    document.documentElement.style.setProperty('--scale', s);
+  }
+
+  function render(){
+    slides.forEach(function(s,i){ s.classList.toggle('active', i===idx); });
+    counter.textContent = (idx+1) + ' / ' + slides.length;
+  }
+
+  function enter(){
+    presenting = true;
+    body.classList.add('present');
+    fitScale();
+    render();
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(function(){});
+    }
+  }
+
+  function exit(){
+    presenting = false;
+    body.classList.remove('present');
+    if (document.fullscreenElement) document.exitFullscreen().catch(function(){});
+  }
+
+  function next(){ if (idx < slides.length-1){ idx++; render(); } }
+  function prev(){ if (idx > 0){ idx--; render(); } }
+
+  document.addEventListener('keydown', function(e){
+    if (!presenting){
+      if (e.key === 'p' || e.key === 'P') enter();
+      return;
+    }
+    switch(e.key){
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown':
+        e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+        e.preventDefault(); prev(); break;
+      case 'Home':
+        e.preventDefault(); idx = 0; render(); break;
+      case 'End':
+        e.preventDefault(); idx = slides.length-1; render(); break;
+      case 'Escape':
+        exit(); break;
+    }
+  });
+
+  document.addEventListener('click', function(e){
+    if (!presenting) return;
+    if (e.target.closest('a')) return;
+    if (e.clientX > window.innerWidth/2) next(); else prev();
+  });
+
+  document.addEventListener('fullscreenchange', function(){
+    if (!document.fullscreenElement && presenting) exit();
+  });
+
+  window.addEventListener('resize', fitScale);
+
+  hint.classList.add('show');
+  setTimeout(function(){ hint.classList.remove('show'); }, 4000);
+
+  // ---- controllo dimensione testo ----
+  var ZOOM_MIN = 0.8, ZOOM_MAX = 1.4, ZOOM_STEP = 0.1;
+  var zoomVal = document.getElementById('zoomVal');
+  var zoomIn = document.getElementById('zoomIn');
+  var zoomOut = document.getElementById('zoomOut');
+  var zoom = 1;
+  try { zoom = parseFloat(localStorage.getItem('slideZoom')) || 1; } catch(e){}
+
+  function applyZoom(){
+    zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom));
+    document.documentElement.style.setProperty('--content-zoom', zoom);
+    zoomVal.textContent = Math.round(zoom * 100) + '%';
+    try { localStorage.setItem('slideZoom', zoom); } catch(e){}
+  }
+
+  zoomIn.addEventListener('click', function(){ zoom += ZOOM_STEP; applyZoom(); });
+  zoomOut.addEventListener('click', function(){ zoom -= ZOOM_STEP; applyZoom(); });
+
+  document.addEventListener('keydown', function(e){
+    if (presenting) return;
+    if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '=')){
+      e.preventDefault(); zoom += ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '-'){
+      e.preventDefault(); zoom -= ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '0'){
+      e.preventDefault(); zoom = 1; applyZoom();
+    }
+  });
+
+  applyZoom();
+})();
+</script>
+
+</body>
+</html>

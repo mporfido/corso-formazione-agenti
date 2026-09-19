@@ -1,0 +1,16 @@
+# Materiale non prodotto da noi (fonti di esempio, wiki, skill di terze parti)
+materiali/
+
+# Archivi
+*.zip
+
+# Sistema operativo
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editor
+.obsidian/
+.vscode/
+*.swp
+*~

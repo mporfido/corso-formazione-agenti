@@ -1,0 +1,23 @@
+# Griglia di valutazione;Retta nel piano cartesiano;svolta il 22/01/2026
+# Indicatori (punteggio massimo);comprensione=2;procedura=3;calcolo=3;linguaggio=2
+id;cognome;nome;comprensione;procedura;calcolo;linguaggio;totale;voto
+S01;Bianchi;Alessandro;1,0;2,0;1,5;1,0;5,5;5,5
+S02;Bruno;Chiara;1,5;2,0;2,0;1,5;7,0;7,0
+S03;Caruso;Matteo;1,0;1,5;1,5;1,0;5,0;5,0
+S04;Colombo;Sofia;1,5;3,0;2,5;1,5;8,5;8,5
+S05;Conti;Lorenzo;1,0;2,0;2,0;1,0;6,0;6,0
+S06;De Angelis;Giulia;1,5;2,5;2,0;1,0;7,0;7,0
+S07;Esposito;Davide;1,0;1,0;1,5;1,0;4,5;4,5
+S08;Ferrari;Martina;1,5;2,5;3,0;2,0;9,0;9,0
+S09;Fontana;Simone;1,0;1,5;2,0;1,0;5,5;5,5
+S10;Galli;Elisa;1,0;2,5;2,5;1,5;7,5;7,5
+S11;Greco;Nicolo;1,0;1,5;1,0;1,0;4,5;4,5
+S12;Longo;Aurora;1,5;2,0;2,5;1,5;7,5;7,5
+S14;Mariani;Beatrice;2,0;2,5;2,5;2,0;9,0;9,0
+S15;Moretti;Riccardo;1,5;2,0;2,0;1,0;6,5;6,5
+S16;Neri;Camilla;1,0;2,0;2,0;1,5;6,5;6,5
+S17;Parisi;Tommaso;1,0;1,5;1,5;1,0;5,0;5,0
+S18;Rizzo;Ludovica;1,5;2,5;2,5;1,5;8,0;8,0
+S19;Sanna;Gabriele;1,5;2,0;2,0;1,5;7,0;7,0
+S20;Serra;Noemi;1,5;2,0;2,0;1,5;7,0;7,0
+S21;Villa;Jacopo;1,0;1,5;1,5;1,0;5,0;5,0

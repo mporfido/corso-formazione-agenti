@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Ora 5 — Knowledge base: file, wiki e RAG</title>
+<style>
+:root{
+  --paper:#f2efe9;
+  --card:#fbfaf7;
+  --ink:#1d1c1a;
+  --ink-soft:#5c5850;
+  --line:#ddd7cc;
+  --green:#1a3c3a;
+  --green-soft:#e6ece9;
+  --orange:#c0562f;
+  --orange-soft:#f6e7de;
+  --blue:#2f5a8c;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);font-family:var(--sans);color:var(--ink);
+  -webkit-font-smoothing:antialiased;padding:28px 0}
+
+/* ---------- slide frame ---------- */
+.slide{
+  position:relative;width:1280px;height:720px;margin:0 auto 28px;
+  background:var(--card);border:1px solid var(--line);
+  display:grid;grid-template-columns:56px 1fr;overflow:hidden;
+}
+.rail{
+  background:var(--green);color:#f4f1ea;
+  display:flex;align-items:center;justify-content:center;
+}
+.rail span{
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  white-space:nowrap;opacity:.9;
+}
+.body{padding:52px 60px 64px;display:flex;flex-direction:column;min-width:0}
+.kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--orange);font-weight:600;margin-bottom:14px}
+h1{font-family:var(--serif);font-size:56px;line-height:1.08;font-weight:600;
+  letter-spacing:-.01em}
+h2{font-family:var(--serif);font-size:40px;line-height:1.12;font-weight:600;
+  letter-spacing:-.01em;margin-bottom:26px}
+h2 .sub{display:block;font-family:var(--sans);font-size:15px;font-weight:400;
+  color:var(--ink-soft);letter-spacing:0;margin-top:10px;line-height:1.45}
+p{font-size:17px;line-height:1.55;color:var(--ink)}
+.muted{color:var(--ink-soft)}
+.foot{position:absolute;left:56px;right:0;bottom:0;height:40px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 60px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-soft);border-top:1px solid var(--line)}
+.content{flex:0 1 auto;min-height:0}
+code{font-family:var(--mono);font-size:.9em;background:var(--green-soft);padding:1px 5px}
+
+/* ---------- cover ---------- */
+.cover .body{justify-content:center}
+.cover h1{font-size:72px;max-width:980px}
+.cover .lede{margin-top:26px;font-size:19px;color:var(--ink-soft);max-width:700px}
+.rule{width:72px;height:3px;background:var(--orange);margin:32px 0 0}
+.meta{margin-top:38px;display:flex;gap:44px;font-size:13px;color:var(--ink-soft)}
+.meta b{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--green);margin-bottom:6px}
+
+/* ---------- generic layout helpers ---------- */
+.cols{display:grid;gap:22px}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c4{grid-template-columns:repeat(4,1fr)}
+.box{border:1px solid var(--line);background:#fff;padding:22px 24px;
+  display:flex;flex-direction:column;gap:10px;min-width:0}
+.box h3{font-family:var(--serif);font-size:22px;font-weight:600;line-height:1.2}
+.box .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.box p,.box li{font-size:15px;line-height:1.5;color:var(--ink-soft)}
+.box.green{background:var(--green-soft);border-color:#cbd8d3}
+.box.orange{background:var(--orange-soft);border-color:#ecd4c5}
+ul.clean{list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.clean li{position:relative;padding-left:18px;font-size:16px;line-height:1.5}
+ul.clean li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;
+  background:var(--orange)}
+.box ul.clean li{font-size:15px}
+ol.num{list-style:none;counter-reset:n;display:flex;flex-direction:column;gap:16px}
+ol.num li{counter-increment:n;position:relative;padding-left:46px;font-size:17px;
+  line-height:1.5}
+ol.num li::before{content:counter(n,decimal-leading-zero);position:absolute;left:0;top:1px;
+  font-size:13px;font-weight:600;color:var(--green);letter-spacing:.06em}
+ol.num li b{display:block;font-family:var(--serif);font-size:20px;font-weight:600;
+  margin-bottom:4px;color:var(--ink)}
+
+/* ---------- tabella ---------- */
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:12px 16px;font-size:15px;line-height:1.45;
+  border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);
+  font-weight:600;border-bottom:2px solid var(--green)}
+td:first-child{font-weight:600;width:30%}
+td.o{color:var(--orange)}
+td.g{color:var(--green)}
+td.n{font-family:var(--serif);font-size:24px;font-weight:600;white-space:nowrap}
+
+/* ---------- prompt / badge ---------- */
+.prompt{background:var(--green);color:#eef2f0;padding:20px 24px;font-family:var(--sans);
+  font-size:15px;line-height:1.6}
+.prompt .lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;margin-bottom:8px}
+.prompt.plain{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.prompt.plain .lbl{color:var(--orange)}
+.badge{display:inline-block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  background:var(--green);color:#fff;padding:4px 9px;align-self:flex-start}
+.badge.o{background:var(--orange)}
+
+/* ---------- barra contesto ---------- */
+.gauge{height:30px;background:#fff;border:1px solid var(--line);display:flex;
+  overflow:hidden}
+.gauge i{display:block;height:100%}
+.g-legend{display:flex;gap:22px;font-size:13px;color:var(--ink-soft);margin-top:10px;
+  flex-wrap:wrap}
+.g-legend span{display:flex;align-items:center;gap:7px}
+.g-legend b{width:10px;height:10px;display:inline-block}
+
+/* ---------- sorgente Markdown ---------- */
+.src{background:#1f2624;color:#dfe6e3;font-family:var(--mono);font-size:13.5px;
+  line-height:1.65;padding:18px 22px;white-space:pre-wrap;overflow-wrap:anywhere}
+.src .h{color:#f1b28f}
+.src .k{color:#9fd3c2}
+.src .dim{color:#7f8c87}
+.src .hl{background:#3b4f3c;color:#fff;display:block;margin:0 -22px;padding:0 22px;
+  border-left:4px solid #f1b28f}
+.src .hl.o{background:#4d3a30}
+.src .hd{display:block;margin:-18px -22px 12px;padding:8px 22px;background:#161c1a;
+  font-family:var(--sans);font-size:12px;letter-spacing:.04em;color:#9fbdb4}
+
+/* ---------- la mappa e i file di dettaglio ---------- */
+.files{display:flex;flex-direction:column;gap:12px}
+.file{border:1px solid var(--line);background:#fff;padding:14px 18px;
+  display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline}
+.file .ic{grid-row:1/3;font-family:var(--mono);font-size:12px;color:#fff;
+  background:var(--green);padding:3px 7px;align-self:start;margin-top:2px}
+.file b{font-family:var(--mono);font-size:14px;font-weight:600;overflow-wrap:anywhere}
+.file span{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+.steps .box{padding:14px 20px;gap:8px}
+.file:not(.main){margin-left:34px;position:relative}
+.file:not(.main)::before{content:"";position:absolute;left:-22px;top:-13px;width:16px;
+  height:calc(50% + 13px);border-left:2px solid #cbd8d3;border-bottom:2px solid #cbd8d3}
+.file.main{background:var(--green-soft);border-color:#cbd8d3}
+.file.main .ic{background:var(--orange)}
+
+/* ---------- scheda piattaforma ---------- */
+.scheda{border:1px solid #cbd8d3;background:#fff}
+.scheda .concept{background:var(--green);color:#eef2f0;padding:14px 20px;
+  display:grid;grid-template-columns:170px 1fr;gap:16px;align-items:baseline}
+.scheda .concept b{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;font-weight:600}
+.scheda .concept span{font-size:16px;line-height:1.45}
+.scheda table th{padding:11px 16px}
+.scheda table td{padding:10px 16px;font-size:14px;line-height:1.4}
+.scheda table td:first-child{width:18%;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--green);padding-top:13px}
+.scheda .stamp{display:flex;justify-content:space-between;gap:20px;padding:9px 16px;
+  font-size:11px;letter-spacing:.08em;color:var(--ink-soft);background:#f7f5f0}
+.check{color:var(--orange);border-bottom:1px dashed var(--orange)}
+
+/* ---------- tipi di slide: dimostrazione e laboratorio ----------
+   Basta aggiungere .demo o .lab alla <section class="slide">: cambiano rail,
+   fondo, kicker e compare il timbro. Il link al file sta nel piè di pagina. */
+.slide.demo{background:#eef2f7}
+.slide.lab{background:#fcf2ea}
+.slide.demo .rail{background:var(--blue)}
+.slide.lab .rail{background:var(--orange)}
+.slide.demo .rail span,.slide.lab .rail span{display:none}
+.slide.demo .rail::before,.slide.lab .rail::before{
+  writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;
+  font-size:14px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:#fff}
+.slide.demo .rail::before{content:"Dimostrazione"}
+.slide.lab .rail::before{content:"Laboratorio"}
+.slide.demo::after,.slide.lab::after{
+  position:absolute;top:18px;right:22px;padding:7px 14px;color:#fff;
+  font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase}
+.slide.demo::after{content:"◉\00a0\00a0Guardate lo schermo";background:var(--blue)}
+.slide.lab::after{content:"✎\00a0\00a0Tocca a voi";background:var(--orange)}
+.slide.demo .kicker{color:var(--blue)}
+.slide.demo .foot,.slide.lab .foot{border-top-color:rgba(0,0,0,.08)}
+.foot a.task{display:inline-flex;align-items:center;gap:10px;margin-left:-12px;
+  padding:6px 12px;color:#fff;text-decoration:none;font-weight:700;letter-spacing:.12em}
+.foot a.task b{font-family:var(--mono);font-weight:400;font-size:12px;letter-spacing:0;
+  text-transform:none;opacity:.95}
+.slide.demo .foot a.task{background:var(--blue)}
+.slide.lab .foot a.task{background:var(--orange)}
+.foot a.task:hover{filter:brightness(1.1)}
+
+/* ---------- print ---------- */
+.slide{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:13.333in 7.5in;margin:0}
+@media print{
+  body{background:#fff;padding:0}
+  .slide{margin:0;border:none;page-break-after:always;box-shadow:none}
+  .slide:last-child{page-break-after:auto}
+}
+
+/* ---------- presentation mode ---------- */
+body.present{padding:0;overflow:hidden;background:#000}
+body.present .slide{
+  display:none;margin:0;border:none;
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(var(--scale,1));
+  transform-origin:center center;
+}
+body.present .slide.active{display:grid}
+.present-hint{
+  position:fixed;bottom:14px;right:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.present-hint.show{opacity:1}
+.present-counter{
+  position:fixed;bottom:14px;left:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  display:none;
+}
+body.present .present-counter{display:block}
+
+/* ---------- controllo dimensione testo ---------- */
+:root{--content-zoom:1}
+.body{zoom:var(--content-zoom)}
+.zoom-ctrl{
+  position:fixed;top:14px;right:18px;z-index:60;
+  display:flex;align-items:center;gap:2px;
+  background:rgba(29,28,26,.88);border-radius:4px;padding:4px;
+  font-family:var(--sans);
+}
+.zoom-ctrl button{
+  width:28px;height:28px;border:none;border-radius:3px;background:transparent;
+  color:#f4f1ea;font-size:14px;font-weight:600;cursor:pointer;line-height:1;
+}
+.zoom-ctrl button:hover{background:rgba(255,255,255,.15)}
+.zoom-ctrl .val{
+  min-width:38px;text-align:center;font-size:11px;letter-spacing:.04em;
+  color:#cfcabf;user-select:none;
+}
+body.present .zoom-ctrl{display:none}
+@media print{.zoom-ctrl{display:none}}
+
+/* ---------- percorso indice → pagina → fonte ---------- */
+.trail{display:grid;grid-template-columns:1fr 36px 1fr 36px 1fr;align-items:stretch}
+.trail .step{border:1px solid var(--line);background:#fff;padding:16px 18px;
+  display:flex;flex-direction:column;gap:8px;min-width:0}
+.trail .step .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--green)}
+.trail .step b{font-family:var(--mono);font-size:13.5px;overflow-wrap:anywhere}
+.trail .step p{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+.trail .arrow{display:flex;align-items:center;justify-content:center;
+  color:var(--orange);font-size:22px}
+.trail .step.src-step{background:var(--green-soft);border-color:#cbd8d3}
+
+/* ---------- le quattro accortezze di scrittura (slide 5) ---------- */
+.regole .box{padding:15px 20px;gap:7px}
+
+/* ---------- screenshot con zone numerate ---------- */
+.shotwrap{position:relative;border:1px solid #bfc9c4;line-height:0}
+.shotwrap img{width:100%;display:block}
+.shotwrap .pin{position:absolute;transform:translate(-50%,-50%);
+  box-shadow:0 0 0 2px #fff,0 1px 4px rgba(0,0,0,.35)}
+.pin{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;
+  border-radius:50%;background:var(--orange);color:#fff;font-size:12px;font-weight:700;
+  font-family:var(--sans);line-height:1;flex:none}
+.zone{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+.zone > div{display:flex;gap:10px;align-items:baseline}
+.zone > div span{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="present-counter" id="presentCounter"></div>
+<div class="present-hint" id="presentHint">Premi P per entrare in modalità presentazione · frecce/spazio per avanzare · Esc per uscire</div>
+<div class="zoom-ctrl">
+  <button id="zoomOut" title="Riduci testo" aria-label="Riduci testo">A−</button>
+  <span class="val" id="zoomVal">100%</span>
+  <button id="zoomIn" title="Aumenta testo" aria-label="Aumenta testo">A+</button>
+</div>
+
+
+<!-- 01 COVER -->
+<section class="slide cover">
+  <div class="rail"><span>Ora 5 · Knowledge base e fonti</span></div>
+  <div class="body">
+    <div class="kicker">Dalla IA generativa alla IA agentica · Ora 5</div>
+    <h1>Knowledge base:<br>file, wiki e RAG</h1>
+    <div class="rule"></div>
+    <p class="lede">Nell'ora 4 avete scritto chi siete. Oggi mettete in ordine le fonti della
+      vostra disciplina, in modo che l'agente le trovi da solo e vi dica sempre da dove ha
+      preso quello che dice.</p>
+    <div class="meta">
+      <div><b>Destinatari</b>Docenti di scuola superiore</div>
+      <div><b>Serve</b>Tre-cinque fonti della vostra materia</div>
+      <div><b>Durata</b>Un'ora, pausa compresa</div>
+      <div><b>Modulo</b>5 di 13</div>
+    </div>
+  </div>
+  <div class="foot"><span>Corso agenti IA</span><span>01</span></div>
+</section>
+
+<!-- 02 OBIETTIVI E MAPPA -->
+<section class="slide">
+  <div class="rail"><span>Ora 5 · Knowledge base e fonti</span></div>
+  <div class="body">
+    <div class="kicker">Obiettivi e mappa</div>
+    <h2>Alla fine di quest'ora<span class="sub">Il profilo dell'ora 4 dice all'agente come
+      lavorate. Adesso gli diamo il materiale su cui lavorare.</span></h2>
+    <ol class="num" style="margin-bottom:28px">
+      <li><b>Avete una piccola knowledge base della vostra materia</b>
+        Poche fonti scelte da voi, un indice che le tiene insieme e pagine di sintesi che
+        citano sempre la fonte.</li>
+      <li><b>Sapete quando servono file navigabili e quando serve un sistema RAG</b>
+        Conoscete la differenza fra le due soluzioni e sapete che cosa ci guadagnate e che
+        cosa ci perdete scegliendo l'una o l'altra.</li>
+    </ol>
+    <div class="content cols c4" style="gap:16px">
+      <div class="box">
+        <div class="tag">10 min</div>
+        <h3>Le fonti</h3>
+        <p>Raccogliere, scegliere, scrivere file che l'agente sa leggere</p>
+      </div>
+      <div class="box">
+        <div class="tag">12 min</div>
+        <h3>La wiki</h3>
+        <p>Indice, pagine, fonti. Una wiki vera, navigata dall'agente</p>
+      </div>
+      <div class="box">
+        <div class="tag">10 min</div>
+        <h3>File o RAG</h3>
+        <p>Due modi di dare conoscenza. Citazioni e copyright</p>
+      </div>
+      <div class="box orange">
+        <div class="tag">20 min</div>
+        <h3>Laboratorio</h3>
+        <p>L'agente monta la vostra wiki partendo da una descrizione</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Obiettivi e mappa</span><span>02</span></div>
+</section>
+
+<!-- 03 IL PUNTO DI PARTENZA -->
+<section class="slide">
+  <div class="rail"><span>Ora 5 · Knowledge base e fonti</span></div>
+  <div class="body">
+    <div class="kicker">Il punto di partenza</div>
+    <h2>Le fonti della vostra materia sono già tutte sul computer<span class="sub">Il problema
+      non riguarda il procurarsele. Riguarda il fatto che nessuno le ha mai messe in un posto
+      solo, e che l'agente da solo non sa dove guardare.</span></h2>
+    <div class="content cols c2">
+      <div class="box orange">
+        <div class="tag">Come stanno oggi</div>
+        <ul class="clean">
+          <li>Le slide di un corso di aggiornamento, in una cartella Download</li>
+          <li>Tre PDF di normativa, allegati a una vecchia mail</li>
+          <li>Gli appunti presi a mano su un manuale</li>
+          <li>Un articolo salvato fra i preferiti del browser</li>
+          <li>Quello che ricordate e che non avete scritto da nessuna parte</li>
+        </ul>
+      </div>
+      <div class="box green">
+        <div class="tag">Che cosa serve all'agente</div>
+        <ul class="clean">
+          <li>Una cartella sola, con dentro le fonti che contano</li>
+          <li>Un indice che dica che cosa c'è e dove sta</li>
+          <li>Pagine di sintesi che l'agente può leggere in fretta</li>
+          <li>Il collegamento fra ogni sintesi e la fonte da cui viene</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box" style="margin-top:22px">
+      <p><b>Una knowledge base è questo e niente di più.</b> È una cartella di file di testo,
+        organizzata in modo che l'agente ci si muova da solo. Non serve un programma
+        particolare e non serve saper programmare.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Il punto di partenza</span><span>03</span></div>
+</section>
+
+<!-- 04 RACCOLTA E SELEZIONE -->
+<section class="slide">
+  <div class="rail"><span>Ora 5 · Knowledge base e fonti</span></div>
+  <div class="body">
+    <div class="kicker">Raccolta e selezione</div>
+    <h2>Poche fonti scelte valgono più di una cartella piena<span class="sub">Vale qui la
+      stessa regola dell'ora 4. Lo spazio di lettura dell'agente è una risorsa finita, e
+      selezionare è il vostro lavoro.</span></h2>
+    <div class="content">
+      <ol class="num">
+        <li><b>Scegliete le fonti che usereste davvero con un collega nuovo</b>
+          Cinque fonti che conoscete bene sono migliori di cinquanta che non avete letto. Le
+          altre si aggiungono strada facendo, una alla volta.</li>
+        <li><b>Tenete le fonti separate dalle sintesi</b>
+          Le fonti stanno in una cartella e non si toccano mai. Le sintesi stanno in
+          un'altra cartella e le scrive l'agente.</li>
+        <li><b>Preferite i formati che l'agente legge senza fatica</b>
+          Il testo semplice e il Markdown si leggono sempre. Un PDF fatto di scansioni è
+          un'immagine, e va convertito prima di metterlo nella raccolta.</li>
+        <li><b>Scrivete accanto a ogni fonte da dove viene</b>
+          Servono il titolo, l'autore, l'anno e il collegamento. Servono a voi per citare e
+          servono all'agente per dirvi su che cosa si sta basando.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="foot"><span>Raccolta e selezione</span><span>04</span></div>
+</section>
+
+<!-- 05 UN FILE LEGGIBILE DALL'AGENTE -->
+<section class="slide">
+  <div class="rail"><span>Ora 5 · Knowledge base e fonti</span></div>
+  <div class="body">
+    <div class="kicker">Come si scrive un file</div>
+    <h2>Un file scritto bene si legge due volte<span class="sub">Lo leggete voi e lo legge
+      l'agente. Le stesse quattro accortezze funzionano per tutti e due.</span></h2>
+    <div class="content cols c2" style="align-items:start">
+      <div class="cols regole" style="gap:12px">
+        <div class="box">
+          <div class="tag">Una riga, un caso</div>
+          <p>Ogni riga descrive una cosa sola. Se una riga contiene due informazioni diverse,
+            conviene spezzarla in due.</p>
+        </div>
+        <div class="box">
+          <div class="tag">Intestazioni esplicite</div>
+          <p>I titoli dicono che cosa c'è sotto. L'agente li usa per decidere quale pezzo del
+            file gli serve davvero.</p>
+        </div>
+        <div class="box">
+          <div class="tag">Valori da un elenco chiuso</div>
+          <p>Dove è possibile, scegliete i valori da una lista breve e dichiarata. Così non
+            dovete spiegarli ogni volta.</p>
+        </div>
+        <div class="box">
+          <div class="tag">Convenzioni dichiarate una volta</div>
+          <p>Le date, i separatori e le abbreviazioni si spiegano in un punto solo, e poi
+            valgono per tutto il materiale.</p>
+        </div>
+      </div>
+      <div class="src"><span class="hd">pagine/tassonomia-di-bloom.md</span><span class="dim">---</span>
+<span class="k">titolo:</span> Tassonomia di Bloom, LOTS e HOTS
+<span class="k">tipo:</span> concetto
+<span class="k">fonti:</span> [fonti/Blooms Taxonomy.pdf]
+<span class="k">tag:</span> [obiettivi, verifica]
+<span class="k">aggiornato:</span> 2026-03-14
+<span class="dim">---</span>
+
+<span class="h"># Tassonomia di Bloom</span>
+
+Le sei categorie, dalla più semplice alla più
+complessa: ricordare, comprendere, applicare,
+analizzare, valutare, creare.
+
+<span class="h">## Collegamenti</span>
+<span class="dim">[[obiettivo-di-apprendimento]]</span>
+<span class="dim">[[progettazione-a-ritroso]]</span></div>
+    </div>
+    <p class="muted" style="margin-top:16px;font-size:15px">Le righe fra i due
+      <code>---</code> sono la scheda della pagina. L'agente le legge per capire di che tipo
+      di pagina si tratta e da quale fonte viene, senza aprire tutto il resto.</p>
+  </div>
+  <div class="foot"><span>Come si scrive un file</span><span>05</span></div>
+</section>
+
+<!-- 06 ARCHITETTURA A TRE LIVELLI -->
+<section class="slide">
+  <div class="rail"><span>Ora 5 · Knowledge base e fonti</span></div>
+  <div class="body">
+    <div class="kicker">L'impianto</div>
+    <h2>Una knowledge base ha tre livelli<span class="sub">Questo impianto lo ha descritto
+      Andrej Karpathy in un testo di due pagine. La divisione dei ruoli è netta: voi
+      scegliete le fonti e fate le domande, l'agente scrive e tiene in ordine le
+      pagine.</span></h2>
+    <div class="content files">
+      <div class="file main"><span class="ic">1</span><b>fonti/</b>
+        <span>I materiali originali: i PDF dei corsi, la normativa, gli articoli, i vostri
+          appunti. L'agente li legge soltanto. Non li modifica, non li rinomina e non li
+          sposta mai. <b>Li curate voi.</b></span></div>
+      <div class="file"><span class="ic">2</span><b>pagine/</b>
+        <span>Le pagine di sintesi e le voci trasversali, scritte in Markdown. Ogni pagina
+          dichiara da quale fonte viene e rimanda alle pagine collegate.
+          <b>Le scrive l'agente.</b></span></div>
+      <div class="file"><span class="ic">3</span><b>AGENTS.md</b>
+        <span>Lo schema della wiki. Spiega com'è fatta, quali sono le convenzioni e che cosa
+          fare quando si aggiunge una fonte o si risponde a una domanda.
+          <b>Lo scrive l'agente e voi lo correggete.</b></span></div>
+    </div>
+    <div class="cols c2" style="margin-top:22px;gap:18px">
+      <div class="box green">
+        <p><b>Lo schema è lo stesso file-guida dell'ora 4.</b> Qui contiene le regole di
+          manutenzione della wiki, e trasforma l'agente in un archivista che lavora sempre
+          allo stesso modo.</p>
+      </div>
+      <div class="box">
+        <p><b>Due file di servizio completano l'impianto.</b> <code>index.md</code> dice che
+          cosa c'è nella wiki. <code>log.md</code> tiene il diario di quello che è stato
+          fatto, con la data.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>L'impianto</span><span>06</span></div>
+</section>
+
+<!-- 07 INDICE E APPROFONDIMENTO PROGRESSIVO -->
+<section class="slide">
+  <div class="rail"><span>Ora 5 · Knowledge base e fonti</span></div>
+  <div class="body">
+    <div class="kicker">Indice e collegamenti</div>
+    <h2>L'agente scende per gradi fino alla fonte<span class="sub">Non legge tutta la wiki a
+      ogni domanda. Parte dall'indice, sceglie la pagina che serve e arriva alla fonte
+      soltanto quando la risposta richiede il dettaglio.</span></h2>
+    <div class="content trail">
+      <div class="step">
+        <div class="tag">Primo passo</div>
+        <b>index.md</b>
+        <p>Il catalogo di tutte le pagine, diviso per tipo. Ogni voce ha un titolo, un
+          collegamento e una riga di riassunto. L'agente lo legge per primo e capisce dove
+          andare.</p>
+      </div>
+      <div class="arrow">&#8594;</div>
+      <div class="step">
+        <div class="tag">Secondo passo</div>
+        <b>pagine/bics-e-calp.md</b>
+        <p>La pagina che risponde. Contiene la sintesi già fatta, i collegamenti alle pagine
+          vicine e il rimando alla fonte da cui deriva.</p>
+      </div>
+      <div class="arrow">&#8594;</div>
+      <div class="step src-step">
+        <div class="tag">Terzo passo, se serve</div>
+        <b>fonti/2024 CLIL/</b>
+        <p>Il materiale originale. L'agente lo apre quando deve verificare un passaggio o
+          citarlo con precisione, e vi dice che lo sta facendo.</p>
+      </div>
+    </div>
+    <div class="cols c2" style="margin-top:24px;gap:18px">
+      <div class="box green">
+        <p><b>Per questo l'indice conta più di tutto il resto.</b> Se una pagina non compare
+          nell'indice, per l'agente è come se non esistesse.</p>
+      </div>
+      <div class="box">
+        <p><b>Ogni passo resta visibile.</b> Vedete quali file l'agente apre e potete
+          controllare che la risposta venga davvero da lì.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Indice e collegamenti</span><span>07</span></div>
+</section>
+
+<!-- 08 DIMOSTRAZIONE -->
+<section class="slide demo">
+  <div class="rail"><span>Ora 5 · Knowledge base e fonti</span></div>
+  <div class="body">
+    <div class="kicker">Dimostrazione · una wiki vera</div>
+    <h2>Guardiamo l'agente percorrere una wiki<span class="sub">Apro una wiki didattica
+      costruita così: una quarantina di pagine, una manciata di fonti, un indice. Faccio una
+      domanda e seguiamo insieme la strada che fa.</span></h2>
+    <div class="content cols" style="grid-template-columns:1fr 1fr;gap:22px;align-items:start">
+      <div class="prompt">
+        <div class="lbl">La domanda</div>
+        Devo spiegare a un collega la differenza fra BICS e CALP e perché conta quando si
+        valuta in CLIL. Rispondimi in dieci righe e dimmi da quali pagine e da quali fonti
+        hai preso ogni cosa.
+      </div>
+      <div class="cols steps" style="gap:12px">
+        <div class="box">
+          <span class="badge">Da guardare</span>
+          <p>L'agente apre <code>index.md</code> prima di ogni altra cosa. Dall'indice sceglie
+            due o tre pagine e lascia perdere tutte le altre.</p>
+        </div>
+        <div class="box">
+          <span class="badge">Da guardare</span>
+          <p>La risposta cita i file. Apriamone uno insieme e controlliamo che ci sia scritto
+            davvero quello che l'agente riporta.</p>
+        </div>
+        <div class="box orange">
+          <span class="badge o">Da guardare</span>
+          <p>Chiedo di archiviare la risposta come pagina nuova. La wiki cresce anche con le
+            domande, non soltanto con le fonti.</p>
+        </div>
+      </div>
+    </div>
+    <div class="box" style="margin-top:18px">
+      <p><b>La cosa da notare è la velocità con cui scarta.</b> Su quaranta pagine ne apre
+        tre. Il lavoro di selezione lo ha fatto l'indice, e l'indice lo ha scritto l'agente
+        quando avete aggiunto le fonti.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Dimostrazione · navigare la wiki</span><span>08</span></div>
+</section>
+
+<!-- 09 LE TRE OPERAZIONI -->
+<section class="slide">
+  <div class="rail"><span>Ora 5 · Knowledge base e fonti</span></div>
+  <div class="body">
+    <div class="kicker">Come si tiene viva</div>
+    <h2>Con la wiki si fanno tre cose<span class="sub">Sono tre operazioni che si chiedono a
+      parole. Conviene scriverle nello schema una volta sola, così l'agente le esegue sempre
+      allo stesso modo.</span></h2>
+    <div class="content cols c3">
+      <div class="box green">
+        <div class="tag">Aggiungere una fonte</div>
+        <h3>Ingest</h3>
+        <p>Mettete un materiale nella cartella delle fonti e lo dite all'agente. Lui lo legge,
+          discute con voi i punti principali, scrive la pagina di sintesi, aggiorna le pagine
+          collegate e ritocca l'indice.</p>
+        <p><b>Una fonte alla volta.</b> Voi leggete quello che ha scritto e correggete prima
+          di passare alla successiva.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Fare una domanda</div>
+        <h3>Query</h3>
+        <p>Chiedete qualcosa alla wiki. L'agente cerca le pagine pertinenti, le legge e
+          risponde citando i file.</p>
+        <p><b>Le risposte buone si archiviano.</b> Un confronto o una sintesi che vi servirà
+          ancora diventa una pagina nuova, invece di restare nella conversazione.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Controllare la salute</div>
+        <h3>Lint</h3>
+        <p>Ogni tanto chiedete all'agente di rileggere tutto e di segnalare i problemi: le
+          pagine che si contraddicono, le affermazioni superate da una fonte nuova, le pagine
+          che nessuno collega, le sintesi senza fonte.</p>
+        <p><b>È la manutenzione che di solito nessuno fa.</b></p>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:22px">
+      <p><b>Qui sta la differenza con una cartella di PDF.</b> La sintesi si fa una volta e
+        poi si aggiorna. Ogni fonte che aggiungete migliora anche le pagine che c'erano già,
+        invece di restare accanto a loro senza toccarle.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Ingest, query, lint</span><span>09</span></div>
+</section>
+
+<!-- 10 FILE CONTRO RAG -->
+<section class="slide">
+  <div class="rail"><span>Ora 5 · Knowledge base e fonti</span></div>
+  <div class="body">
+    <div class="kicker">Due modi di dare conoscenza</div>
+    <h2>I file navigabili e il RAG risolvono lo stesso problema<span class="sub">Il problema
+      è dare all'agente una conoscenza che non ha. Cambia chi decide che cosa leggere, e
+      cambia quanto potete controllarlo.</span></h2>
+    <div class="content">
+      <table>
+        <tr><th></th><th>File navigabili</th><th>RAG</th></tr>
+        <tr><td>Chi sceglie che cosa leggere</td>
+          <td class="g">L'agente, seguendo l'indice e i collegamenti che avete davanti</td>
+          <td class="o">Un componente automatico, prima che l'agente entri in gioco</td></tr>
+        <tr><td>Che cosa arriva nel contesto</td>
+          <td class="g">Le pagine intere che l'agente ha deciso di aprire</td>
+          <td class="o">I pezzi di documento che il sistema giudica simili alla domanda</td></tr>
+        <tr><td>Che cosa vedete voi</td>
+          <td class="g">Ogni file aperto, uno per uno. Potete aprirlo anche voi e controllare</td>
+          <td class="o">La risposta e i riferimenti. Il criterio di selezione resta nascosto</td></tr>
+        <tr><td>Che cosa si accumula</td>
+          <td class="g">Le sintesi e i collegamenti restano scritti e migliorano nel tempo</td>
+          <td class="o">Niente. Ogni domanda riparte dai documenti originali</td></tr>
+        <tr><td>Quando conviene</td>
+          <td class="g">Poche decine o poche centinaia di documenti, curati da voi</td>
+          <td class="o">Migliaia di documenti, oppure un archivio che cambia in continuazione</td></tr>
+      </table>
+    </div>
+    <p class="muted" style="margin-top:18px;font-size:15px">Le due strade non si escludono.
+      Un agente può usare un sistema RAG come una delle sue fonti, e una wiki può nascere
+      dalle risposte che il RAG ha dato.</p>
+  </div>
+  <div class="foot"><span>File navigabili e RAG</span><span>10</span></div>
+</section>
+
+<!-- 11 NOTEBOOKLM -->
+<section class="slide">
+  <div class="rail"><span>Ora 5 · Knowledge base e fonti</span></div>
+  <div class="body">
+    <div class="kicker">Un esempio di RAG</div>
+    <h2>NotebookLM funziona così<span class="sub">Lo guardiamo da fuori, senza laboratorio.
+      Molti di voi lo usano già ed è l'esempio più vicino di sistema RAG pronto
+      all'uso.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.1fr 1fr;gap:22px;align-items:start">
+      <div>
+        <div class="shotwrap">
+          <img src="img/ora-05-notebooklm.png" alt="Schermata di NotebookLM con trentanove
+            fonti caricate, la chat al centro e il pannello Studio a destra">
+          <span class="pin" style="left:13%;top:61%">1</span>
+          <span class="pin" style="left:50%;top:87%">2</span>
+          <span class="pin" style="left:86.5%;top:47%">3</span>
+        </div>
+        <div class="zone">
+          <div><span class="pin">1</span><span><b>Le fonti caricate.</b> Qui ce ne sono
+            trentanove, raggruppate per argomento.</span></div>
+          <div><span class="pin">2</span><span><b>La chat.</b> Le risposte citano il punto
+            esatto del documento.</span></div>
+          <div><span class="pin">3</span><span><b>Lo Studio.</b> Dalle stesse fonti genera
+            mappe, quiz, report e infografiche.</span></div>
+        </div>
+      </div>
+      <div class="cols" style="gap:14px">
+        <div class="box green">
+          <div class="tag">Che cosa fa bene</div>
+          <ul class="clean">
+            <li>Carica molti documenti in pochi minuti</li>
+            <li>Risponde citando il punto esatto del documento</li>
+            <li>Trasforma le fonti in mappe, quiz e riassunti</li>
+          </ul>
+        </div>
+        <div class="box orange">
+          <div class="tag">Che cosa non fa</div>
+          <ul class="clean">
+            <li>Non costruisce nulla che resti fra una domanda e l'altra</li>
+            <li>Non vi avverte quando due fonti si contraddicono</li>
+            <li>Non lavora nella cartella dove tenete i materiali</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="box" style="margin-top:18px">
+      <p><b>Un uso ragionevole tiene insieme le due cose.</b> NotebookLM serve per esplorare
+        in fretta un materiale nuovo. La wiki serve per conservare quello che avete capito,
+        in una forma che l'agente riusa nelle ore successive.</p>
+    </div>
+  </div>
+  <div class="foot"><span>NotebookLM</span><span>11</span></div>
+</section>
+
+<!-- 12 QUALITA DELLE FONTI, CITAZIONI, COPYRIGHT -->
+<section class="slide">
+  <div class="rail"><span>Ora 5 · Knowledge base e fonti</span></div>
+  <div class="body">
+    <div class="kicker">Sicurezza applicata</div>
+    <h2>La knowledge base non rende vere le fonti che contiene<span class="sub">Una sintesi
+      scritta bene sembra affidabile anche quando la fonte non lo è. La responsabilità di
+      scegliere le fonti resta vostra.</span></h2>
+    <div class="content cols c3">
+      <div class="box">
+        <div class="tag">Qualità</div>
+        <h3>Che cosa entra</h3>
+        <ul class="clean">
+          <li>Preferite le fonti che potete attribuire a un autore e a una data</li>
+          <li>Segnalate nel file le fonti di cui non siete sicuri</li>
+          <li>Tenete la normativa nella versione ufficiale, non in un riassunto trovato in
+            rete</li>
+        </ul>
+      </div>
+      <div class="box">
+        <div class="tag">Citazioni</div>
+        <h3>Da dove viene</h3>
+        <ul class="clean">
+          <li>Chiedete sempre la citazione del file, anche quando la risposta vi convince</li>
+          <li>Aprite la fonte e controllate, almeno a campione</li>
+          <li>Se una frase non ha una fonte, chiedete all'agente da dove l'ha presa</li>
+        </ul>
+      </div>
+      <div class="box orange">
+        <div class="tag">Copyright</div>
+        <h3>Che cosa esce</h3>
+        <ul class="clean">
+          <li>Un manuale a stampa si tiene per studio personale e non si ridistribuisce</li>
+          <li>Nei materiali per la classe mettete la citazione, non il testo copiato</li>
+          <li>Le immagini prese in rete hanno una licenza, e va guardata prima di usarle</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box green" style="margin-top:22px">
+      <p><b>Scrivete nello schema della wiki la regola sulle citazioni.</b> Per esempio: «In
+        ogni risposta cita i file da cui hai preso le informazioni. Se una cosa non la trovi
+        nelle pagine o nelle fonti, dillo invece di rispondere lo stesso.»</p>
+    </div>
+  </div>
+  <div class="foot"><span>Fonti, citazioni, copyright</span><span>12</span></div>
+</section>
+
+<!-- 13 LA DOMANDA DI CONTROLLO -->
+<section class="slide">
+  <div class="rail"><span>Ora 5 · Knowledge base e fonti</span></div>
+  <div class="body">
+    <div class="kicker">La prova che conta</div>
+    <h2>Fate una domanda la cui risposta non sta nelle fonti<span class="sub">È il solo modo
+      per scoprire se la vostra knowledge base vi protegge dall'invenzione vista nell'ora 4,
+      oppure se vi lascia esposti come prima.</span></h2>
+    <div class="content cols c2" style="align-items:start">
+      <div class="cols" style="gap:16px">
+        <div class="prompt plain">
+          <div class="lbl">La domanda di controllo</div>
+          Nelle mie fonti, che cosa si dice sulla valutazione delle competenze digitali degli
+          studenti? Se non c'è, dimmelo.
+        </div>
+        <div class="box green">
+          <div class="tag">Risposta buona</div>
+          <p>L'agente dice che nelle pagine e nelle fonti quell'argomento non c'è, e vi
+            propone di cercare una fonte che lo copra.</p>
+        </div>
+        <div class="box orange">
+          <div class="tag">Risposta da correggere</div>
+          <p>L'agente risponde lo stesso, con affermazioni ragionevoli e nessuna citazione.
+            Sono le sue conoscenze generali, presentate come se venissero dalle vostre
+            fonti.</p>
+        </div>
+      </div>
+      <div class="box">
+        <h3>Che cosa fare quando succede</h3>
+        <ul class="clean">
+          <li>Aggiungete allo schema la regola sulle citazioni e la richiesta esplicita di
+            segnalare i buchi.</li>
+          <li>Ripetete la stessa domanda in una sessione nuova e controllate se la risposta
+            cambia.</li>
+          <li>Tenete la domanda di controllo da parte. Vi servirà ogni volta che aggiungerete
+            fonti nuove.</li>
+        </ul>
+        <p class="muted" style="margin-top:6px">Questa è la stessa verifica dell'ora 4,
+          spostata dalle regole alle fonti. Un vuoto nella knowledge base si comporta come un
+          vuoto nel file-guida.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>La domanda di controllo</span><span>13</span></div>
+</section>
+
+<!-- 14 LABORATORIO -->
+<section class="slide lab">
+  <div class="rail"><span>Ora 5 · Knowledge base e fonti</span></div>
+  <div class="body">
+    <div class="kicker">Laboratorio · 20 minuti · da soli, al computer</div>
+    <h2>Una descrizione, e l'agente costruisce<span class="sub">La struttura della wiki non
+      la decidete voi. Date all'agente il testo di Karpathy e il vostro argomento, e lui
+      prepara cartelle, schema e indice.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.25fr 1fr;gap:22px;align-items:start">
+      <div class="prompt" style="overflow-wrap:anywhere">
+        <div class="lbl">Da incollare, con il vostro argomento al posto della parentesi</div>
+        Leggi questo testo:
+        <code style="background:#2c4a46;color:#dfe6e3;font-size:.82em">https://gist.githubusercontent.com/karpathy/442a6bf555914893e9891c11519de94f/raw/ac46de1ad27f92b28ac95459c782c07f6b8c964a/llm-wiki.md</code>
+        Descrive un modo di costruire una knowledge base mantenuta da un agente. Seguendo
+        quelle linee guida, prepara in questa cartella la mia wiki su [argomento]. Crea le
+        cartelle, scrivi il file-guida con le convenzioni e le operazioni, e crea l'indice e
+        il registro. Poi spiegami in poche righe le scelte che hai fatto.
+      </div>
+      <div class="cols steps" style="gap:11px">
+        <div class="box">
+          <span class="badge">3 min</span>
+          <p>Create una cartella vuota, apritela con l'agente e metteteci dentro le vostre
+            tre-cinque fonti.</p>
+        </div>
+        <div class="box">
+          <span class="badge">7 min</span>
+          <p>Incollate il prompt. Leggete il file-guida che l'agente ha scritto e
+            correggetelo dove non vi convince.</p>
+        </div>
+        <div class="box">
+          <span class="badge">10 min</span>
+          <p>Chiedete di ingerire le fonti una alla volta. Poi fate una domanda vera e la
+            domanda di controllo della slide precedente.</p>
+        </div>
+      </div>
+    </div>
+    <div class="cols c2 regole" style="margin-top:14px;gap:18px">
+      <div class="box orange">
+        <p><b>Da controllare alla fine:</b> il file-guida spiega ingest, query e lint? Ogni
+          pagina cita la sua fonte? L'indice le elenca tutte? Alla domanda di controllo
+          l'agente ha ammesso di non sapere?</p>
+      </div>
+      <div class="box green">
+        <p><b>Chi arriva senza materiale</b> trova su Classroom un pacchetto di fonti di
+          didattica trasversale, adatto a qualunque disciplina.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../consegne/ora-05-lab-knowledge-base.md" target="_blank">Consegna su Classroom <b>ora-05-lab-knowledge-base.md</b></a><span>14</span></div>
+</section>
+
+<!-- 15 CHIUSURA -->
+<section class="slide">
+  <div class="rail"><span>Ora 5 · Knowledge base e fonti</span></div>
+  <div class="body">
+    <div class="kicker">Chiusura</div>
+    <h2>Quattro cose da portare a casa</h2>
+    <div class="content">
+      <ol class="num">
+        <li><b>Una buona descrizione vale come un progetto.</b>
+          La vostra wiki l'ha montata l'agente a partire da due pagine di testo scritte da
+          qualcun altro. Voi avete scelto l'argomento e le fonti.</li>
+        <li><b>L'indice fa il lavoro più importante.</b>
+          L'agente parte da lì, scende alla pagina e poi alla fonte. Una pagina fuori
+          dall'indice non viene mai letta.</li>
+        <li><b>La sintesi si fa una volta e poi si mantiene.</b>
+          Ogni fonte nuova migliora anche le pagine vecchie. Un sistema RAG invece ricomincia
+          da capo a ogni domanda.</li>
+        <li><b>Le citazioni sono la vostra garanzia.</b>
+          Chiedetele sempre e controllatele a campione. La domanda di controllo vi dice se
+          l'agente sta inventando.</li>
+      </ol>
+      <div class="cols c2" style="margin-top:24px;gap:18px">
+        <div class="box green">
+          <p><b>A casa, se volete, aggiungete una fonte sola.</b> Guardate quante pagine
+            l'agente tocca per sistemarla e se vi segnala qualcosa che contraddice quello che
+            c'era già. Il testo di Karpathy sta nella consegna.</p>
+        </div>
+        <div class="box orange">
+          <p><b>Prossima ora: le skill.</b> Adesso l'agente sa chi siete e conosce le vostre
+            fonti. Nell'ora 6 gli insegnate una procedura, che poi richiama da solo quando
+            serve.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Chiusura</span><span>15</span></div>
+</section>
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var body = document.body;
+  var counter = document.getElementById('presentCounter');
+  var hint = document.getElementById('presentHint');
+  var idx = 0;
+  var presenting = false;
+
+  function fitScale(){
+    var s = Math.min(window.innerWidth/1280, window.innerHeight/720);
+    document.documentElement.style.setProperty('--scale', s);
+  }
+
+  function render(){
+    slides.forEach(function(s,i){ s.classList.toggle('active', i===idx); });
+    counter.textContent = (idx+1) + ' / ' + slides.length;
+  }
+
+  function enter(){
+    presenting = true;
+    body.classList.add('present');
+    fitScale();
+    render();
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(function(){});
+    }
+  }
+
+  function exit(){
+    presenting = false;
+    body.classList.remove('present');
+    if (document.fullscreenElement) document.exitFullscreen().catch(function(){});
+  }
+
+  function next(){ if (idx < slides.length-1){ idx++; render(); } }
+  function prev(){ if (idx > 0){ idx--; render(); } }
+
+  document.addEventListener('keydown', function(e){
+    if (!presenting){
+      if (e.key === 'p' || e.key === 'P') enter();
+      return;
+    }
+    switch(e.key){
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown':
+        e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+        e.preventDefault(); prev(); break;
+      case 'Home':
+        e.preventDefault(); idx = 0; render(); break;
+      case 'End':
+        e.preventDefault(); idx = slides.length-1; render(); break;
+      case 'Escape':
+        exit(); break;
+    }
+  });
+
+  document.addEventListener('click', function(e){
+    if (!presenting) return;
+    if (e.target.closest('a')) return;
+    if (e.clientX > window.innerWidth/2) next(); else prev();
+  });
+
+  document.addEventListener('fullscreenchange', function(){
+    if (!document.fullscreenElement && presenting) exit();
+  });
+
+  window.addEventListener('resize', fitScale);
+
+  hint.classList.add('show');
+  setTimeout(function(){ hint.classList.remove('show'); }, 4000);
+
+  // ---- controllo dimensione testo ----
+  var ZOOM_MIN = 0.8, ZOOM_MAX = 1.4, ZOOM_STEP = 0.1;
+  var zoomVal = document.getElementById('zoomVal');
+  var zoomIn = document.getElementById('zoomIn');
+  var zoomOut = document.getElementById('zoomOut');
+  var zoom = 1;
+  try { zoom = parseFloat(localStorage.getItem('slideZoom')) || 1; } catch(e){}
+
+  function applyZoom(){
+    zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom));
+    document.documentElement.style.setProperty('--content-zoom', zoom);
+    zoomVal.textContent = Math.round(zoom * 100) + '%';
+    try { localStorage.setItem('slideZoom', zoom); } catch(e){}
+  }
+
+  zoomIn.addEventListener('click', function(){ zoom += ZOOM_STEP; applyZoom(); });
+  zoomOut.addEventListener('click', function(){ zoom -= ZOOM_STEP; applyZoom(); });
+
+  document.addEventListener('keydown', function(e){
+    if (presenting) return;
+    if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '=')){
+      e.preventDefault(); zoom += ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '-'){
+      e.preventDefault(); zoom -= ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '0'){
+      e.preventDefault(); zoom = 1; applyZoom();
+    }
+  });
+
+  applyZoom();
+})();
+</script>
+
+</body>
+</html>

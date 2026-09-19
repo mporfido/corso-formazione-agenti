@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Ora 4 — Context engineering e memoria permanente</title>
+<style>
+:root{
+  --paper:#f2efe9;
+  --card:#fbfaf7;
+  --ink:#1d1c1a;
+  --ink-soft:#5c5850;
+  --line:#ddd7cc;
+  --green:#1a3c3a;
+  --green-soft:#e6ece9;
+  --orange:#c0562f;
+  --orange-soft:#f6e7de;
+  --blue:#2f5a8c;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);font-family:var(--sans);color:var(--ink);
+  -webkit-font-smoothing:antialiased;padding:28px 0}
+
+/* ---------- slide frame ---------- */
+.slide{
+  position:relative;width:1280px;height:720px;margin:0 auto 28px;
+  background:var(--card);border:1px solid var(--line);
+  display:grid;grid-template-columns:56px 1fr;overflow:hidden;
+}
+.rail{
+  background:var(--green);color:#f4f1ea;
+  display:flex;align-items:center;justify-content:center;
+}
+.rail span{
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  white-space:nowrap;opacity:.9;
+}
+.body{padding:52px 60px 64px;display:flex;flex-direction:column;min-width:0}
+.kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--orange);font-weight:600;margin-bottom:14px}
+h1{font-family:var(--serif);font-size:56px;line-height:1.08;font-weight:600;
+  letter-spacing:-.01em}
+h2{font-family:var(--serif);font-size:40px;line-height:1.12;font-weight:600;
+  letter-spacing:-.01em;margin-bottom:26px}
+h2 .sub{display:block;font-family:var(--sans);font-size:15px;font-weight:400;
+  color:var(--ink-soft);letter-spacing:0;margin-top:10px;line-height:1.45}
+p{font-size:17px;line-height:1.55;color:var(--ink)}
+.muted{color:var(--ink-soft)}
+.foot{position:absolute;left:56px;right:0;bottom:0;height:40px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 60px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-soft);border-top:1px solid var(--line)}
+.content{flex:0 1 auto;min-height:0}
+code{font-family:var(--mono);font-size:.9em;background:var(--green-soft);padding:1px 5px}
+
+/* ---------- cover ---------- */
+.cover .body{justify-content:center}
+.cover h1{font-size:72px;max-width:980px}
+.cover .lede{margin-top:26px;font-size:19px;color:var(--ink-soft);max-width:700px}
+.rule{width:72px;height:3px;background:var(--orange);margin:32px 0 0}
+.meta{margin-top:38px;display:flex;gap:44px;font-size:13px;color:var(--ink-soft)}
+.meta b{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--green);margin-bottom:6px}
+
+/* ---------- generic layout helpers ---------- */
+.cols{display:grid;gap:22px}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c4{grid-template-columns:repeat(4,1fr)}
+.box{border:1px solid var(--line);background:#fff;padding:22px 24px;
+  display:flex;flex-direction:column;gap:10px;min-width:0}
+.box h3{font-family:var(--serif);font-size:22px;font-weight:600;line-height:1.2}
+.box .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.box p,.box li{font-size:15px;line-height:1.5;color:var(--ink-soft)}
+.box.green{background:var(--green-soft);border-color:#cbd8d3}
+.box.orange{background:var(--orange-soft);border-color:#ecd4c5}
+ul.clean{list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.clean li{position:relative;padding-left:18px;font-size:16px;line-height:1.5}
+ul.clean li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;
+  background:var(--orange)}
+.box ul.clean li{font-size:15px}
+ol.num{list-style:none;counter-reset:n;display:flex;flex-direction:column;gap:16px}
+ol.num li{counter-increment:n;position:relative;padding-left:46px;font-size:17px;
+  line-height:1.5}
+ol.num li::before{content:counter(n,decimal-leading-zero);position:absolute;left:0;top:1px;
+  font-size:13px;font-weight:600;color:var(--green);letter-spacing:.06em}
+ol.num li b{display:block;font-family:var(--serif);font-size:20px;font-weight:600;
+  margin-bottom:4px;color:var(--ink)}
+
+/* ---------- tabella ---------- */
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:12px 16px;font-size:15px;line-height:1.45;
+  border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);
+  font-weight:600;border-bottom:2px solid var(--green)}
+td:first-child{font-weight:600;width:30%}
+td.o{color:var(--orange)}
+td.g{color:var(--green)}
+td.n{font-family:var(--serif);font-size:24px;font-weight:600;white-space:nowrap}
+
+/* ---------- prompt / badge ---------- */
+.prompt{background:var(--green);color:#eef2f0;padding:20px 24px;font-family:var(--sans);
+  font-size:15px;line-height:1.6}
+.prompt .lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;margin-bottom:8px}
+.prompt.plain{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.prompt.plain .lbl{color:var(--orange)}
+.badge{display:inline-block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  background:var(--green);color:#fff;padding:4px 9px;align-self:flex-start}
+.badge.o{background:var(--orange)}
+
+/* ---------- barra contesto ---------- */
+.gauge{height:30px;background:#fff;border:1px solid var(--line);display:flex;
+  overflow:hidden}
+.gauge i{display:block;height:100%}
+.g-legend{display:flex;gap:22px;font-size:13px;color:var(--ink-soft);margin-top:10px;
+  flex-wrap:wrap}
+.g-legend span{display:flex;align-items:center;gap:7px}
+.g-legend b{width:10px;height:10px;display:inline-block}
+
+/* ---------- sorgente Markdown ---------- */
+.src{background:#1f2624;color:#dfe6e3;font-family:var(--mono);font-size:13.5px;
+  line-height:1.65;padding:18px 22px;white-space:pre-wrap;overflow-wrap:anywhere}
+.src .h{color:#f1b28f}
+.src .k{color:#9fd3c2}
+.src .dim{color:#7f8c87}
+.src .hl{background:#3b4f3c;color:#fff;display:block;margin:0 -22px;padding:0 22px;
+  border-left:4px solid #f1b28f}
+.src .hl.o{background:#4d3a30}
+.src .hd{display:block;margin:-18px -22px 12px;padding:8px 22px;background:#161c1a;
+  font-family:var(--sans);font-size:12px;letter-spacing:.04em;color:#9fbdb4}
+
+/* ---------- la mappa e i file di dettaglio ---------- */
+.files{display:flex;flex-direction:column;gap:12px}
+.file{border:1px solid var(--line);background:#fff;padding:14px 18px;
+  display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline}
+.file .ic{grid-row:1/3;font-family:var(--mono);font-size:12px;color:#fff;
+  background:var(--green);padding:3px 7px;align-self:start;margin-top:2px}
+.file b{font-family:var(--mono);font-size:14px;font-weight:600;overflow-wrap:anywhere}
+.file span{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+.steps .box{padding:14px 20px;gap:8px}
+.file:not(.main){margin-left:34px;position:relative}
+.file:not(.main)::before{content:"";position:absolute;left:-22px;top:-13px;width:16px;
+  height:calc(50% + 13px);border-left:2px solid #cbd8d3;border-bottom:2px solid #cbd8d3}
+.file.main{background:var(--green-soft);border-color:#cbd8d3}
+.file.main .ic{background:var(--orange)}
+
+/* ---------- scheda piattaforma ---------- */
+.scheda{border:1px solid #cbd8d3;background:#fff}
+.scheda .concept{background:var(--green);color:#eef2f0;padding:14px 20px;
+  display:grid;grid-template-columns:170px 1fr;gap:16px;align-items:baseline}
+.scheda .concept b{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;font-weight:600}
+.scheda .concept span{font-size:16px;line-height:1.45}
+.scheda table th{padding:11px 16px}
+.scheda table td{padding:10px 16px;font-size:14px;line-height:1.4}
+.scheda table td:first-child{width:18%;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--green);padding-top:13px}
+.scheda .stamp{display:flex;justify-content:space-between;gap:20px;padding:9px 16px;
+  font-size:11px;letter-spacing:.08em;color:var(--ink-soft);background:#f7f5f0}
+.check{color:var(--orange);border-bottom:1px dashed var(--orange)}
+
+/* ---------- tipi di slide: dimostrazione e laboratorio ----------
+   Basta aggiungere .demo o .lab alla <section class="slide">: cambiano rail,
+   fondo, kicker e compare il timbro. Il link al file sta nel piè di pagina. */
+.slide.demo{background:#eef2f7}
+.slide.lab{background:#fcf2ea}
+.slide.demo .rail{background:var(--blue)}
+.slide.lab .rail{background:var(--orange)}
+.slide.demo .rail span,.slide.lab .rail span{display:none}
+.slide.demo .rail::before,.slide.lab .rail::before{
+  writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;
+  font-size:14px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:#fff}
+.slide.demo .rail::before{content:"Dimostrazione"}
+.slide.lab .rail::before{content:"Laboratorio"}
+.slide.demo::after,.slide.lab::after{
+  position:absolute;top:18px;right:22px;padding:7px 14px;color:#fff;
+  font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase}
+.slide.demo::after{content:"◉\00a0\00a0Guardate lo schermo";background:var(--blue)}
+.slide.lab::after{content:"✎\00a0\00a0Tocca a voi";background:var(--orange)}
+.slide.demo .kicker{color:var(--blue)}
+.slide.demo .foot,.slide.lab .foot{border-top-color:rgba(0,0,0,.08)}
+.foot a.task{display:inline-flex;align-items:center;gap:10px;margin-left:-12px;
+  padding:6px 12px;color:#fff;text-decoration:none;font-weight:700;letter-spacing:.12em}
+.foot a.task b{font-family:var(--mono);font-weight:400;font-size:12px;letter-spacing:0;
+  text-transform:none;opacity:.95}
+.slide.demo .foot a.task{background:var(--blue)}
+.slide.lab .foot a.task{background:var(--orange)}
+.foot a.task:hover{filter:brightness(1.1)}
+
+/* ---------- print ---------- */
+.slide{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:13.333in 7.5in;margin:0}
+@media print{
+  body{background:#fff;padding:0}
+  .slide{margin:0;border:none;page-break-after:always;box-shadow:none}
+  .slide:last-child{page-break-after:auto}
+}
+
+/* ---------- presentation mode ---------- */
+body.present{padding:0;overflow:hidden;background:#000}
+body.present .slide{
+  display:none;margin:0;border:none;
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(var(--scale,1));
+  transform-origin:center center;
+}
+body.present .slide.active{display:grid}
+.present-hint{
+  position:fixed;bottom:14px;right:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.present-hint.show{opacity:1}
+.present-counter{
+  position:fixed;bottom:14px;left:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  display:none;
+}
+body.present .present-counter{display:block}
+
+/* ---------- controllo dimensione testo ---------- */
+:root{--content-zoom:1}
+.body{zoom:var(--content-zoom)}
+.zoom-ctrl{
+  position:fixed;top:14px;right:18px;z-index:60;
+  display:flex;align-items:center;gap:2px;
+  background:rgba(29,28,26,.88);border-radius:4px;padding:4px;
+  font-family:var(--sans);
+}
+.zoom-ctrl button{
+  width:28px;height:28px;border:none;border-radius:3px;background:transparent;
+  color:#f4f1ea;font-size:14px;font-weight:600;cursor:pointer;line-height:1;
+}
+.zoom-ctrl button:hover{background:rgba(255,255,255,.15)}
+.zoom-ctrl .val{
+  min-width:38px;text-align:center;font-size:11px;letter-spacing:.04em;
+  color:#cfcabf;user-select:none;
+}
+body.present .zoom-ctrl{display:none}
+@media print{.zoom-ctrl{display:none}}
+</style>
+</head>
+<body>
+<div class="present-counter" id="presentCounter"></div>
+<div class="present-hint" id="presentHint">Premi P per entrare in modalità presentazione · frecce/spazio per avanzare · Esc per uscire</div>
+<div class="zoom-ctrl">
+  <button id="zoomOut" title="Riduci testo" aria-label="Riduci testo">A−</button>
+  <span class="val" id="zoomVal">100%</span>
+  <button id="zoomIn" title="Aumenta testo" aria-label="Aumenta testo">A+</button>
+</div>
+
+<!-- 01 COVER -->
+<section class="slide cover">
+  <div class="rail"><span>Ora 4 · Context engineering e memoria</span></div>
+  <div class="body">
+    <div class="kicker">Dalla IA generativa alla IA agentica · Ora 4</div>
+    <h1>Context engineering<br>e memoria permanente</h1>
+    <div class="rule"></div>
+    <p class="lede">Che cosa l'agente ha davanti quando lavora, che cosa gli manca, e come
+      scrivere una volta sola ciò che oggi ripetete a ogni conversazione.</p>
+    <div class="meta">
+      <div><b>Destinatari</b>Docenti di scuola superiore</div>
+      <div><b>Serve</b>L'ambiente usato nelle ore 2 e 3</div>
+      <div><b>Durata</b>Un'ora, pausa compresa</div>
+      <div><b>Modulo</b>4 di 13</div>
+    </div>
+  </div>
+  <div class="foot"><span>Corso agenti IA</span><span>01</span></div>
+</section>
+
+<!-- 02 OBIETTIVI E MAPPA -->
+<section class="slide">
+  <div class="rail"><span>Ora 4 · Context engineering e memoria</span></div>
+  <div class="body">
+    <div class="kicker">Obiettivi e mappa</div>
+    <h2>Alla fine di quest'ora<span class="sub">Nell'ora 3 le regole stavano nel brief e
+      valevano per una sessione. Oggi le spostiamo in un file, così valgono sempre.</span></h2>
+    <ol class="num" style="margin-bottom:28px">
+      <li><b>Sapete che cosa ha davanti l'agente</b>
+        Sapete quanto spazio c'è e che cosa lo riempie. Capite perché più contesto non dà
+        risultati migliori.</li>
+      <li><b>Avete il vostro primo profilo di docente</b>
+        È un file breve, organizzato come una mappa, che l'agente rilegge a ogni sessione.
+        Non contiene dati degli studenti.</li>
+    </ol>
+    <div class="content cols c4" style="gap:16px">
+      <div class="box">
+        <div class="tag">10 min</div>
+        <h3>Il contesto</h3>
+        <p>Quanto è grande, che cosa lo riempie</p>
+      </div>
+      <div class="box">
+        <div class="tag">15 min</div>
+        <h3>Tre prove</h3>
+        <p>Prima senza file-guida, poi con il file-guida</p>
+      </div>
+      <div class="box">
+        <div class="tag">10 min</div>
+        <h3>Il file-guida</h3>
+        <p>Mappa, piattaforme, dati personali</p>
+      </div>
+      <div class="box orange">
+        <div class="tag">20 min</div>
+        <h3>Laboratorio</h3>
+        <p>Il vostro profilo disciplinare</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Obiettivi e mappa</span><span>02</span></div>
+</section>
+
+<!-- 03 CHE COS'È IL CONTESTO -->
+<section class="slide">
+  <div class="rail"><span>Ora 4 · Context engineering e memoria</span></div>
+  <div class="body">
+    <div class="kicker">Il contesto</div>
+    <h2>Il contesto è tutto ciò che l'agente ha sulla scrivania<span class="sub">A ogni risposta l'agente rilegge
+      tutto da capo. Quello che non sta qui, per lui, non esiste.</span></h2>
+    <div class="content">
+      <div class="gauge">
+        <i style="width:9%;background:#8a857b"></i>
+        <i style="width:5%;background:#1a3c3a"></i>
+        <i style="width:30%;background:#6f9a8e"></i>
+        <i style="width:24%;background:#c0562f"></i>
+        <i style="width:32%;background:#fbfaf7"></i>
+      </div>
+      <div class="g-legend">
+        <span><b style="background:#8a857b"></b>Istruzioni del prodotto</span>
+        <span><b style="background:#1a3c3a"></b>File-guida</span>
+        <span><b style="background:#6f9a8e"></b>File che ha letto</span>
+        <span><b style="background:#c0562f"></b>Conversazione, errori compresi</span>
+        <span><b style="background:#fbfaf7;border:1px solid #ddd7cc"></b>Spazio libero</span>
+      </div>
+      <div class="cols c3" style="margin-top:28px">
+        <div class="box">
+          <div class="tag">Modo 1</div>
+          <h3>Incollare</h3>
+          <p>Il testo entra così com'è nella conversazione. È comodo per poche righe, ma
+            diventa faticoso per testi lunghi.</p>
+        </div>
+        <div class="box">
+          <div class="tag">Modo 2</div>
+          <h3>Allegare</h3>
+          <p>Il file lo scegliete voi, uno per volta. È ciò che fate già con le chat.</p>
+        </div>
+        <div class="box green">
+          <div class="tag">Modo 3</div>
+          <h3>Far leggere la cartella</h3>
+          <p>L'agente decide da solo che cosa aprire. Ha più autonomia, quindi conviene
+            curare bene che cosa c'è nella cartella.</p>
+        </div>
+      </div>
+      <div class="box orange" style="margin-top:22px">
+        <p><b>Anche il file-guida sta sulla scrivania,</b> e ci resta dall'inizio alla fine di
+          ogni sessione. Per questo conviene che sia breve.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Che cos'è il contesto</span><span>03</span></div>
+</section>
+
+<!-- 04 RISORSA FINITA -->
+<section class="slide">
+  <div class="rail"><span>Ora 4 · Context engineering e memoria</span></div>
+  <div class="body">
+    <div class="kicker">I limiti della conversazione</div>
+    <h2>Il contesto è una risorsa finita<span class="sub">Il limite tecnico è lontano: i
+      modelli di punta leggono libri interi. Il problema arriva molto prima.</span></h2>
+    <div class="content cols c2">
+      <div class="box">
+        <div class="tag">Il degrado</div>
+        <h3>Con più testo, l'agente ragiona peggio</h3>
+        <ul class="clean">
+          <li>Oltre una certa quantità di testo la qualità cala in modo marcato. Le fonti
+            indicano <b>circa 200 mila token</b>.</li>
+          <li>Tende a <b>perdere ciò che gli avete detto all'inizio</b>, come un collega
+            dopo quattro ore di consiglio.</li>
+          <li>Errori e correzioni fatti strada facendo <b>restano lì</b> e si mescolano
+            alle istruzioni buone.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <div class="tag">La compattazione</div>
+        <h3>Quando il contesto è pieno, l'agente riassume</h3>
+        <p>Arrivato al limite, l'agente sostituisce la conversazione con un suo riassunto e
+          va avanti. Si vede dal contatore che si svuota di colpo.</p>
+        <p>Ogni riassunto <b>perde qualcosa</b>, e non siete voi a scegliere che cosa. Spesso
+          si perde proprio il dettaglio che contava.</p>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:22px">
+      <p><b>Usate una sessione per ogni compito.</b> Quando il compito è finito, aprite una
+        sessione nuova. Scrivete in un file tutto quello che deve durare oltre la sessione.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Context rot e compattazione</span><span>04</span></div>
+</section>
+
+<!-- 05 UTILE E RUMORE -->
+<section class="slide">
+  <div class="rail"><span>Ora 4 · Context engineering e memoria</span></div>
+  <div class="body">
+    <div class="kicker">Context engineering</div>
+    <h2>Il vostro lavoro è scegliere il contesto<span class="sub">Nell'ora 3 avete curato la
+      richiesta. Adesso curate ciò che le sta intorno: che cosa l'agente trova e che cosa è
+      meglio che non trovi.</span></h2>
+    <div class="content">
+      <table>
+        <tr><th>Contesto utile</th><th>Rumore</th></tr>
+        <tr><td style="font-weight:400" class="g">La griglia della verifica di cui parlate</td>
+          <td>Tutta la cartella dei materiali «per sicurezza»</td></tr>
+        <tr><td style="font-weight:400" class="g">Tre righe su come volete i giudizi</td>
+          <td>Dieci pagine di PTOF incollate in apertura</td></tr>
+        <tr><td style="font-weight:400" class="g">Una sessione per il calendario, una per la
+          verifica</td><td>La stessa conversazione per calendario, verifica e circolare</td></tr>
+        <tr><td style="font-weight:400" class="g">Una correzione chiara, poi sessione nuova</td>
+          <td>Cinque tentativi corretti uno sopra l'altro</td></tr>
+      </table>
+      <div class="box green" style="margin-top:24px">
+        <p><b>Il contesto buono è piccolo e pertinente.</b> Esiste però un secondo problema,
+          che riguarda le informazioni che <i>mancano</i>. Lo vediamo dal vivo.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Contesto utile e rumore</span><span>05</span></div>
+</section>
+
+<!-- 06 DEMO · SCELTA SILENZIOSA -->
+<section class="slide demo">
+  <div class="rail"><span>Ora 4 · Context engineering e memoria</span></div>
+  <div class="body">
+    <div class="kicker">Dimostrazione · 1 di 3 · senza file-guida</div>
+    <h2>La scelta silenziosa<span class="sub">Usiamo la cartella di prova con il
+      file-guida spento. La richiesta è normalissima e i conti sono giusti.</span></h2>
+    <div class="content cols" style="grid-template-columns:1fr 1.1fr;gap:28px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="prompt">
+          <div class="lbl">La richiesta</div>
+          Guarda la cartella. Fammi una tabella con la media del primo quadrimestre di ogni
+          studente.
+        </div>
+        <div class="box">
+          <div class="tag">Nessuno gli ha detto</div>
+          <ul class="clean">
+            <li>se gli orali pesano quanto gli scritti;</li>
+            <li>se si mediano tutti i voti insieme o prima per tipo;</li>
+            <li>che cosa fare di chi ha una sola interrogazione.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="box">
+        <div class="tag">Caruso: tre scritti 4,5 · 4,0 · 5,0 — un orale 6,0</div>
+        <table style="margin-top:2px">
+          <tr><th>Come si calcola</th><th>Media</th></tr>
+          <tr><td style="font-weight:400;width:auto">Tutti e quattro i voti insieme</td>
+            <td class="n o">4,9</td></tr>
+          <tr><td style="font-weight:400;width:auto">Scritti due terzi, orali un terzo</td>
+            <td class="n">5,0</td></tr>
+          <tr><td style="font-weight:400;width:auto">Scritti e orali con peso uguale</td>
+            <td class="n g">5,25</td></tr>
+        </table>
+        <p style="margin-top:4px">Tutte e tre le letture sono difendibili. La prima dà
+          un'insufficienza netta, l'ultima un caso da discutere in consiglio. <b>L'agente ha
+          scelto da solo e non l'ha detto.</b></p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../demo/ora-04-demo-scelta-silenziosa.md" target="_blank">Copione della demo <b>ora-04-demo-scelta-silenziosa.md</b></a><span>06</span></div>
+</section>
+
+<!-- 07 DEMO · VUOTO RIEMPITO -->
+<section class="slide demo">
+  <div class="rail"><span>Ora 4 · Context engineering e memoria</span></div>
+  <div class="body">
+    <div class="kicker">Dimostrazione · 2 di 3 · senza, poi con il file-guida</div>
+    <h2>Il vuoto riempito<span class="sub">Ritroviamo l'invenzione dell'ora 1, ma stavolta
+      l'agente ha la cartella davanti. Usiamo lo stesso prompt due volte: prima senza
+      <code>AGENTS.md</code>, poi con il file.</span></h2>
+    <div class="content">
+      <div class="prompt">
+        <div class="lbl">Lo stesso prompt, due volte, in due sessioni nuove</div>
+        Scrivimi il giudizio del primo quadrimestre per tutti e 21 gli studenti, tre righe
+        ciascuno.
+      </div>
+      <div class="cols c2" style="margin-top:20px">
+        <div class="box">
+          <div class="tag">Senza file-guida</div>
+          <h3>Da dove vengono ventuno giudizi diversi?</h3>
+          <p>Cercate «si impegna con costanza», «partecipa attivamente», «ha mostrato
+            progressi». Poi chiedete: <b>«da quale file l'hai preso?»</b></p>
+          <p class="muted">La cartella contiene voti, griglie, un commento per interrogazione
+            e tre note individuali. Sull'impegno dei singoli non dice una parola.</p>
+        </div>
+        <div class="box green">
+          <div class="tag">Con il file-guida</div>
+          <h3>I giudizi si basano sui dati</h3>
+          <p>Ogni voto riporta la sua prova. Quando manca un'informazione, l'agente lo dice
+            invece di nasconderlo.</p>
+          <p class="muted">Voi non gliel'avete chiesto: l'agente ha letto la regola da solo,
+            aprendo la cartella.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../demo/ora-04-demo-vuoto-riempito.md" target="_blank">Copione della demo <b>ora-04-demo-vuoto-riempito.md</b></a><span>07</span></div>
+</section>
+
+<!-- 08 LE TRE RIGHE -->
+<section class="slide">
+  <div class="rail"><span>Ora 4 · Context engineering e memoria</span></div>
+  <div class="body">
+    <div class="kicker">Istruzioni permanenti</div>
+    <h2>Le righe che hanno fatto la differenza<span class="sub">Ecco il file-guida della cartella
+      di prova. Sono venti righe scritte una volta sola, e valgono per ogni sessione.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.35fr 1fr;gap:28px;align-items:start">
+<div class="src"><span class="hd">cartella-di-prova/AGENTS.md · estratto</span><span class="h">## Come muoverti qui dentro</span>
+<span class="dim">- `ASS` significa assente, non zero. Non contarlo nelle medie.
+- …</span>
+
+<span class="h">## Come scrivere</span>
+<span class="dim">- Rispondi in italiano, con il registro di un docente.</span>
+<span class="hl">- Quando riporti un voto, riporta anche da dove l'hai
+  preso (file e prova).</span><span class="hl">- Se ti chiedo un giudizio su uno studente, basati solo
+  sui dati presenti. Non inventare episodi, atteggiamenti
+  o progressi: se manca un'informazione, dimmelo.</span>
+<span class="h">## Attenzione</span>
+<span class="hl o">- L'elenco studenti contiene una nota su un piano
+  didattico personalizzato. Trattala come riservata.</span></div>
+      <div class="box">
+        <h3>Che cosa si nota</h3>
+        <ul class="clean">
+          <li><b>Il file contiene regole.</b> Le frasi sono brevi e si possono verificare.</li>
+          <li><b>Nessuna regola riguarda la media.</b> È il buco della prima prova: la scelta
+            resta ancora all'agente.</li>
+          <li><b>L'ultima riga</b> la mettiamo alla prova adesso.</li>
+        </ul>
+        <p class="muted" style="margin-top:4px">Il brief dell'ora 3 diceva le stesse cose.
+          Ma andava riscritto ogni volta.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Le righe che contano</span><span>08</span></div>
+</section>
+
+<!-- 09 DEMO · COMUNICAZIONE ALLE FAMIGLIE -->
+<section class="slide demo">
+  <div class="rail"><span>Ora 4 · Context engineering e memoria</span></div>
+  <div class="body">
+    <div class="kicker">Dimostrazione · 3 di 3 · trenta secondi</div>
+    <h2>Che cosa finisce nella lettera<span class="sub">Facciamo una richiesta di routine. Nella
+      stessa cartella però c'è un'informazione riservata.</span></h2>
+    <div class="content">
+      <div class="prompt">
+        <div class="lbl">La richiesta</div>
+        Prepara una comunicazione per le famiglie della classe sugli esiti del primo
+        quadrimestre.
+      </div>
+      <div class="cols c3" style="margin-top:20px">
+        <div class="box">
+          <div class="tag">Che cosa guardare</div>
+          <p>Nell'elenco studenti c'è la nota su un piano didattico personalizzato. Finisce
+            nel testo destinato a tutte le famiglie?</p>
+        </div>
+        <div class="box green">
+          <div class="tag">Con il file-guida</div>
+          <p>Non dovrebbe, perché c'è una riga apposta. Senza quella riga può succedere, e
+            nessuno ve lo segnala.</p>
+        </div>
+        <div class="box orange">
+          <div class="tag">Il punto</div>
+          <p>Qui il dato è finto, ma nella vostra cartella sarebbe vero. Ciò che è nel contesto
+            <b>può uscire</b> in qualunque testo.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../demo/ora-04-demo-comunicazione-famiglie.md" target="_blank">Copione della demo <b>ora-04-demo-comunicazione-famiglie.md</b></a><span>09</span></div>
+</section>
+
+<!-- 10 IL FILE-GUIDA -->
+<section class="slide">
+  <div class="rail"><span>Ora 4 · Context engineering e memoria</span></div>
+  <div class="body">
+    <div class="kicker">Memoria permanente</div>
+    <h2>Il file-guida<span class="sub">Ogni sessione riparte da zero: l'agente non ricorda la
+      conversazione di ieri. Ricorda soltanto ciò che trova scritto.</span></h2>
+    <div class="content cols c3">
+      <div class="box">
+        <div class="tag">Che cos'è</div>
+        <h3>Un file di testo nella cartella</h3>
+        <p>In Markdown, con un nome che l'agente riconosce. Nel corso usiamo
+          <code>AGENTS.md</code>, che leggono tutti e tre i prodotti.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Quando lo legge</div>
+        <h3>All'apertura di ogni sessione</h3>
+        <p>Lo legge da solo, senza che nessuno glielo chieda. Il file entra nel contesto
+          prima della vostra prima domanda e ci resta.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Che cosa contiene</div>
+        <h3>Ciò che ripetereste ogni volta</h3>
+        <p>Dice di che cosa tratta la cartella, dove stanno le cose, come volete che si
+          lavori e che cosa l'agente non deve fare.</p>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:22px">
+      <p><b>Brief e file-guida si dividono il lavoro.</b> Il brief dice che cosa fare
+        <i>adesso</i>. Il file-guida dice come si lavora <i>qui</i>, sempre. Una regola che
+        scrivete in tre brief di fila va nel file-guida.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Il file-guida</span><span>10</span></div>
+</section>
+
+<!-- 11 LA MAPPA, NON IL TERRITORIO -->
+<section class="slide">
+  <div class="rail"><span>Ora 4 · Context engineering e memoria</span></div>
+  <div class="body">
+    <div class="kicker">Struttura a mappa</div>
+    <h2>Il file-guida funziona come una mappa<span class="sub">L'agente lo rilegge a ogni
+      sessione e il file occupa spazio sulla scrivania. Deve dire dove stanno le cose, senza
+      contenerle.</span></h2>
+    <div class="content cols" style="grid-template-columns:1fr 1fr;gap:28px;align-items:start">
+      <div class="files">
+        <div class="file main"><span class="ic">sempre</span><b>AGENTS.md</b>
+          <span>Dice chi siete, come si lavora e dove trovare il resto. Bastano poche decine di righe.</span></div>
+        <div class="file"><span class="ic">se serve</span><b>profilo/stile-materiali.md</b>
+          <span>L'agente lo legge quando prepara schede, verifiche e presentazioni.</span></div>
+        <div class="file"><span class="ic">se serve</span><b>profilo/valutazione.md</b>
+          <span>L'agente lo legge quando si parla di griglie, voti e giudizi.</span></div>
+        <div class="file"><span class="ic">se serve</span><b>profilo/classi.md</b>
+          <span>L'agente lo legge quando serve il programma o il profilo di una classe.</span></div>
+      </div>
+      <div class="box green">
+        <h3>Tre regole pratiche</h3>
+        <ul class="clean">
+          <li><b>Tenetelo breve.</b> Restate sotto le 250 righe circa, meglio molto meno. Più
+            il file è asciutto, più l'agente lo segue.</li>
+          <li><b>Mettete un rimando per ogni dettaglio lungo</b> e scrivete <i>quando</i>
+            aprirlo. L'agente andrà a leggere il resto da solo.</li>
+          <li><b>Scrivete ogni cosa in un posto solo.</b> Se la stessa regola è scritta in due file, prima
+            o poi i due file diranno cose diverse.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>La mappa</span><span>11</span></div>
+</section>
+
+<!-- 12 COME NASCE UN FILE-GUIDA -->
+<section class="slide">
+  <div class="rail"><span>Ora 4 · Context engineering e memoria</span></div>
+  <div class="body">
+    <div class="kicker">Scriverlo e tenerlo in ordine</div>
+    <h2>Un file-guida non si scrive a mano<span class="sub">Lo scrive l'agente e voi lo
+      rileggete. Poi il file cresce con il lavoro.</span></h2>
+    <div class="content cols c3">
+      <div class="box">
+        <span class="badge">1 · nascere</span>
+        <h3>Fatevi intervistare</h3>
+        <p>L'agente vi fa una domanda alla volta su materia, classi, stile e valutazione.
+          Poi vi propone il file e voi lo correggete. È la tecnica dell'ora 3, applicata al
+          contesto.</p>
+      </div>
+      <div class="box">
+        <span class="badge">2 · crescere</span>
+        <h3>Le regole nascono dalle correzioni</h3>
+        <p>Ogni volta che correggete la stessa cosa due volte, chiedete: «aggiungi una regola
+          al file-guida perché non succeda più».</p>
+      </div>
+      <div class="box">
+        <span class="badge">3 · potare</span>
+        <h3>Il test di cancellazione</h3>
+        <p>Se togliete una riga e il comportamento non cambia, quella riga era inutile e va
+          cancellata. Il file non deve solo crescere.</p>
+      </div>
+    </div>
+    <div class="box green" style="margin-top:22px">
+      <p><b>Incontrerete anche altri due file.</b> <code>MEMORY.md</code> è il diario del
+        lavoro fatto e delle lezioni imparate. <code>plan.md</code> contiene il piano di un
+        lavoro lungo. Il file-guida dice dove trovarli, senza copiarne il contenuto.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Scrivere il file-guida</span><span>12</span></div>
+</section>
+
+<!-- 13 SCHEDA · FILE-GUIDA E MEMORIA -->
+<section class="slide">
+  <div class="rail"><span>Ora 4 · Context engineering e memoria</span></div>
+  <div class="body">
+    <div class="kicker">Scheda piattaforma · 3</div>
+    <h2>File-guida e memoria automatica</h2>
+    <div class="content scheda">
+      <div class="concept"><b>Concetto stabile</b>
+        <span>Voi scrivete il file-guida e l'agente lo rilegge sempre. La memoria automatica
+          invece raccoglie appunti che l'agente decide da solo di conservare. È comoda, ma
+          non la controllate voi.</span></div>
+      <table>
+        <tr><th></th><th>Claude Code</th><th>Codex</th><th>Antigravity</th></tr>
+        <tr><td>File-guida</td><td><code>CLAUDE.md</code>; una riga di rimando porta ad
+          <code>AGENTS.md</code></td><td><code>AGENTS.md</code></td>
+          <td><code>AGENTS.md</code> oppure <code>GEMINI.md</code></td></tr>
+        <tr><td>Per tutte le cartelle</td><td><code>CLAUDE.md</code> nella cartella utente
+          <code>.claude</code></td><td><code>AGENTS.md</code> nella cartella utente
+          <code>.codex</code></td><td><code>GEMINI.md</code> nella cartella utente
+          <code>.gemini</code></td></tr>
+        <tr><td>Memoria automatica</td><td>Attiva: appunti in un <code>MEMORY.md</code> che si
+          può aprire e correggere</td><td>«Memorie», spente all'inizio: si attivano da
+          Impostazioni → Personalizzazione</td><td><span class="check">Base di conoscenza
+          raccolta dalle conversazioni</span></td></tr>
+      </table>
+      <div class="stamp"><span>Stato: fonti di marzo–settembre 2026</span>
+        <span class="check">Da ricontrollare la settimana della lezione</span></div>
+    </div>
+    <div class="cols c2" style="margin-top:16px;gap:18px">
+      <div class="box green">
+        <p><b>Scrivete nel file-guida le regole che devono valere sempre.</b> Non affidatele
+          alla memoria automatica: lo raccomandano anche i produttori.</p>
+      </div>
+      <div class="box">
+        <p><b>Il file per tutte le cartelle</b> potrebbe ospitare il vostro profilo. Nel corso
+          lo teniamo in una cartella a parte, dove si vede e si corregge.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Scheda · file-guida e memoria</span><span>13</span></div>
+</section>
+
+<!-- 14 DATI PERSONALI -->
+<section class="slide">
+  <div class="rail"><span>Ora 4 · Context engineering e memoria</span></div>
+  <div class="body">
+    <div class="kicker">Sicurezza applicata</div>
+    <h2>I dati degli studenti restano fuori dal contesto permanente<span class="sub">Il
+      file-guida entra in ogni sessione e viaggia con la cartella. Quello che ci scrivete vi
+      segue ovunque.</span></h2>
+    <div class="content cols c2">
+      <div class="box green">
+        <div class="tag">Nel profilo sì</div>
+        <ul class="clean">
+          <li>Materia, indirizzo, anno delle classi</li>
+          <li>Programma e profilo della classe <b>nel suo insieme</b></li>
+          <li>Stile dei materiali, formati, lunghezze</li>
+          <li>Scale, griglie, convenzioni di valutazione</li>
+          <li>«Ci sono studenti con PDP: prepara sempre anche la versione con misure
+            compensative»</li>
+        </ul>
+      </div>
+      <div class="box orange">
+        <div class="tag">Nel profilo no</div>
+        <ul class="clean">
+          <li>Nomi e cognomi, anche solo iniziali riconoscibili</li>
+          <li>Voti, assenze, note disciplinari</li>
+          <li>Certificazioni, diagnosi, contenuto dei PDP</li>
+          <li>Situazioni familiari, salute, provenienza</li>
+          <li>Elaborati degli studenti non resi anonimi</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box" style="margin-top:22px">
+      <p><b>Mettete questa riga in ogni profilo:</b> «In questa cartella non entrano dati di
+        singoli studenti. Se te ne incollo per errore, fermati e dimmelo.» Il controllo resta
+        vostro, ma la riga aggiunge una protezione.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Dati personali</span><span>14</span></div>
+</section>
+
+<!-- 15 UN PROFILO D'ESEMPIO -->
+<section class="slide">
+  <div class="rail"><span>Ora 4 · Context engineering e memoria</span></div>
+  <div class="body">
+    <div class="kicker">Il profilo disciplinare</div>
+    <h2>Ecco un profilo completo<span class="sub">È il profilo di una docente inventata di
+      Italiano e Storia. Contiene una pagina di mappa e tre file di dettaglio.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.35fr 1fr;gap:28px;align-items:start">
+<div class="src"><span class="hd">materiali/ora-04-profilo-esempio/AGENTS.md · estratto</span><span class="h"># Profilo docente — Italiano e Storia</span>
+
+<span class="h">## Come lavoriamo</span>
+- Prima di un materiale lungo proponimi una scaletta
+  e aspetta il mio via.
+- Se ti manca un'informazione, chiedimela oppure scrivi
+  [dato mancante]. Non inventare.
+
+<span class="h">## Dove trovi i dettagli</span>
+<span class="k">| prepari schede, verifiche | profilo/stile-materiali.md |
+| proponi voti o giudizi    | profilo/valutazione.md     |</span>
+
+<span class="h">## Regole nate dalle correzioni</span>
+- Nelle verifiche di Storia niente vero/falso. <span class="dim">(ottobre)</span></div>
+      <div class="box">
+        <h3>Da guardare</h3>
+        <ul class="clean">
+          <li><b>La tabella dei rimandi</b> dice anche <i>quando</i> aprire ogni file.</li>
+          <li><b>Le regole nate dalle correzioni</b> hanno la data: si sa da dove vengono.</li>
+          <li><b>La media del quadrimestre</b> è scritta in <code>valutazione.md</code>. Per
+            questo qui l'agente non fa scelte silenziose.</li>
+        </ul>
+        <p class="muted" style="margin-top:4px">Chi non finisce il laboratorio può copiare
+          questo profilo e adattarlo.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Un profilo d'esempio</span><span>15</span></div>
+</section>
+
+<!-- 16 LABORATORIO -->
+<section class="slide lab">
+  <div class="rail"><span>Ora 4 · Context engineering e memoria</span></div>
+  <div class="body">
+    <div class="kicker">Laboratorio · 20 minuti · da soli, al computer</div>
+    <h2>Il vostro profilo disciplinare<span class="sub">Lavorate in una cartella nuova e vuota,
+      non nella cartella di prova. L'agente scrive il file e voi date le risposte.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.2fr 1fr;gap:22px;align-items:start">
+      <div class="prompt">
+        <div class="lbl">Da incollare</div>
+        Voglio creare il mio profilo di docente: un AGENTS.md che rileggerai ogni volta che
+        lavoriamo in questa cartella. Intervistami una domanda alla volta su materia, classi,
+        stile dei materiali e convenzioni di valutazione. Poi proponimi il file: breve, a
+        mappa, con i dettagli lunghi in file separati che richiami solo quando servono. Non
+        inserire nomi o dati di studenti.
+      </div>
+      <div class="cols steps" style="gap:12px">
+        <div class="box">
+          <span class="badge">2 min</span>
+          <p>Create la cartella <code>profilo-docente</code> e apritela con l'agente.</p>
+        </div>
+        <div class="box">
+          <span class="badge">12 min</span>
+          <p>L'agente vi intervista e propone il file. Rispondete come a un collega nuovo e
+            correggete il file prima di approvarlo.</p>
+        </div>
+        <div class="box">
+          <span class="badge">6 min</span>
+          <p>Aprite una sessione nuova e chiedete: «Che cosa sai di me e del mio lavoro?».
+            L'agente risponde con ciò che avete scritto?</p>
+        </div>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:18px">
+      <p><b>Da controllare alla fine:</b> è breve? Rimanda a file separati, dicendo quando
+        aprirli? C'è una riga che, cancellata, non cambierebbe niente? C'è un nome di studente?</p>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../consegne/ora-04-lab-profilo.md" target="_blank">Consegna su Classroom <b>ora-04-lab-profilo.md</b></a><span>16</span></div>
+</section>
+
+<!-- 17 CHIUSURA -->
+<section class="slide">
+  <div class="rail"><span>Ora 4 · Context engineering e memoria</span></div>
+  <div class="body">
+    <div class="kicker">Chiusura</div>
+    <h2>Quattro cose da portare a casa</h2>
+    <div class="content">
+      <ol class="num">
+        <li><b>Il contesto è una scrivania da tenere in ordine.</b>
+          Tenetelo piccolo e pertinente e usate una sessione per compito. Scrivete su file
+          ciò che deve durare.</li>
+        <li><b>Quando manca un'informazione, l'agente decide o inventa.</b>
+          E non ve lo dice. Le regole scritte in anticipo vi proteggono.</li>
+        <li><b>Il file-guida è una mappa.</b>
+          È breve e rimanda i dettagli a file separati. Nasce da un'intervista e cresce con
+          le correzioni.</li>
+        <li><b>I dati degli studenti restano fuori dal contesto permanente.</b>
+          Ciò che è sulla scrivania può finire in qualunque testo.</li>
+      </ol>
+      <div class="cols c2" style="margin-top:24px;gap:18px">
+        <div class="box green">
+          <p><b>A casa, se volete, aggiungete la regola che manca.</b> Scrivete in
+            <code>AGENTS.md</code> della cartella di prova come si calcola la media, e rifate
+            la prima prova con un collega.</p>
+        </div>
+        <div class="box orange">
+          <p><b>Prossima ora: la knowledge base.</b> Il profilo dice chi siete. Adesso servono
+            le fonti della vostra disciplina, organizzate in modo che l'agente le trovi.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Chiusura</span><span>17</span></div>
+</section>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var body = document.body;
+  var counter = document.getElementById('presentCounter');
+  var hint = document.getElementById('presentHint');
+  var idx = 0;
+  var presenting = false;
+
+  function fitScale(){
+    var s = Math.min(window.innerWidth/1280, window.innerHeight/720);
+    document.documentElement.style.setProperty('--scale', s);
+  }
+
+  function render(){
+    slides.forEach(function(s,i){ s.classList.toggle('active', i===idx); });
+    counter.textContent = (idx+1) + ' / ' + slides.length;
+  }
+
+  function enter(){
+    presenting = true;
+    body.classList.add('present');
+    fitScale();
+    render();
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(function(){});
+    }
+  }
+
+  function exit(){
+    presenting = false;
+    body.classList.remove('present');
+    if (document.fullscreenElement) document.exitFullscreen().catch(function(){});
+  }
+
+  function next(){ if (idx < slides.length-1){ idx++; render(); } }
+  function prev(){ if (idx > 0){ idx--; render(); } }
+
+  document.addEventListener('keydown', function(e){
+    if (!presenting){
+      if (e.key === 'p' || e.key === 'P') enter();
+      return;
+    }
+    switch(e.key){
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown':
+        e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+        e.preventDefault(); prev(); break;
+      case 'Home':
+        e.preventDefault(); idx = 0; render(); break;
+      case 'End':
+        e.preventDefault(); idx = slides.length-1; render(); break;
+      case 'Escape':
+        exit(); break;
+    }
+  });
+
+  document.addEventListener('click', function(e){
+    if (!presenting) return;
+    if (e.target.closest('a')) return;
+    if (e.clientX > window.innerWidth/2) next(); else prev();
+  });
+
+  document.addEventListener('fullscreenchange', function(){
+    if (!document.fullscreenElement && presenting) exit();
+  });
+
+  window.addEventListener('resize', fitScale);
+
+  hint.classList.add('show');
+  setTimeout(function(){ hint.classList.remove('show'); }, 4000);
+
+  // ---- controllo dimensione testo ----
+  var ZOOM_MIN = 0.8, ZOOM_MAX = 1.4, ZOOM_STEP = 0.1;
+  var zoomVal = document.getElementById('zoomVal');
+  var zoomIn = document.getElementById('zoomIn');
+  var zoomOut = document.getElementById('zoomOut');
+  var zoom = 1;
+  try { zoom = parseFloat(localStorage.getItem('slideZoom')) || 1; } catch(e){}
+
+  function applyZoom(){
+    zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom));
+    document.documentElement.style.setProperty('--content-zoom', zoom);
+    zoomVal.textContent = Math.round(zoom * 100) + '%';
+    try { localStorage.setItem('slideZoom', zoom); } catch(e){}
+  }
+
+  zoomIn.addEventListener('click', function(){ zoom += ZOOM_STEP; applyZoom(); });
+  zoomOut.addEventListener('click', function(){ zoom -= ZOOM_STEP; applyZoom(); });
+
+  document.addEventListener('keydown', function(e){
+    if (presenting) return;
+    if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '=')){
+      e.preventDefault(); zoom += ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '-'){
+      e.preventDefault(); zoom -= ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '0'){
+      e.preventDefault(); zoom = 1; applyZoom();
+    }
+  });
+
+  applyZoom();
+})();
+</script>
+
+</body>
+</html>

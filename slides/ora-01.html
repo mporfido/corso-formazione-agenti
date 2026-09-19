@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Ora 1 — Dal chatbot all'agente</title>
+<style>
+:root{
+  --paper:#f2efe9;
+  --card:#fbfaf7;
+  --ink:#1d1c1a;
+  --ink-soft:#5c5850;
+  --line:#ddd7cc;
+  --green:#1a3c3a;
+  --green-soft:#e6ece9;
+  --orange:#c0562f;
+  --orange-soft:#f6e7de;
+  --blue:#2f5a8c;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);font-family:var(--sans);color:var(--ink);
+  -webkit-font-smoothing:antialiased;padding:28px 0}
+
+/* ---------- slide frame ---------- */
+.slide{
+  position:relative;width:1280px;height:720px;margin:0 auto 28px;
+  background:var(--card);border:1px solid var(--line);
+  display:grid;grid-template-columns:56px 1fr;overflow:hidden;
+}
+.rail{
+  background:var(--green);color:#f4f1ea;
+  display:flex;align-items:center;justify-content:center;
+}
+.rail span{
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  white-space:nowrap;opacity:.9;
+}
+.body{padding:52px 60px 64px;display:flex;flex-direction:column;min-width:0}
+.kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--orange);font-weight:600;margin-bottom:14px}
+h1{font-family:var(--serif);font-size:56px;line-height:1.08;font-weight:600;
+  letter-spacing:-.01em}
+h2{font-family:var(--serif);font-size:40px;line-height:1.12;font-weight:600;
+  letter-spacing:-.01em;margin-bottom:26px}
+h2 .sub{display:block;font-family:var(--sans);font-size:15px;font-weight:400;
+  color:var(--ink-soft);letter-spacing:0;margin-top:10px;line-height:1.45}
+p{font-size:17px;line-height:1.55;color:var(--ink)}
+.muted{color:var(--ink-soft)}
+.foot{position:absolute;left:56px;right:0;bottom:0;height:40px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 60px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-soft);border-top:1px solid var(--line)}
+.content{flex:0 1 auto;min-height:0}
+
+/* ---------- cover ---------- */
+.cover .body{justify-content:center}
+.cover h1{font-size:72px;max-width:900px}
+.cover .lede{margin-top:26px;font-size:19px;color:var(--ink-soft);max-width:680px}
+.rule{width:72px;height:3px;background:var(--orange);margin:32px 0 0}
+.meta{margin-top:38px;display:flex;gap:44px;font-size:13px;color:var(--ink-soft)}
+.meta b{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--green);margin-bottom:6px}
+
+/* ---------- generic layout helpers ---------- */
+.cols{display:grid;gap:22px}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c4{grid-template-columns:repeat(4,1fr)}
+.box{border:1px solid var(--line);background:#fff;padding:22px 24px;
+  display:flex;flex-direction:column;gap:10px;min-width:0}
+.box h3{font-family:var(--serif);font-size:22px;font-weight:600;line-height:1.2}
+.box .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.box p,.box li{font-size:15px;line-height:1.5;color:var(--ink-soft)}
+.box.green{background:var(--green-soft);border-color:#cbd8d3}
+.box.orange{background:var(--orange-soft);border-color:#ecd4c5}
+ul.clean{list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.clean li{position:relative;padding-left:18px;font-size:16px;line-height:1.5}
+ul.clean li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;
+  background:var(--orange)}
+.box ul.clean li{font-size:15px}
+ol.num{list-style:none;counter-reset:n;display:flex;flex-direction:column;gap:16px}
+ol.num li{counter-increment:n;position:relative;padding-left:46px;font-size:17px;
+  line-height:1.5}
+ol.num li::before{content:counter(n,decimal-leading-zero);position:absolute;left:0;top:1px;
+  font-size:13px;font-weight:600;color:var(--green);letter-spacing:.06em}
+ol.num li b{display:block;font-family:var(--serif);font-size:20px;font-weight:600;
+  margin-bottom:4px;color:var(--ink)}
+
+/* ---------- tabella ---------- */
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:13px 16px;font-size:15px;line-height:1.45;
+  border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);
+  font-weight:600;border-bottom:2px solid var(--green)}
+td:first-child{font-weight:600;width:24%}
+td.o{color:var(--orange)}
+
+/* ---------- loop diagram ---------- */
+.loop{display:flex;align-items:stretch;gap:0;margin-top:6px}
+.step{flex:1;border:1px solid var(--line);background:#fff;padding:20px 18px 22px;
+  display:flex;flex-direction:column;gap:8px;min-width:0}
+.step .n{font-size:11px;letter-spacing:.16em;color:var(--orange);font-weight:600}
+.step h3{font-family:var(--serif);font-size:24px;font-weight:600}
+.step p{font-size:14px;line-height:1.45;color:var(--ink-soft)}
+.step.on{background:var(--green-soft);border-color:#cbd8d3}
+.arrow{display:flex;align-items:center;padding:0 9px;color:var(--green);font-size:20px}
+.loopback{margin-top:14px;border-top:1px dashed var(--green);padding-top:10px;
+  font-size:13px;color:var(--green);letter-spacing:.04em;text-align:center}
+
+/* ---------- catena ---------- */
+.chain{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.link{border:1px solid var(--line);background:#fff;padding:18px;display:flex;
+  flex-direction:column;gap:8px;min-width:0}
+.link .idx{font-family:var(--serif);font-size:30px;color:var(--green);line-height:1}
+.link h3{font-size:15px;font-weight:700;line-height:1.3}
+.link p{font-size:13px;line-height:1.45;color:var(--ink-soft)}
+.link .lim{font-size:12px;color:var(--orange);line-height:1.4;margin-top:auto;
+  padding-top:8px;border-top:1px solid var(--line)}
+.link.on{background:var(--green-soft);border-color:#cbd8d3}
+.link.on .lim{color:var(--green);border-top-color:#cbd8d3}
+
+/* ---------- ieri / oggi ---------- */
+.ba{display:flex;flex-direction:column;gap:9px;margin-top:2px}
+.ba div{position:relative;padding-left:54px;font-size:14px;line-height:1.5;
+  color:var(--ink-soft)}
+.ba div b{position:absolute;left:0;top:3px;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;font-weight:600;color:var(--ink-soft)}
+.ba div.now{color:var(--ink)}
+.ba div.now b{color:var(--orange)}
+
+/* ---------- prompt box ---------- */
+.prompt{background:var(--green);color:#eef2f0;padding:20px 24px;font-family:var(--sans);
+  font-size:15px;line-height:1.6}
+.prompt .lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;margin-bottom:8px}
+.badge{display:inline-block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  background:var(--green);color:#fff;padding:4px 9px;align-self:flex-start}
+.badge.o{background:var(--orange)}
+
+/* ---------- cartoncino casi d'uso ---------- */
+.card-uso{border:1px dashed var(--green);background:#fff;padding:22px 26px;
+  display:flex;flex-direction:column;gap:0}
+.card-uso .row{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:12px 0;
+  border-bottom:1px solid var(--line)}
+.card-uso .row:last-child{border-bottom:none}
+.card-uso .row i{font-style:normal;font-family:var(--serif);font-size:20px;
+  color:var(--orange);line-height:1.2}
+.card-uso .row b{display:block;font-size:16px;line-height:1.35}
+.card-uso .row span{display:block;font-size:13px;line-height:1.45;color:var(--ink-soft);
+  margin-top:3px}
+
+/* ---------- scala autonomia ---------- */
+.scale{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);
+  background:#fff}
+.scale div{padding:14px 16px;border-right:1px solid var(--line);min-width:0}
+.scale div:last-child{border-right:none}
+.scale b{display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--green);margin-bottom:6px}
+.scale span{display:block;font-size:14px;line-height:1.4}
+.scale-axis{display:flex;justify-content:space-between;font-size:11px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--orange);margin-top:8px}
+
+/* ---------- matrice ---------- */
+.qs{background:var(--green);color:#eef2f0;padding:18px 24px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.qs div{font-size:16px;line-height:1.4;min-width:0;padding-left:34px;position:relative}
+.qs div i{position:absolute;left:0;top:-2px;font-style:normal;font-family:var(--serif);
+  font-size:24px;color:#9fbdb4}
+.qs-to{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);
+  font-weight:600;margin:16px 0 12px}
+.zone .who{font-size:13px;line-height:1.45;color:var(--ink);padding-bottom:8px;
+  border-bottom:1px solid var(--line)}
+.zone.green .who{border-bottom-color:#cbd8d3}
+.zone.orange .who{border-bottom-color:#ecd4c5}
+
+/* ---------- tipi di slide: dimostrazione e laboratorio ----------
+   Basta aggiungere .demo o .lab alla <section class="slide">: cambiano rail,
+   fondo, kicker e compare il timbro. Il link al file sta nel piè di pagina. */
+.slide.demo{background:#eef2f7}
+.slide.lab{background:#fcf2ea}
+.slide.demo .rail{background:var(--blue)}
+.slide.lab .rail{background:var(--orange)}
+.slide.demo .rail span,.slide.lab .rail span{display:none}
+.slide.demo .rail::before,.slide.lab .rail::before{
+  writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;
+  font-size:14px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:#fff}
+.slide.demo .rail::before{content:"Dimostrazione"}
+.slide.lab .rail::before{content:"Laboratorio"}
+.slide.demo::after,.slide.lab::after{
+  position:absolute;top:18px;right:22px;padding:7px 14px;color:#fff;
+  font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase}
+.slide.demo::after{content:"◉\00a0\00a0Guardate lo schermo";background:var(--blue)}
+.slide.lab::after{content:"✎\00a0\00a0Tocca a voi";background:var(--orange)}
+.slide.demo .kicker{color:var(--blue)}
+.slide.demo .foot,.slide.lab .foot{border-top-color:rgba(0,0,0,.08)}
+.foot a.task{display:inline-flex;align-items:center;gap:10px;margin-left:-12px;
+  padding:6px 12px;color:#fff;text-decoration:none;font-weight:700;letter-spacing:.12em}
+.foot a.task b{font-family:var(--mono);font-weight:400;font-size:12px;letter-spacing:0;
+  text-transform:none;opacity:.95}
+.slide.demo .foot a.task{background:var(--blue)}
+.slide.lab .foot a.task{background:var(--orange)}
+.foot a.task:hover{filter:brightness(1.1)}
+
+/* ---------- print ---------- */
+.slide{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:13.333in 7.5in;margin:0}
+@media print{
+  body{background:#fff;padding:0}
+  .slide{margin:0;border:none;page-break-after:always;box-shadow:none}
+  .slide:last-child{page-break-after:auto}
+}
+
+/* ---------- presentation mode ---------- */
+body.present{padding:0;overflow:hidden;background:#000}
+body.present .slide{
+  display:none;margin:0;border:none;
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(var(--scale,1));
+  transform-origin:center center;
+}
+body.present .slide.active{display:grid}
+.present-hint{
+  position:fixed;bottom:14px;right:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.present-hint.show{opacity:1}
+.present-counter{
+  position:fixed;bottom:14px;left:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  display:none;
+}
+body.present .present-counter{display:block}
+
+/* ---------- controllo dimensione testo ---------- */
+:root{--content-zoom:1}
+.body{zoom:var(--content-zoom)}
+.zoom-ctrl{
+  position:fixed;top:14px;right:18px;z-index:60;
+  display:flex;align-items:center;gap:2px;
+  background:rgba(29,28,26,.88);border-radius:4px;padding:4px;
+  font-family:var(--sans);
+}
+.zoom-ctrl button{
+  width:28px;height:28px;border:none;border-radius:3px;background:transparent;
+  color:#f4f1ea;font-size:14px;font-weight:600;cursor:pointer;line-height:1;
+}
+.zoom-ctrl button:hover{background:rgba(255,255,255,.15)}
+.zoom-ctrl .val{
+  min-width:38px;text-align:center;font-size:11px;letter-spacing:.04em;
+  color:#cfcabf;user-select:none;
+}
+body.present .zoom-ctrl{display:none}
+@media print{.zoom-ctrl{display:none}}
+</style>
+</head>
+<body>
+<div class="present-counter" id="presentCounter"></div>
+<div class="present-hint" id="presentHint">Premi P per entrare in modalità presentazione · frecce/spazio per avanzare · Esc per uscire</div>
+<div class="zoom-ctrl">
+  <button id="zoomOut" title="Riduci testo" aria-label="Riduci testo">A−</button>
+  <span class="val" id="zoomVal">100%</span>
+  <button id="zoomIn" title="Aumenta testo" aria-label="Aumenta testo">A+</button>
+</div>
+
+<!-- 01 COVER -->
+<section class="slide cover">
+  <div class="rail"><span>Ora 1 · Dal chatbot all'agente</span></div>
+  <div class="body">
+    <div class="kicker">Dalla IA generativa alla IA agentica · Ora 1</div>
+    <h1>Dal chatbot<br>all'agente</h1>
+    <div class="rule"></div>
+    <p class="lede">Vediamo che cosa rende «agentico» un sistema e dove può sbagliare.
+      Poi decidiamo quali compiti conviene affidargli e quali è meglio tenere per sé.</p>
+    <div class="meta">
+      <div><b>Destinatari</b>Docenti di scuola superiore</div>
+      <div><b>Prerequisiti</b>Aver usato ChatGPT o simili</div>
+      <div><b>Durata</b>Un'ora, pausa compresa</div>
+      <div><b>Modulo</b>1 di 13</div>
+    </div>
+  </div>
+  <div class="foot"><span>Corso agenti IA</span><span>01</span></div>
+</section>
+
+<!-- 02 DA DOVE VENIAMO -->
+<section class="slide">
+  <div class="rail"><span>Ora 1 · Dal chatbot all'agente</span></div>
+  <div class="body">
+    <div class="kicker">Continuità</div>
+    <h2>Siamo passati per quattro fasi. Oggi inizia la quinta<span class="sub">Il corso
+      «Docente 4.0» si fermava alla quarta fase. Questo corso riparte da lì.</span></h2>
+    <div class="content">
+      <div class="chain">
+        <div class="link">
+          <div class="idx">1.0</div>
+          <h3>Analogico</h3>
+          <p>Il docente custodisce la conoscenza e la trasmette con lezione, libro e lavagna.</p>
+          <div class="lim">Il sapere viaggia in una sola direzione.</div>
+        </div>
+        <div class="link">
+          <div class="idx">2.0</div>
+          <h3>Connettività</h3>
+          <p>Con blog, wiki e forum la conoscenza si condivide e si costruisce insieme.</p>
+          <div class="lim">Però tutto resta dentro piattaforme chiuse.</div>
+        </div>
+        <div class="link">
+          <div class="idx">3.0</div>
+          <h3>Digitale integrato</h3>
+          <p>Con LIM, Google Docs e Kahoot il digitale entra nella lezione e nella valutazione.</p>
+          <div class="lim">I contenuti restano legati allo strumento.</div>
+        </div>
+        <div class="link on">
+          <div class="idx">4.0</div>
+          <h3>Padronanza strategica</h3>
+          <p>L'IA genera i contenuti e voi li curate. I materiali restano vostri, in formati
+            standard.</p>
+          <div class="lim">Qui si è fermato il corso precedente.</div>
+        </div>
+      </div>
+      <div class="box orange" style="margin-top:26px">
+        <p>Finora l'IA produceva testo e i file li gestivate voi: esportavate, copiavate,
+          incollavate e reimportavate. <b>Da oggi i file li sposta l'agente.</b></p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Da dove veniamo</span><span>02</span></div>
+</section>
+
+<!-- 03 PERCHÉ QUESTO CORSO -->
+<section class="slide">
+  <div class="rail"><span>Ora 1 · Dal chatbot all'agente</span></div>
+  <div class="body">
+    <div class="kicker">Motivazione</div>
+    <h2>Il problema che avevamo lasciato aperto<span class="sub">Il corso precedente
+      ha lasciato aperti tre nodi. L'agente li scioglie tutti e tre.</span></h2>
+    <div class="content">
+    <div class="cols c3">
+      <div class="box">
+        <div class="tag">Nodo 1</div>
+        <h3>Il lavoro resta prigioniero</h3>
+        <div class="ba">
+          <div><b>Ieri</b>Il quiz costruito dentro Panquiz vive solo lì: se la
+            piattaforma chiude o passa a pagamento, sparisce.</div>
+          <div class="now"><b>Oggi</b>L'agente lavora sui vostri file, nella vostra
+            cartella. Il materiale resta vostro anche senza di lui.</div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="tag">Nodo 2</div>
+        <h3>Poco controllo su ciò che l'IA produce</h3>
+        <div class="ba">
+          <div><b>Ieri</b>Premi «genera domande» e prendi quello che esce.</div>
+          <div class="now"><b>Oggi</b>Gli mostrate la vostra griglia, la programmazione e
+            i materiali della classe. Mentre lavora, potete correggere il tiro.</div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="tag">Nodo 3</div>
+        <h3>La fatica di fare da tramite</h3>
+        <div class="ba">
+          <div><b>Ieri</b>A ogni passaggio dovevate esportare, copiare, incollare,
+            ricontrollare e reimportare.</div>
+          <div class="now"><b>Oggi</b>Quei passaggi li fa lui. A voi restano la decisione
+            e la verifica.</div>
+        </div>
+      </div>
+    </div>
+    <div class="box green" style="margin-top:22px">
+      <p>Il salto non dipende da un'IA più potente. L'IA smette di darvi istruzioni e
+        comincia a fare il lavoro, sotto la vostra supervisione. <b>Restate architetti del
+        sapere, ma adesso avete una squadra.</b></p>
+    </div>
+    </div>
+  </div>
+  <div class="foot"><span>Perché questo corso</span><span>03</span></div>
+</section>
+
+<!-- 04 CASI D'USO -->
+<section class="slide lab">
+  <div class="rail"><span>Ora 1 · Dal chatbot all'agente</span></div>
+  <div class="body">
+    <div class="kicker">Laboratorio · 5 minuti · da soli, su carta</div>
+    <h2>Un compito che vi ruba tempo<span class="sub">Pensate a un compito vero del
+      vostro lavoro, uno solo. Scrivetelo sul cartoncino: lo riprenderemo alla fine dell'ora.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.25fr 1fr;align-items:start">
+      <div class="card-uso">
+        <div class="row"><i>1</i><div><b>Il compito</b>
+          <span>Es.: preparare le schede di recupero, riordinare i materiali di un anno,
+            scrivere le comunicazioni alle famiglie.</span></div></div>
+        <div class="row"><i>2</i><div><b>Ogni quanto lo fate</b>
+          <span>Una volta l'anno, ogni settimana, ogni giorno.</span></div></div>
+        <div class="row"><i>3</i><div><b>Che cosa vi serve per farlo</b>
+          <span>File, dati, fonti, programmazione, griglie…</span></div></div>
+        <div class="row"><i>4</i><div><b>Se esce sbagliato, chi se ne accorge?</b>
+          <span>Pensate anche a quando: subito, dopo o forse mai.</span></div></div>
+      </div>
+      <div class="box green">
+        <div class="tag">Perché queste quattro righe</div>
+        <p>Le prime due dicono se vale la pena delegarlo. Le ultime due dicono
+          <b>quanto controllo serve</b> se lo delegate.</p>
+        <p>Quest'ora serve a rispondere a questa domanda. La risposta cambia da
+          compito a compito.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../consegne/ora-01-lab-casi-uso.md" target="_blank">Consegna su Classroom <b>ora-01-lab-casi-uso.md</b></a><span>04</span></div>
+</section>
+
+<!-- 05 OBIETTIVI E MAPPA -->
+<section class="slide">
+  <div class="rail"><span>Ora 1 · Dal chatbot all'agente</span></div>
+  <div class="body">
+    <div class="kicker">Obiettivi e mappa</div>
+    <h2>Alla fine di quest'ora<span class="sub">Oggi non servono account né installazioni:
+      guardiamo e ragioniamo. Dall'ora 2 lavorerete voi al computer.</span></h2>
+    <ol class="num" style="margin-bottom:28px">
+      <li><b>Sapete riconoscere che cosa rende agentico un sistema</b>
+        Capite anche perché lo stesso modello lavora in modo diverso se cambia l'impalcatura.</li>
+      <li><b>Sapete distinguere che cosa affidargli</b>
+        Alcuni compiti si possono automatizzare, altri richiedono un vostro controllo stretto.</li>
+    </ol>
+    <div class="content cols c3">
+      <div class="box green">
+        <div class="tag">Parte 1 · 20 min</div>
+        <h3>Che cosa rende agentico un sistema</h3>
+        <ul class="clean">
+          <li>Chat e agente, dal vivo</li>
+          <li>Il ciclo in quattro fasi</li>
+          <li>L'impalcatura intorno al modello</li>
+        </ul>
+      </div>
+      <div class="box">
+        <div class="tag">Parte 2 · 15 min</div>
+        <h3>Dove può sbagliare</h3>
+        <ul class="clean">
+          <li>Autonomia e supervisione</li>
+          <li>Quando non sa, l'agente inventa</li>
+          <li>Chi risponde del risultato</li>
+        </ul>
+      </div>
+      <div class="box orange">
+        <div class="tag">Parte 3 · 15 min</div>
+        <h3>Che cosa affidargli</h3>
+        <ul class="clean">
+          <li>Tre domande per decidere</li>
+          <li>I vostri casi d'uso nella matrice</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Obiettivi e mappa</span><span>05</span></div>
+</section>
+
+<!-- 06 DEMO CHAT VS AGENTE -->
+<section class="slide demo">
+  <div class="rail"><span>Ora 1 · Dal chatbot all'agente</span></div>
+  <div class="body">
+    <div class="kicker">Dimostrazione dal vivo</div>
+    <h2>La stessa domanda, due risposte diverse<span class="sub">Facciamo la stessa
+      richiesta sulla cartella di una classe inventata, prima a una chat e poi a un agente.</span></h2>
+    <div class="content cols c2">
+      <div class="box">
+        <div class="tag">Chat</div>
+        <h3>«Quante insufficienze ci sono state in 3ªB a gennaio?»</h3>
+        <p>«Non ho accesso al tuo registro. Puoi esportare i voti e incollarmeli qui,
+          oppure controllare nella sezione valutazioni.»</p>
+        <p class="muted">Risponde una volta sola, con quello che ha in memoria.
+          Il lavoro resta tutto a voi.</p>
+      </div>
+      <div class="box green">
+        <div class="tag">Agente</div>
+        <h3>«Quante insufficienze ci sono state in 3ªB a gennaio?»</h3>
+        <p>Cerca nella cartella dove stanno i voti → apre scritti e orali → tiene solo
+          le prove di gennaio → conta → risponde e prepara la tabella, dicendo da quali
+          file ha preso i numeri.</p>
+        <p class="muted">Osserva, pianifica, agisce e controlla il risultato. Nessuno gli
+          ha detto dove guardare.</p>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:22px">
+      <p><b>Mentre guardate la demo:</b> contate quante cose fa l'agente
+        <i>prima</i> di rispondere. Sono quelle che, con la chat, avreste fatto voi.</p>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../demo/ora-01-demo-chat-agente.md" target="_blank">Copione della demo <b>ora-01-demo-chat-agente.md</b></a><span>06</span></div>
+</section>
+
+<!-- 07 CHAT VS AGENTE TABELLA -->
+<section class="slide">
+  <div class="rail"><span>Ora 1 · Dal chatbot all'agente</span></div>
+  <div class="body">
+    <div class="kicker">La differenza in quattro punti</div>
+    <h2>Chat e agente a confronto</h2>
+    <div class="content">
+      <table>
+        <tr><th></th><th>Chat</th><th>Agente</th></tr>
+        <tr><td>Modo di lavorare</td><td>Una domanda, una risposta</td>
+          <td class="o">Un obiettivo, molti passi in sequenza</td></tr>
+        <tr><td>Strumenti</td><td>Solo testo (e ciò che gli incollate)</td>
+          <td class="o">Legge e scrive file, cerca, esegue programmi</td></tr>
+        <tr><td>Memoria</td><td>Finisce con la conversazione</td>
+          <td class="o">Scrive su file e li rilegge la sessione dopo</td></tr>
+        <tr><td>Chi fa il lavoro</td><td>Voi, seguendo le istruzioni</td>
+          <td class="o">Lui, sotto la vostra supervisione</td></tr>
+      </table>
+      <div class="box orange" style="margin-top:26px">
+        <p><b>Ecco il punto che cambia tutto:</b> le azioni dell'agente hanno
+          <i>conseguenze</i> reali. Un file modificato resta modificato. Per questo
+          esistono i permessi, che useremo nell'ora 3.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Chat vs agente</span><span>07</span></div>
+</section>
+
+<!-- 08 CICLO -->
+<section class="slide">
+  <div class="rail"><span>Ora 1 · Dal chatbot all'agente</span></div>
+  <div class="body">
+    <div class="kicker">Il meccanismo</div>
+    <h2>Osserva, pianifica, agisce, verifica<span class="sub">Poi l'agente ricomincia.
+      Il ciclo si ripete finché l'obiettivo non è raggiunto.</span></h2>
+    <div class="content">
+      <div class="loop">
+        <div class="step">
+          <div class="n">01</div>
+          <h3>Osserva</h3>
+          <p>Legge la richiesta e lo stato delle cose: i file nella cartella, il risultato
+            del passo precedente, i vostri chiarimenti.</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="n">02</div>
+          <h3>Pianifica</h3>
+          <p>Decide il prossimo passo: mi bastano i dati che ho? Mi serve uno strumento?
+            Devo chiedere una precisazione?</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <div class="n">03</div>
+          <h3>Agisce</h3>
+          <p>Usa uno strumento: apre un file, lo modifica, cerca sul web, esegue un
+            comando.</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step on">
+          <div class="n">04</div>
+          <h3>Verifica</h3>
+          <p>Guarda com'è andata: il passo è riuscito? L'obiettivo è raggiunto? Se no,
+            torna a osservare.</p>
+        </div>
+      </div>
+      <div class="loopback">↺ &nbsp; Il ciclo si ripete finché il compito è finito o serve una vostra decisione</div>
+      <div class="box orange" style="margin-top:22px">
+        <p><b>La quarta fase è la più fragile.</b> L'agente verifica ciò che sa verificare,
+          per esempio che un file sia salvato o che un conto torni. Non può sapere se un
+          giudizio è giusto o adatto a quella classe. Quella verifica spetta a voi.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Il ciclo</span><span>08</span></div>
+</section>
+
+<!-- 09 TOOL USE -->
+<section class="slide">
+  <div class="rail"><span>Ora 1 · Dal chatbot all'agente</span></div>
+  <div class="body">
+    <div class="kicker">Sotto il cofano</div>
+    <h2>In realtà l'agente scrive soltanto testo<span class="sub">Saperlo vi evita di
+      attribuirgli poteri che non ha. E vi aiuta a capire dove potete intervenire.</span></h2>
+    <div class="content cols c2">
+      <div class="box">
+        <h3>Cosa succede davvero</h3>
+        <p>Il modello fa sempre e solo la stessa cosa: prevede la parola successiva.
+          Alcune "parole" che produce però sono <b>speciali</b>. Funzionano come etichette
+          che significano <i>«apri questo file»</i> o <i>«fai questo calcolo»</i>.</p>
+        <p>Un programma esterno legge quelle etichette e le trasforma in azioni vere.
+          Poi restituisce il risultato al modello, che riparte da lì.</p>
+      </div>
+      <div class="box green">
+        <h3>Perché ci interessa</h3>
+        <ul class="clean">
+          <li>Fra il modello e il mondo c'è sempre <b>un programma</b>: è lì che si mettono
+            i controlli e le richieste di conferma.</li>
+          <li>Il modello non "vuole" niente e non sa cosa ha combinato: sa solo cosa gli
+            viene riferito.</li>
+          <li>Se un'azione ha effetti veri (inviare, cancellare, pubblicare), siete voi a
+            doverla fermare. L'agente non lo fa da solo.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Tool use</span><span>09</span></div>
+</section>
+
+<!-- 10 HARNESS -->
+<section class="slide">
+  <div class="rail"><span>Ora 1 · Dal chatbot all'agente</span></div>
+  <div class="body">
+    <div class="kicker">Il concetto chiave</div>
+    <h2>L'harness funziona come i finimenti del cavallo<span class="sub">Il cavallo da solo
+      non tira il carretto: servono i finimenti. Allo stesso modo, l'harness trasforma un
+      modello in un collaboratore.</span></h2>
+    <div class="content cols c4">
+      <div class="box">
+        <div class="tag">01</div>
+        <h3>Il modello</h3>
+        <p>È il motore che capisce la richiesta e decide. Potete cambiarlo anche a metà
+          lavoro.</p>
+      </div>
+      <div class="box">
+        <div class="tag">02</div>
+        <h3>Gli strumenti</h3>
+        <p>Permettono di leggere e scrivere file, cercare sul web ed eseguire
+          programmi.</p>
+      </div>
+      <div class="box">
+        <div class="tag">03</div>
+        <h3>Il terminale</h3>
+        <p>L'agente lo usa per agire sul computer. Voi non dovete conoscere i comandi.</p>
+      </div>
+      <div class="box">
+        <div class="tag">04</div>
+        <h3>La memoria</h3>
+        <p>L'agente scrive dei file e li rilegge. Così la sessione di domani riparte dal
+          lavoro di oggi.</p>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:22px">
+      <p>Claude Code, Codex e Antigravity, che vedremo nell'ora 2, seguono
+        <b>lo stesso schema con nomi diversi</b>. Conviene imparare l'impalcatura, perché i
+        prodotti cambiano.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Harness</span><span>10</span></div>
+</section>
+
+<!-- 11 AUTONOMIA E SUPERVISIONE -->
+<section class="slide">
+  <div class="rail"><span>Ora 1 · Dal chatbot all'agente</span></div>
+  <div class="body">
+    <div class="kicker">Autonomia e supervisione</div>
+    <h2>Più autonomia non vuol dire meno controllo<span class="sub">Vuol dire che il
+      controllo arriva in un momento diverso. Siete voi a scegliere il livello, compito per compito.</span></h2>
+    <div class="content">
+      <div class="scale">
+        <div><b>Livello 1</b><span>Vi suggerisce cosa fare e voi lo fate</span></div>
+        <div><b>Livello 2</b><span>Propone ogni passo e aspetta il vostro sì</span></div>
+        <div><b>Livello 3</b><span>Procede da solo e si ferma sui passi rischiosi</span></div>
+        <div><b>Livello 4</b><span>Fa tutto e voi controllate alla fine</span></div>
+      </div>
+      <div class="scale-axis"><span>← Più tempo vostro</span><span>Più fiducia nel compito →</span></div>
+      <div class="cols c3" style="margin-top:22px">
+        <div class="box">
+          <div class="tag">Prima</div>
+          <h3>Il piano</h3>
+          <p>Leggete che cosa intende fare, prima che lo faccia. Correggere un piano
+            costa poco, mentre correggere un lavoro finito costa molto.</p>
+        </div>
+        <div class="box">
+          <div class="tag">Durante</div>
+          <h3>Le conferme</h3>
+          <p>Vi chiede il permesso sulle azioni che contano: scrivere, cancellare,
+            inviare.</p>
+        </div>
+        <div class="box green">
+          <div class="tag">Dopo</div>
+          <h3>La verifica</h3>
+          <p>Controllate il risultato contro quello che avevate chiesto. Questo
+            momento non sparisce mai, a nessun livello.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Autonomia e supervisione</span><span>11</span></div>
+</section>
+
+<!-- 12 DEMO INVENZIONE -->
+<section class="slide demo">
+  <div class="rail"><span>Ora 1 · Dal chatbot all'agente</span></div>
+  <div class="body">
+    <div class="kicker">Dimostrazione dal vivo · i limiti</div>
+    <h2>Quando non sa, l'agente inventa<span class="sub">Facciamo una richiesta comune in
+      una chat qualsiasi. Non diamo nessun dato sullo studente.</span></h2>
+    <div class="content cols" style="grid-template-columns:1fr 1fr;align-items:start">
+      <div class="prompt">
+        <div class="lbl">La richiesta</div>
+        Devo scrivere il giudizio del primo quadrimestre di matematica per uno
+        studente di terza liceo che ha una media del 6 e mezzo. Scrivimelo.
+      </div>
+      <div class="box">
+        <div class="tag">Che cosa guardare</div>
+        <p>Esce un giudizio che va bene per chiunque. Contiene anche cose che nessuno
+          ha detto: <i>«ha mostrato crescente interesse»</i>, <i>«partecipa
+          attivamente»</i>.</p>
+        <p>Non sono errori di distrazione. Il modello produce il testo <b>più
+          plausibile</b>, che non è per forza quello vero. E un giudizio plausibile di
+          solito parla di interesse e partecipazione.</p>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:22px">
+      <p>Questo fenomeno si chiama <b>allucinazione</b>: il modello inventa un'informazione
+        e la presenta con lo stesso tono di una vera. Nell'ora 4 lo ritroveremo con la
+        cartella di una classe davanti, e vedremo come fermarlo.</p>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../demo/ora-01-demo-invenzione.md" target="_blank">Copione della demo <b>ora-01-demo-invenzione.md</b></a><span>12</span></div>
+</section>
+
+<!-- 13 COME SBAGLIA UN AGENTE -->
+<section class="slide">
+  <div class="rail"><span>Ora 1 · Dal chatbot all'agente</span></div>
+  <div class="body">
+    <div class="kicker">I limiti</div>
+    <h2>Quattro modi in cui un agente sbaglia<span class="sub">Gli strumenti non
+      eliminano questi errori. Anzi, ne aggiungono uno: ora l'agente può sbagliare anche quando agisce.</span></h2>
+    <div class="content cols c2" style="gap:18px">
+      <div class="box">
+        <div class="tag">01 · Inventa</div>
+        <p>Riempie un vuoto con qualcosa di plausibile: un episodio, una citazione, un
+          progresso che nessuno ha osservato.</p>
+      </div>
+      <div class="box">
+        <div class="tag">02 · Sceglie in silenzio</div>
+        <p>Davanti a un'ambiguità decide da solo, per esempio come pesare gli orali o
+          cosa fare di un assente. E non ve lo dice.</p>
+      </div>
+      <div class="box">
+        <div class="tag">03 · Dice «fatto» troppo presto</div>
+        <p>Dichiara concluso un compito che non ha davvero controllato, o che ha
+          completato solo in parte.</p>
+      </div>
+      <div class="box">
+        <div class="tag">04 · Agisce nel posto sbagliato</div>
+        <p>Modifica il file sbagliato, sovrascrive una versione buona o tocca ciò che
+          doveva solo leggere.</p>
+      </div>
+    </div>
+    <div class="box green" style="margin-top:18px">
+      <p><b>Nessuno dei quattro dipende da quanto è bravo il modello.</b> I conti ormai
+        li fa bene. Dipendono da ciò che gli manca: i vostri dati, le vostre regole, il
+        vostro controllo.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Limiti</span><span>13</span></div>
+</section>
+
+<!-- 14 RESPONSABILITÀ -->
+<section class="slide">
+  <div class="rail"><span>Ora 1 · Dal chatbot all'agente</span></div>
+  <div class="body">
+    <div class="kicker">Responsabilità</div>
+    <h2>La firma resta vostra<span class="sub">L'agente non risponde di niente: non firma il
+      giudizio, non incontra la famiglia, non siede in consiglio di classe.</span></h2>
+    <div class="content cols c2">
+      <div class="box">
+        <div class="tag">L'agente può</div>
+        <ul class="clean">
+          <li>Raccogliere e riordinare i dati</li>
+          <li>Preparare una bozza, anche ottima</li>
+          <li>Proporre alternative e segnalare dubbi</li>
+          <li>Eseguire i passaggi ripetitivi</li>
+        </ul>
+      </div>
+      <div class="box green">
+        <div class="tag">Voi dovete</div>
+        <ul class="clean">
+          <li>Decidere che cosa è giusto per quella classe</li>
+          <li>Verificare prima di usare</li>
+          <li>Firmare e rispondere del risultato</li>
+          <li>Decidere quali dati far vedere e quali no</li>
+        </ul>
+      </div>
+    </div>
+    <div class="prompt" style="margin-top:22px">
+      <div class="lbl">Il gesto da portarsi a casa</div>
+      Chiedete «Da dove l'hai preso?» per ogni affermazione che non sapete ricondurre a
+      un dato. Se l'agente non indica una fonte, quell'informazione non è un fatto.
+    </div>
+  </div>
+  <div class="foot"><span>Responsabilità</span><span>14</span></div>
+</section>
+
+<!-- 15 MATRICE -->
+<section class="slide">
+  <div class="rail"><span>Ora 1 · Dal chatbot all'agente</span></div>
+  <div class="body">
+    <div class="kicker">Che cosa affidargli</div>
+    <h2>Tre domande prima di delegare</h2>
+    <div class="content">
+      <div class="qs">
+        <div><i>1</i>Il risultato si può verificare, e in fretta?</div>
+        <div><i>2</i>Se sbaglia, si torna indietro senza danni?</div>
+        <div><i>3</i>Ci sono di mezzo dati o decisioni su persone?</div>
+      </div>
+      <div class="qs-to">Le tre risposte insieme indicano una zona ↓</div>
+      <div class="cols c3" style="gap:14px">
+        <div class="box green zone">
+          <div class="tag">Via libera</div>
+          <div class="who">Sì alla prima, sì alla seconda, no alla terza</div>
+          <ul class="clean">
+            <li>Riordinare e rinominare materiali</li>
+            <li>Sistemare refusi e impaginazione</li>
+            <li>Prima bozza di esercizi da rivedere</li>
+          </ul>
+        </div>
+        <div class="box zone">
+          <div class="tag">Con controllo</div>
+          <div class="who">Un dubbio sulla prima o sulla seconda, no alla terza</div>
+          <ul class="clean">
+            <li>Schede e verifiche da somministrare</li>
+            <li>Sintesi di fonti e testi</li>
+            <li>Calendario delle lezioni</li>
+          </ul>
+        </div>
+        <div class="box orange zone">
+          <div class="tag">Controllo stretto</div>
+          <div class="who">Sì alla terza, oppure nessun ritorno possibile</div>
+          <ul class="clean">
+            <li>Giudizi, voti, valutazioni</li>
+            <li>Comunicazioni alle famiglie</li>
+            <li>Tutto ciò che si invia o si pubblica</li>
+          </ul>
+        </div>
+      </div>
+      <div class="box orange" style="margin-top:18px">
+        <p>La zona vi dice <b>quanto controllo</b> serve. Anche un giudizio si può
+          preparare con un agente, ma siete voi a scriverlo, rileggerlo e firmarlo.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Cosa affidare, cosa sorvegliare</span><span>15</span></div>
+</section>
+
+<!-- 16 LABORATORIO -->
+<section class="slide lab">
+  <div class="rail"><span>Ora 1 · Dal chatbot all'agente</span></div>
+  <div class="body">
+    <div class="kicker">Laboratorio · 10 minuti</div>
+    <h2>Mettete il vostro cartoncino nella matrice<span class="sub">Riprendete il compito scritto
+      all'inizio dell'ora.</span></h2>
+    <div class="content cols c3">
+      <div class="box">
+        <span class="badge">Da soli · 3 min</span>
+        <h3>Rispondete alle tre domande</h3>
+        <p>Verificabile? Reversibile? Dati o decisioni su persone? Scrivete la zona sul
+          cartoncino.</p>
+      </div>
+      <div class="box">
+        <span class="badge">In coppia · 4 min</span>
+        <h3>Spezzatelo</h3>
+        <p>Quasi nessun compito sta tutto in una zona. Quale parte potreste affidare
+          subito, e quale tenere per voi?</p>
+      </div>
+      <div class="box orange">
+        <span class="badge o">Tutti · 3 min</span>
+        <h3>Due casi al centro</h3>
+        <p>Scegliete un compito che sembrava delegabile e non lo è. Poi uno che sembrava
+          intoccabile e che, diviso in parti, si può delegare in parte.</p>
+      </div>
+    </div>
+    <div class="box green" style="margin-top:22px">
+      <p>Conservate il cartoncino: è il candidato naturale per il laboratorio aperto
+        dell'ultima ora del corso.</p>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../consegne/ora-01-lab-casi-uso.md" target="_blank">Consegna su Classroom <b>ora-01-lab-casi-uso.md</b></a><span>16</span></div>
+</section>
+
+<!-- 17 CHIUSURA -->
+<section class="slide">
+  <div class="rail"><span>Ora 1 · Dal chatbot all'agente</span></div>
+  <div class="body">
+    <div class="kicker">Chiusura</div>
+    <h2>Quattro cose da portare a casa</h2>
+    <div class="content">
+      <ol class="num">
+        <li><b>L'agente lavora in un ciclo.</b>
+          Osserva, pianifica, agisce e verifica. Il vostro ruolo è guidarlo lungo il
+          ciclo.</li>
+        <li><b>L'impalcatura conta più del prodotto.</b>
+          Modello, strumenti, terminale e memoria ci sono in ogni prodotto. Chi cambia
+          strumento ritrova gli stessi quattro pezzi.</li>
+        <li><b>Quando non sa, l'agente inventa.</b>
+          E usa lo stesso tono di quando sa. La domanda «Da dove l'hai preso?» vi
+          protegge.</li>
+        <li><b>Potete delegare un compito, ma la responsabilità resta vostra.</b>
+          Se il compito è verificabile, reversibile e senza dati su persone, potete
+          delegarlo. Altrimenti serve controllo, e la firma resta vostra.</li>
+      </ol>
+      <div class="box orange" style="margin-top:24px">
+        <p><b>Prossima ora: orientarsi negli ambienti agentici.</b> Vedremo le tre
+          piattaforme e gli account, e aprirete la prima cartella con un agente.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Chiusura</span><span>17</span></div>
+</section>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var body = document.body;
+  var counter = document.getElementById('presentCounter');
+  var hint = document.getElementById('presentHint');
+  var idx = 0;
+  var presenting = false;
+
+  function fitScale(){
+    var s = Math.min(window.innerWidth/1280, window.innerHeight/720);
+    document.documentElement.style.setProperty('--scale', s);
+  }
+
+  function render(){
+    slides.forEach(function(s,i){ s.classList.toggle('active', i===idx); });
+    counter.textContent = (idx+1) + ' / ' + slides.length;
+  }
+
+  function enter(){
+    presenting = true;
+    body.classList.add('present');
+    fitScale();
+    render();
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(function(){});
+    }
+  }
+
+  function exit(){
+    presenting = false;
+    body.classList.remove('present');
+    if (document.fullscreenElement) document.exitFullscreen().catch(function(){});
+  }
+
+  function next(){ if (idx < slides.length-1){ idx++; render(); } }
+  function prev(){ if (idx > 0){ idx--; render(); } }
+
+  document.addEventListener('keydown', function(e){
+    if (!presenting){
+      if (e.key === 'p' || e.key === 'P') enter();
+      return;
+    }
+    switch(e.key){
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown':
+        e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+        e.preventDefault(); prev(); break;
+      case 'Home':
+        e.preventDefault(); idx = 0; render(); break;
+      case 'End':
+        e.preventDefault(); idx = slides.length-1; render(); break;
+      case 'Escape':
+        exit(); break;
+    }
+  });
+
+  document.addEventListener('click', function(e){
+    if (!presenting) return;
+    if (e.target.closest('a')) return;
+    if (e.clientX > window.innerWidth/2) next(); else prev();
+  });
+
+  document.addEventListener('fullscreenchange', function(){
+    if (!document.fullscreenElement && presenting) exit();
+  });
+
+  window.addEventListener('resize', fitScale);
+
+  hint.classList.add('show');
+  setTimeout(function(){ hint.classList.remove('show'); }, 4000);
+
+  // ---- controllo dimensione testo ----
+  var ZOOM_MIN = 0.8, ZOOM_MAX = 1.4, ZOOM_STEP = 0.1;
+  var zoomVal = document.getElementById('zoomVal');
+  var zoomIn = document.getElementById('zoomIn');
+  var zoomOut = document.getElementById('zoomOut');
+  var zoom = 1;
+  try { zoom = parseFloat(localStorage.getItem('slideZoom')) || 1; } catch(e){}
+
+  function applyZoom(){
+    zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom));
+    document.documentElement.style.setProperty('--content-zoom', zoom);
+    zoomVal.textContent = Math.round(zoom * 100) + '%';
+    try { localStorage.setItem('slideZoom', zoom); } catch(e){}
+  }
+
+  zoomIn.addEventListener('click', function(){ zoom += ZOOM_STEP; applyZoom(); });
+  zoomOut.addEventListener('click', function(){ zoom -= ZOOM_STEP; applyZoom(); });
+
+  document.addEventListener('keydown', function(e){
+    if (presenting) return;
+    if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '=')){
+      e.preventDefault(); zoom += ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '-'){
+      e.preventDefault(); zoom -= ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '0'){
+      e.preventDefault(); zoom = 1; applyZoom();
+    }
+  });
+
+  applyZoom();
+})();
+</script>
+
+</body>
+</html>

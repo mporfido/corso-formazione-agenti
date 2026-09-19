@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Ora 6 — Usare e comprendere le skill</title>
+<style>
+:root{
+  --paper:#f2efe9;
+  --card:#fbfaf7;
+  --ink:#1d1c1a;
+  --ink-soft:#5c5850;
+  --line:#ddd7cc;
+  --green:#1a3c3a;
+  --green-soft:#e6ece9;
+  --orange:#c0562f;
+  --orange-soft:#f6e7de;
+  --blue:#2f5a8c;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);font-family:var(--sans);color:var(--ink);
+  -webkit-font-smoothing:antialiased;padding:28px 0}
+
+/* ---------- slide frame ---------- */
+.slide{
+  position:relative;width:1280px;height:720px;margin:0 auto 28px;
+  background:var(--card);border:1px solid var(--line);
+  display:grid;grid-template-columns:56px 1fr;overflow:hidden;
+}
+.rail{
+  background:var(--green);color:#f4f1ea;
+  display:flex;align-items:center;justify-content:center;
+}
+.rail span{
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  white-space:nowrap;opacity:.9;
+}
+.body{padding:52px 60px 64px;display:flex;flex-direction:column;min-width:0}
+.kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--orange);font-weight:600;margin-bottom:14px}
+h1{font-family:var(--serif);font-size:56px;line-height:1.08;font-weight:600;
+  letter-spacing:-.01em}
+h2{font-family:var(--serif);font-size:40px;line-height:1.12;font-weight:600;
+  letter-spacing:-.01em;margin-bottom:26px}
+h2 .sub{display:block;font-family:var(--sans);font-size:15px;font-weight:400;
+  color:var(--ink-soft);letter-spacing:0;margin-top:10px;line-height:1.45}
+p{font-size:17px;line-height:1.55;color:var(--ink)}
+.muted{color:var(--ink-soft)}
+.foot{position:absolute;left:56px;right:0;bottom:0;height:40px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 60px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-soft);border-top:1px solid var(--line)}
+.content{flex:0 1 auto;min-height:0}
+code{font-family:var(--mono);font-size:.9em;background:var(--green-soft);padding:1px 5px}
+
+/* ---------- cover ---------- */
+.cover .body{justify-content:center}
+.cover h1{font-size:72px;max-width:980px}
+.cover .lede{margin-top:26px;font-size:19px;color:var(--ink-soft);max-width:700px}
+.rule{width:72px;height:3px;background:var(--orange);margin:32px 0 0}
+.meta{margin-top:38px;display:flex;gap:44px;font-size:13px;color:var(--ink-soft)}
+.meta b{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--green);margin-bottom:6px}
+
+/* ---------- generic layout helpers ---------- */
+.cols{display:grid;gap:22px}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c4{grid-template-columns:repeat(4,1fr)}
+.box{border:1px solid var(--line);background:#fff;padding:22px 24px;
+  display:flex;flex-direction:column;gap:10px;min-width:0}
+.box h3{font-family:var(--serif);font-size:22px;font-weight:600;line-height:1.2}
+.box .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.box p,.box li{font-size:15px;line-height:1.5;color:var(--ink-soft)}
+.box.green{background:var(--green-soft);border-color:#cbd8d3}
+.box.orange{background:var(--orange-soft);border-color:#ecd4c5}
+ul.clean{list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.clean li{position:relative;padding-left:18px;font-size:16px;line-height:1.5}
+ul.clean li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;
+  background:var(--orange)}
+.box ul.clean li{font-size:15px}
+ol.num{list-style:none;counter-reset:n;display:flex;flex-direction:column;gap:16px}
+ol.num li{counter-increment:n;position:relative;padding-left:46px;font-size:17px;
+  line-height:1.5}
+ol.num li::before{content:counter(n,decimal-leading-zero);position:absolute;left:0;top:1px;
+  font-size:13px;font-weight:600;color:var(--green);letter-spacing:.06em}
+ol.num li b{display:block;font-family:var(--serif);font-size:20px;font-weight:600;
+  margin-bottom:4px;color:var(--ink)}
+
+/* ---------- tabella ---------- */
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:12px 16px;font-size:15px;line-height:1.45;
+  border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);
+  font-weight:600;border-bottom:2px solid var(--green)}
+td:first-child{font-weight:600;width:30%}
+td.o{color:var(--orange)}
+td.g{color:var(--green)}
+td.n{font-family:var(--serif);font-size:24px;font-weight:600;white-space:nowrap}
+
+/* ---------- prompt / badge ---------- */
+.prompt{background:var(--green);color:#eef2f0;padding:20px 24px;font-family:var(--sans);
+  font-size:15px;line-height:1.6}
+.prompt .lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;margin-bottom:8px}
+.prompt.plain{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.prompt.plain .lbl{color:var(--orange)}
+.badge{display:inline-block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  background:var(--green);color:#fff;padding:4px 9px;align-self:flex-start}
+.badge.o{background:var(--orange)}
+
+/* ---------- barra contesto ---------- */
+.gauge{height:30px;background:#fff;border:1px solid var(--line);display:flex;
+  overflow:hidden}
+.gauge i{display:block;height:100%}
+.g-legend{display:flex;gap:22px;font-size:13px;color:var(--ink-soft);margin-top:10px;
+  flex-wrap:wrap}
+.g-legend span{display:flex;align-items:center;gap:7px}
+.g-legend b{width:10px;height:10px;display:inline-block}
+
+/* ---------- sorgente Markdown ---------- */
+.src{background:#1f2624;color:#dfe6e3;font-family:var(--mono);font-size:13.5px;
+  line-height:1.65;padding:18px 22px;white-space:pre-wrap;overflow-wrap:anywhere}
+.src .h{color:#f1b28f}
+.src .k{color:#9fd3c2}
+.src .dim{color:#7f8c87}
+.src .hl{background:#3b4f3c;color:#fff;display:block;margin:0 -22px;padding:0 22px;
+  border-left:4px solid #f1b28f}
+.src .hl.o{background:#4d3a30}
+.src .hd{display:block;margin:-18px -22px 12px;padding:8px 22px;background:#161c1a;
+  font-family:var(--sans);font-size:12px;letter-spacing:.04em;color:#9fbdb4}
+
+/* ---------- la mappa e i file di dettaglio ---------- */
+.files{display:flex;flex-direction:column;gap:12px}
+.file{border:1px solid var(--line);background:#fff;padding:14px 18px;
+  display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline}
+.file .ic{grid-row:1/3;font-family:var(--mono);font-size:12px;color:#fff;
+  background:var(--green);padding:3px 7px;align-self:start;margin-top:2px}
+.file b{font-family:var(--mono);font-size:14px;font-weight:600;overflow-wrap:anywhere}
+.file span{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+.steps .box{padding:14px 20px;gap:8px}
+.file:not(.main){margin-left:34px;position:relative}
+.file:not(.main)::before{content:"";position:absolute;left:-22px;top:-13px;width:16px;
+  height:calc(50% + 13px);border-left:2px solid #cbd8d3;border-bottom:2px solid #cbd8d3}
+.file.main{background:var(--green-soft);border-color:#cbd8d3}
+.file.main .ic{background:var(--orange)}
+
+/* ---------- scheda piattaforma ---------- */
+.scheda{border:1px solid #cbd8d3;background:#fff}
+.scheda .concept{background:var(--green);color:#eef2f0;padding:14px 20px;
+  display:grid;grid-template-columns:170px 1fr;gap:16px;align-items:baseline}
+.scheda .concept b{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;font-weight:600}
+.scheda .concept span{font-size:16px;line-height:1.45}
+.scheda table th{padding:11px 16px}
+.scheda table td{padding:10px 16px;font-size:14px;line-height:1.4}
+.scheda table td:first-child{width:18%;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--green);padding-top:13px}
+.scheda .stamp{display:flex;justify-content:space-between;gap:20px;padding:9px 16px;
+  font-size:11px;letter-spacing:.08em;color:var(--ink-soft);background:#f7f5f0}
+.check{color:var(--orange);border-bottom:1px dashed var(--orange)}
+
+/* ---------- tipi di slide: dimostrazione e laboratorio ----------
+   Basta aggiungere .demo o .lab alla <section class="slide">: cambiano rail,
+   fondo, kicker e compare il timbro. Il link al file sta nel piè di pagina. */
+.slide.demo{background:#eef2f7}
+.slide.lab{background:#fcf2ea}
+.slide.demo .rail{background:var(--blue)}
+.slide.lab .rail{background:var(--orange)}
+.slide.demo .rail span,.slide.lab .rail span{display:none}
+.slide.demo .rail::before,.slide.lab .rail::before{
+  writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;
+  font-size:14px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:#fff}
+.slide.demo .rail::before{content:"Dimostrazione"}
+.slide.lab .rail::before{content:"Laboratorio"}
+.slide.demo::after,.slide.lab::after{
+  position:absolute;top:18px;right:22px;padding:7px 14px;color:#fff;
+  font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase}
+.slide.demo::after{content:"◉\00a0\00a0Guardate lo schermo";background:var(--blue)}
+.slide.lab::after{content:"✎\00a0\00a0Tocca a voi";background:var(--orange)}
+.slide.demo .kicker{color:var(--blue)}
+.slide.demo .foot,.slide.lab .foot{border-top-color:rgba(0,0,0,.08)}
+.foot a.task{display:inline-flex;align-items:center;gap:10px;margin-left:-12px;
+  padding:6px 12px;color:#fff;text-decoration:none;font-weight:700;letter-spacing:.12em}
+.foot a.task b{font-family:var(--mono);font-weight:400;font-size:12px;letter-spacing:0;
+  text-transform:none;opacity:.95}
+.slide.demo .foot a.task{background:var(--blue)}
+.slide.lab .foot a.task{background:var(--orange)}
+.foot a.task:hover{filter:brightness(1.1)}
+
+/* ---------- print ---------- */
+.slide{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:13.333in 7.5in;margin:0}
+@media print{
+  body{background:#fff;padding:0}
+  .slide{margin:0;border:none;page-break-after:always;box-shadow:none}
+  .slide:last-child{page-break-after:auto}
+}
+
+/* ---------- presentation mode ---------- */
+body.present{padding:0;overflow:hidden;background:#000}
+body.present .slide{
+  display:none;margin:0;border:none;
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(var(--scale,1));
+  transform-origin:center center;
+}
+body.present .slide.active{display:grid}
+.present-hint{
+  position:fixed;bottom:14px;right:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.present-hint.show{opacity:1}
+.present-counter{
+  position:fixed;bottom:14px;left:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  display:none;
+}
+body.present .present-counter{display:block}
+
+/* ---------- controllo dimensione testo ---------- */
+:root{--content-zoom:1}
+.body{zoom:var(--content-zoom)}
+.zoom-ctrl{
+  position:fixed;top:14px;right:18px;z-index:60;
+  display:flex;align-items:center;gap:2px;
+  background:rgba(29,28,26,.88);border-radius:4px;padding:4px;
+  font-family:var(--sans);
+}
+.zoom-ctrl button{
+  width:28px;height:28px;border:none;border-radius:3px;background:transparent;
+  color:#f4f1ea;font-size:14px;font-weight:600;cursor:pointer;line-height:1;
+}
+.zoom-ctrl button:hover{background:rgba(255,255,255,.15)}
+.zoom-ctrl .val{
+  min-width:38px;text-align:center;font-size:11px;letter-spacing:.04em;
+  color:#cfcabf;user-select:none;
+}
+body.present .zoom-ctrl{display:none}
+@media print{.zoom-ctrl{display:none}}
+
+/* ---------- percorso indice → pagina → fonte ---------- */
+.trail{display:grid;grid-template-columns:1fr 36px 1fr 36px 1fr;align-items:stretch}
+.trail .step{border:1px solid var(--line);background:#fff;padding:16px 18px;
+  display:flex;flex-direction:column;gap:8px;min-width:0}
+.trail .step .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--green)}
+.trail .step b{font-family:var(--mono);font-size:13.5px;overflow-wrap:anywhere}
+.trail .step p{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+.trail .arrow{display:flex;align-items:center;justify-content:center;
+  color:var(--orange);font-size:22px}
+.trail .step.src-step{background:var(--green-soft);border-color:#cbd8d3}
+
+/* ---------- le quattro accortezze di scrittura (slide 5) ---------- */
+.regole .box{padding:15px 20px;gap:7px}
+
+/* ---------- screenshot con zone numerate ---------- */
+.shotwrap{position:relative;border:1px solid #bfc9c4;line-height:0}
+.shotwrap img{width:100%;display:block}
+.shotwrap .pin{position:absolute;transform:translate(-50%,-50%);
+  box-shadow:0 0 0 2px #fff,0 1px 4px rgba(0,0,0,.35)}
+.pin{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;
+  border-radius:50%;background:var(--orange);color:#fff;font-size:12px;font-weight:700;
+  font-family:var(--sans);line-height:1;flex:none}
+.zone{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+.zone > div{display:flex;gap:10px;align-items:baseline}
+.zone > div span{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="present-counter" id="presentCounter"></div>
+<div class="present-hint" id="presentHint">Premi P per entrare in modalità presentazione · frecce/spazio per avanzare · Esc per uscire</div>
+<div class="zoom-ctrl">
+  <button id="zoomOut" title="Riduci testo" aria-label="Riduci testo">A−</button>
+  <span class="val" id="zoomVal">100%</span>
+  <button id="zoomIn" title="Aumenta testo" aria-label="Aumenta testo">A+</button>
+</div>
+
+
+<style>
+/* ---------- ora 6: due modi di dare una procedura ---------- */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:stretch}
+.duo .side{border:1px solid var(--line);background:#fff;padding:20px 22px;
+  display:flex;flex-direction:column;gap:12px;min-width:0}
+.duo .side.g{background:var(--green-soft);border-color:#cbd8d3}
+.duo .side .lbl{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.duo .side h3{font-family:var(--serif);font-size:23px;font-weight:600;line-height:1.2}
+.duo .side p,.duo .side li{font-size:14.5px;line-height:1.5;color:var(--ink-soft)}
+/* ---------- chiavi del frontmatter ---------- */
+.fm{display:flex;flex-direction:column;gap:9px}
+.fm > div{display:grid;grid-template-columns:190px 1fr;gap:14px;align-items:baseline;
+  border-bottom:1px solid var(--line);padding-bottom:9px}
+.fm b{font-family:var(--mono);font-size:12.5px;color:var(--green);overflow-wrap:anywhere}
+.fm span{font-size:14px;line-height:1.45;color:var(--ink-soft)}
+/* ---------- numerino grande nei box ---------- */
+.big{font-family:var(--serif);font-size:30px;font-weight:600;line-height:1;
+  color:var(--orange);display:block}
+</style>
+
+<!-- 01 COVER -->
+<section class="slide cover">
+  <div class="rail"><span>Ora 6 · Le skill</span></div>
+  <div class="body">
+    <div class="kicker">Dalla IA generativa alla IA agentica · Ora 6</div>
+    <h1>Usare e comprendere<br>le skill</h1>
+    <div class="rule"></div>
+    <p class="lede">L'agente sa chi siete e conosce le vostre fonti. Manca il terzo pezzo:
+      le procedure. Come si insegna all'agente un modo di lavorare che poi richiama da solo,
+      quando serve, senza che glielo ripetiate.</p>
+    <div class="meta">
+      <div><b>Destinatari</b>Docenti di scuola superiore</div>
+      <div><b>Serve</b>Una cosa che volete imparare voi</div>
+      <div><b>Durata</b>Un'ora, pausa compresa</div>
+      <div><b>Modulo</b>6 di 13</div>
+    </div>
+  </div>
+  <div class="foot"><span>Corso agenti IA</span><span>01</span></div>
+</section>
+
+<!-- 02 OBIETTIVI E MAPPA -->
+<section class="slide">
+  <div class="rail"><span>Ora 6 · Le skill</span></div>
+  <div class="body">
+    <div class="kicker">Obiettivi e mappa</div>
+    <h2>Alla fine di quest'ora<span class="sub">Non scriverete una skill da zero: quello è
+      il lavoro dell'ora 7. Oggi ne aprite una vera, capite come è fatta e la mettete al
+      lavoro su di voi.</span></h2>
+    <ol class="num" style="margin-bottom:26px">
+      <li><b>Sapete riconoscere quando una procedura merita di diventare una skill</b>
+        E quando invece basta una riga nel file-guida, o una richiesta scritta lì per lì.</li>
+      <li><b>Avete installato una skill esistente e sapete dove è finita</b>
+        Ne avete letto il sorgente, capito da che cosa si attiva, e l'avete vista all'opera.</li>
+    </ol>
+    <div class="content cols c4" style="gap:16px">
+      <div class="box">
+        <div class="tag">14 min</div>
+        <h3>Che cos'è</h3>
+        <p>Istruzione permanente o procedura a chiamata. Anatomia di una skill</p>
+      </div>
+      <div class="box">
+        <div class="tag">10 min</div>
+        <h3>Quando parte</h3>
+        <p>La descrizione è l'interruttore. Confini, criteri, potatura</p>
+      </div>
+      <div class="box">
+        <div class="tag">12 min</div>
+        <h3>La skill teach</h3>
+        <p>Una skill che insegna. E la didattica che ha dentro</p>
+      </div>
+      <div class="box orange">
+        <div class="tag">20 min</div>
+        <h3>Laboratorio</h3>
+        <p>Installarla, trovarla, leggerla, usarla su un argomento vostro</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Obiettivi e mappa</span><span>02</span></div>
+</section>
+
+<!-- 03 ISTRUZIONE PERMANENTE CONTRO SKILL -->
+<section class="slide">
+  <div class="rail"><span>Ora 6 · Le skill</span></div>
+  <div class="body">
+    <div class="kicker">Il problema che risolve</div>
+    <h2>Non tutto quello che sapete va detto ogni volta<span class="sub">Il file-guida
+      dell'ora 4 entra in ogni sessione, dalla prima riga. Va bene per quello che vale
+      sempre. Una procedura che usate una volta al mese, lì dentro, è peso morto.</span></h2>
+    <div class="content duo">
+      <div class="side g">
+        <div class="lbl" style="color:var(--green)">Istruzione permanente</div>
+        <h3>Il file-guida</h3>
+        <p>Sempre caricato, in ogni conversazione, prima ancora che apriate bocca.</p>
+        <ul class="clean">
+          <li>«Insegno matematica in terza di un istituto tecnico»</li>
+          <li>«I materiali li voglio in italiano, al massimo due pagine»</li>
+          <li>«Cita sempre i file da cui prendi le informazioni»</li>
+        </ul>
+        <p style="margin-top:2px"><b>Ci scrivete</b> quello che vale per <i>qualunque</i>
+          cosa vi serva.</p>
+      </div>
+      <div class="side">
+        <div class="lbl">Procedura specializzata</div>
+        <h3>La skill</h3>
+        <p>Caricata solo quando serve davvero. Il resto del tempo l'agente sa soltanto che
+          esiste.</p>
+        <ul class="clean">
+          <li>«Come preparo una verifica di recupero»</li>
+          <li>«Come compilo il verbale del consiglio di classe»</li>
+          <li>«Come trasformo i miei appunti in una scheda per la classe»</li>
+        </ul>
+        <p style="margin-top:2px"><b>Ci scrivete</b> i <i>passi</i> di una cosa che rifate
+          uguale, ogni tanto.</p>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:20px">
+      <p><b>La domanda per decidere:</b> se mettessi questa cosa nel file-guida, l'agente la
+        leggerebbe anche quando non c'entra niente? Se sì, è una skill.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Permanente o a chiamata</span><span>03</span></div>
+</section>
+
+<!-- 04 IL COSTO DEL CONTESTO -->
+<section class="slide">
+  <div class="rail"><span>Ora 6 · Le skill</span></div>
+  <div class="body">
+    <div class="kicker">Perché non si può tenere tutto acceso</div>
+    <h2>Di una skill l'agente vede sempre solo una riga<span class="sub">Nel contesto resta
+      la descrizione: dieci, quindici parole. La procedura intera viene letta soltanto se
+      l'agente decide che gli serve. È lo stesso meccanismo dell'indice della wiki, visto
+      nell'ora 5.</span></h2>
+    <div class="content">
+      <div class="cols c3" style="gap:20px">
+        <div class="box green">
+          <div class="tag">Sempre in contesto</div>
+          <h3>La descrizione</h3>
+          <p>Una riga per ogni skill installata. È il cartello sulla porta: dice che cosa
+            c'è dietro, senza aprirla.</p>
+        </div>
+        <div class="box">
+          <div class="tag">Letto all'attivazione</div>
+          <h3>Il corpo</h3>
+          <p>La procedura vera e propria. Entra nel contesto solo quando la skill parte, e
+            solo per quella volta.</p>
+        </div>
+        <div class="box">
+          <div class="tag">Letto se serve ancora</div>
+          <h3>I riferimenti</h3>
+          <p>Schede, modelli, formati in file separati. Il corpo li richiama solo nel
+            passaggio che li usa.</p>
+        </div>
+      </div>
+      <div style="margin-top:26px">
+        <div class="gauge">
+          <i style="width:9%;background:var(--green)"></i>
+          <i style="width:32%;background:var(--orange)"></i>
+          <i style="width:59%;background:#e9e4da"></i>
+        </div>
+        <div class="g-legend">
+          <span><b style="background:var(--green)"></b>Le descrizioni di tutte le skill
+            installate</span>
+          <span><b style="background:var(--orange)"></b>La sola skill che si è attivata
+            adesso</span>
+          <span><b style="background:#e9e4da"></b>Quello che resta per il vostro lavoro</span>
+        </div>
+      </div>
+    </div>
+    <div class="box" style="margin-top:22px">
+      <p><b>Il conto si ribalta se esagerate.</b> Con cento skill installate avete cento
+        descrizioni sempre accese, e quella prima fettina verde diventa la fetta grossa.
+        Meglio poche skill, e usate davvero.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Il costo del contesto</span><span>04</span></div>
+</section>
+
+<!-- 05 ANATOMIA -->
+<section class="slide">
+  <div class="rail"><span>Ora 6 · Le skill</span></div>
+  <div class="body">
+    <div class="kicker">Anatomia</div>
+    <h2>Una skill è una cartella con dentro un file Markdown<span class="sub">Niente
+      installatori, niente formati speciali. Questa è <code>teach</code>, la skill che
+      installerete fra poco: si apre con un editor di testo e si legge.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.1fr 1fr;gap:26px;align-items:start">
+      <div class="files">
+        <div class="file main"><span class="ic">MD</span><b>SKILL.md</b>
+          <span>Il cuore. In testa il nome e la descrizione, sotto la procedura. 1.488
+            parole</span></div>
+        <div class="file"><span class="ic">MD</span><b>MISSION-FORMAT.md</b>
+          <span>Come si scrive il documento con lo scopo di chi impara</span></div>
+        <div class="file"><span class="ic">MD</span><b>LEARNING-RECORD-FORMAT.md</b>
+          <span>Come si annota quello che una persona ha già imparato</span></div>
+        <div class="file"><span class="ic">MD</span><b>RESOURCES-FORMAT.md</b>
+          <span>Come si tiene l'elenco delle fonti affidabili</span></div>
+        <div class="file"><span class="ic">MD</span><b>GLOSSARY-FORMAT.md</b>
+          <span>Come si costruisce il glossario della materia</span></div>
+      </div>
+      <div class="cols" style="gap:16px">
+        <div class="box green">
+          <h3>I quattro file in fondo sono riferimento</h3>
+          <p>Non sono la procedura: sono i modelli che la procedura usa. Stanno fuori da
+            <code>SKILL.md</code> perché servono solo in certi momenti, e così il file
+            principale resta leggibile.</p>
+        </div>
+        <div class="box">
+          <h3>Non tutte sono così grandi</h3>
+          <p>Le skill del progetto delle ore 11-13 stanno fra le 270 e le 850 parole, senza
+            file di riferimento. <code>teach</code> è grossa perché è un metodo di
+            insegnamento intero, non una singola operazione.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Anatomia di una skill</span><span>05</span></div>
+</section>
+
+<!-- 06 IL SORGENTE -->
+<section class="slide">
+  <div class="rail"><span>Ora 6 · Le skill</span></div>
+  <div class="body">
+    <div class="kicker">Guardiamola davvero</div>
+    <h2>Le prime righe decidono tutto il resto<span class="sub">Quello fra i due tratteggi
+      non è per voi: è la scheda che l'agente legge per sapere se questa skill lo riguarda.
+      Sotto, la procedura, scritta come la scrivereste a un supplente.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.1fr .9fr;gap:24px;align-items:start">
+      <div class="src" style="font-size:11.6px;line-height:1.6"><span class="hd">teach / SKILL.md — le prime righe</span><span class="hl">---
+name: teach
+description: Teach the user a new skill or
+  concept, within this workspace.
+disable-model-invocation: true
+argument-hint: "What would you like to learn about?"
+---</span>
+<span class="dim">The user has asked you to teach them something.
+This is a stateful request - they intend to learn
+the topic over multiple sessions.</span>
+
+<span class="h">## Teaching Workspace</span>
+
+Treat the current directory as a teaching workspace.
+The state of their learning is captured in this
+directory in several files:
+
+- <span class="k">`MISSION.md`</span>: A document capturing the _reason_
+  the user is interested in the topic...</div>
+      <div class="fm">
+        <div><b>name</b><span>Come si chiama. Diventa il comando con cui la invocate</span></div>
+        <div><b>description</b><span>L'unica riga sempre visibile all'agente. Qui si decide
+          se e quando parte</span></div>
+        <div><b>disable-model-invocation</b><span>Messo a <code>true</code>: questa skill
+          non si attiva mai da sola, dovete chiamarla voi</span></div>
+        <div><b>argument-hint</b><span>Che cosa vi viene chiesto se la lanciate senza dire
+          altro</span></div>
+        <div style="border:none"><b>il corpo</b><span>Dal primo titolo in giù: istruzioni
+          rivolte all'agente, in seconda persona</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Il sorgente di una skill</span><span>06</span></div>
+</section>
+
+<!-- 07 ATTIVAZIONE -->
+<section class="slide">
+  <div class="rail"><span>Ora 6 · Le skill</span></div>
+  <div class="body">
+    <div class="kicker">Attivazione</div>
+    <h2>Chi decide che la skill deve partire<span class="sub">Due filosofie opposte, e la
+      sceglie chi scrive la skill. Non è un dettaglio tecnico: cambia chi si deve ricordare
+      le cose, voi o l'agente.</span></h2>
+    <div class="content duo">
+      <div class="side">
+        <div class="lbl">La chiamate voi</div>
+        <h3>Su richiesta</h3>
+        <p>La descrizione non entra nel contesto. L'agente non sa nemmeno che la skill
+          esiste, finché non gliela nominate.</p>
+        <ul class="clean">
+          <li><b>Non costa niente</b> in contesto</li>
+          <li><b>Dovete ricordarvene voi:</b> quali skill avete e quando servono</li>
+          <li><b>È il caso di <code>teach</code>.</b> Se scrivete «vorrei imparare le
+            derivate», non succede niente: bisogna dire di usare la skill</li>
+        </ul>
+      </div>
+      <div class="side g">
+        <div class="lbl" style="color:var(--green)">La sceglie l'agente</div>
+        <h3>Dalla descrizione</h3>
+        <p>La descrizione resta sempre accesa. L'agente la confronta con quello che gli
+          chiedete e decide da sé.</p>
+        <ul class="clean">
+          <li><b>Non dovete ricordare niente:</b> lavorate normalmente</li>
+          <li><b>Costa una riga</b> di contesto per ogni skill installata</li>
+          <li><b>Può sbagliare:</b> a volte non parte quando sarebbe il momento giusto, a
+            volte parte quando non c'entra</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:20px">
+      <p><b>Da provare in laboratorio.</b> Fate all'agente una richiesta che somiglia a
+        quello che la skill fa, senza nominarla. Se non parte, avete scoperto com'è
+        configurata, e lo ritrovate scritto nelle prime righe del file. Se parte lo stesso,
+        avete scoperto una cosa altrettanto utile: il vostro strumento quella riga non la
+        legge (in Antigravity, per esempio, non esiste).</p>
+    </div>
+  </div>
+  <div class="foot"><span>Quando parte e quando no</span><span>07</span></div>
+</section>
+
+<!-- 08 LA DESCRIZIONE E I CONFINI -->
+<section class="slide">
+  <div class="rail"><span>Ora 6 · Le skill</span></div>
+  <div class="body">
+    <div class="kicker">Scrivere la descrizione</div>
+    <h2>Dice due cose: che cosa fa e quando non farlo<span class="sub">È la riga più
+      importante dell'intero file. Una descrizione vaga produce una skill che parte a
+      sproposito, oppure che non parte mai.</span></h2>
+    <div class="content cols c2" style="align-items:start;gap:24px">
+      <div class="cols" style="gap:14px">
+        <div class="prompt plain">
+          <div class="lbl">Descrizione debole</div>
+          Aiuta con i documenti del progetto.
+        </div>
+        <div class="box">
+          <p class="muted">Quali documenti? Aiuta a farci che cosa? L'agente non ha modo di
+            capire se una richiesta rientra o no, e tira a indovinare.</p>
+        </div>
+        <div class="prompt">
+          <div class="lbl">Descrizione che funziona · da una skill vera</div>
+          Salva il lavoro fatto nella storia del progetto, in locale, senza pubblicare. Da
+          usare SOLO quando il docente chiede esplicitamente di salvare; non salvare mai di
+          propria iniziativa.
+        </div>
+      </div>
+      <div class="cols" style="gap:16px">
+        <div class="box green">
+          <div class="tag">Il criterio di applicazione</div>
+          <h3>Che cosa fa, in una riga</h3>
+          <p>Verbo concreto e oggetto concreto. «Salva il lavoro nella storia del progetto»,
+            non «gestisce il versionamento».</p>
+        </div>
+        <div class="box orange">
+          <div class="tag">Il confine</div>
+          <h3>Quando NON deve partire</h3>
+          <p>La seconda metà della descrizione è quasi sempre un divieto. Tiene la skill
+            fuori dalle situazioni che le somigliano ma non sono sue.</p>
+        </div>
+        <div class="box">
+          <div class="tag">La prova</div>
+          <h3>Si verifica sul campo</h3>
+          <p>Provate tre richieste che devono farla partire e tre che non devono. È l'unico
+            modo di sapere se la descrizione è scritta bene.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>La descrizione è l'interruttore</span><span>08</span></div>
+</section>
+
+<!-- 09 POTATURA -->
+<section class="slide">
+  <div class="rail"><span>Ora 6 · Le skill</span></div>
+  <div class="body">
+    <div class="kicker">Tenerla piccola</div>
+    <h2>Le skill lunghe non sono un problema di spazio<span class="sub">Sono il sintomo di
+      tre difetti che si accumulano da soli, col tempo. Chi le scrive di mestiere li chiama
+      per nome.</span></h2>
+    <div class="content cols c3">
+      <div class="box">
+        <div class="tag">Difetto 1</div>
+        <h3>Duplicazione</h3>
+        <p>La stessa cosa scritta in due posti: nel corpo e nella scheda di riferimento.
+          Prima o poi le due versioni divergono e non si capisce più quale vale.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Difetto 2</div>
+        <h3>Sedimento</h3>
+        <p>Ognuno aggiunge e nessuno toglie, per non disfare il lavoro altrui. Dopo sei mesi
+          la skill contiene istruzioni per un modo di lavorare che avete abbandonato.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Difetto 3</div>
+        <h3>Istruzioni inerti</h3>
+        <p>Righe che sembrano comandare qualcosa ma non cambiano niente, perché l'agente
+          avrebbe fatto così comunque. Occupano posto e basta.</p>
+      </div>
+    </div>
+    <div class="cols c2" style="margin-top:24px;gap:20px">
+      <div class="box green">
+        <h3>La prova della cancellazione</h3>
+        <p>Il modo per scovare le istruzioni inerti: togliete un paragrafo, rifate lo stesso
+          lavoro e guardate se l'agente si comporta diversamente. Se non cambia niente, quel
+          paragrafo non stava facendo niente.</p>
+      </div>
+      <div class="box orange">
+        <h3>Non fermatevi alla prima versione</h3>
+        <p>Una skill è un documento vivo: si prova su casi veri per qualche giorno, poi si
+          rivede. Chi le usa sul serio ci torna ogni settimana o ogni mese, a seconda di
+          quanto conta quel lavoro.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>La potatura</span><span>09</span></div>
+</section>
+
+<!-- 10 SCHEDA PIATTAFORMA -->
+<section class="slide">
+  <div class="rail"><span>Ora 6 · Le skill</span></div>
+  <div class="body">
+    <div class="kicker">Scheda piattaforma · 4</div>
+    <h2>Dove stanno le skill</h2>
+    <div class="content scheda">
+      <div class="concept"><b>Concetto stabile</b>
+        <span>Una cartella per ogni skill, con dentro un file Markdown. Se la cartella sta
+          nel progetto, la skill vale solo lì; se sta nella cartella personale del
+          programma, vi segue ovunque.</span></div>
+      <table>
+        <tr><th></th><th>Claude Code</th><th>Codex</th><th>Antigravity</th></tr>
+        <tr><td>Solo questo progetto</td>
+          <td><code>.claude/skills/&lt;nome&gt;/</code></td>
+          <td><code>.agents/skills/&lt;nome&gt;/</code></td>
+          <td><code>.agents/skills/&lt;nome&gt;/</code></td></tr>
+        <tr><td>Ovunque</td>
+          <td><code>~/.claude/skills/</code></td>
+          <td><code>~/.agents/skills/</code></td>
+          <td><code>~/.gemini/config/skills/</code></td></tr>
+        <tr><td>Si attiva da sola?</td>
+          <td>Sì, dalla descrizione. Si spegne con
+            <code>disable-model-invocation</code></td>
+          <td>Sì, dalla descrizione. Si spegne con
+            <code>allow_implicit_invocation: false</code></td>
+          <td class="o">Sempre sì. Non c'è modo di spegnerla: decide l'agente</td></tr>
+        <tr><td>Come si installa</td><td colspan="3">Chiedete all'agente di installarla e
+          dategli l'indirizzo: scarica i file e li mette dove vanno. È il laboratorio di
+          oggi.</td></tr>
+      </table>
+      <div class="stamp"><span>Percorsi verificati sulla documentazione ufficiale il
+        19/09/2026</span>
+        <span class="check">Da ricontrollare la settimana della lezione</span></div>
+    </div>
+    <div class="box green" style="margin-top:16px">
+      <p><b>Due colonne su tre dicono <code>.agents/skills/</code>, ed è la stessa storia di
+        <code>AGENTS.md</code>.</b> Nel progetto delle ore 11-13 le skill vere stanno lì, e in
+        <code>.claude/skills/</code> c'è solo un file di due righe che rimanda alla cartella
+        buona. Una copia sola, che funziona con tutti e tre gli strumenti.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Scheda · dove stanno le skill</span><span>10</span></div>
+</section>
+
+<!-- 11 TEACH: CHE COSA COSTRUISCE -->
+<section class="slide">
+  <div class="rail"><span>Ora 6 · Le skill</span></div>
+  <div class="body">
+    <div class="kicker">Un esempio per intero · 1</div>
+    <h2>La skill <code style="font-size:.78em">teach</code>: insegnare a chi la usa<span class="sub">La
+      guardiamo perché fa una cosa che conoscete bene, ma la fa a voi. Invece di rispondere
+      alle domande, costruisce una cartella che cresce lezione dopo lezione.</span></h2>
+    <div class="content cols" style="grid-template-columns:1fr 1.05fr;gap:26px;align-items:start">
+      <div class="files">
+        <div class="file main"><span class="ic">MD</span><b>MISSION.md</b>
+          <span>Perché volete imparare questa cosa. Non l'argomento: lo scopo</span></div>
+        <div class="file"><span class="ic">DIR</span><b>learning-records/</b>
+          <span>Un appunto numerato per ogni cosa capita, o che ancora manca</span></div>
+        <div class="file"><span class="ic">DIR</span><b>lessons/</b>
+          <span>Una lezione per volta, in HTML, corta e con un esercizio</span></div>
+        <div class="file"><span class="ic">DIR</span><b>reference/</b>
+          <span>Le schede di sintesi: quelle che riaprirete davvero</span></div>
+        <div class="file"><span class="ic">MD</span><b>RESOURCES.md</b>
+          <span>Le fonti buone trovate sull'argomento, con il link</span></div>
+      </div>
+      <div class="cols" style="gap:15px">
+        <div class="box green">
+          <h3>Prima la missione, poi il programma</h3>
+          <p>Se <code>MISSION.md</code> è vuoto, la skill vieta all'agente di insegnare
+            qualunque cosa: prima deve farvi domande su perché vi serve. Senza quello, dice,
+            le lezioni vengono astratte.</p>
+        </div>
+        <div class="box">
+          <h3>La memoria dell'apprendimento</h3>
+          <p>Gli appunti numerati sono quello che l'agente rilegge all'inizio di ogni
+            sessione per decidere che cosa insegnarvi adesso. Sono la ragione per cui la
+            seconda lezione non ricomincia da capo.</p>
+        </div>
+        <div class="box orange">
+          <h3>Lezioni e schede sono separate apposta</h3>
+          <p>Le lezioni si fanno una volta sola. Le schede si riaprono. Tenerle distinte
+            costringe a ripescare dalla memoria invece che a rileggere.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>teach · che cosa costruisce</span><span>11</span></div>
+</section>
+
+<!-- 12 TEACH: LA PEDAGOGIA -->
+<section class="slide">
+  <div class="rail"><span>Ora 6 · Le skill</span></div>
+  <div class="body">
+    <div class="kicker">Un esempio per intero · 2</div>
+    <h2>Dentro c'è didattica che riconoscete<span class="sub">Le istruzioni che l'agente
+      riceve non sono tecniche. Sono principi che avete studiato, scritti in modo che una
+      macchina li possa applicare.</span></h2>
+    <div class="content cols c4" style="gap:18px">
+      <div class="box">
+        <span class="big">01</span>
+        <div class="tag">Vygotskij</div>
+        <h3>Sviluppo prossimale</h3>
+        <p>Ogni lezione deve risultare sfidante quel tanto che basta. Per calcolarlo
+          l'agente rilegge gli appunti su quello che sapete già e sceglie il passo
+          successivo.</p>
+      </div>
+      <div class="box">
+        <span class="big">02</span>
+        <div class="tag">Scaffolding</div>
+        <h3>Prima capire, poi esercitarsi</h3>
+        <p>Per acquisire conoscenza la difficoltà è il nemico: mangia la memoria di lavoro
+          che serve a capire. Per acquisire un'abilità la difficoltà diventa lo
+          strumento.</p>
+      </div>
+      <div class="box">
+        <span class="big">03</span>
+        <div class="tag">Ritenzione</div>
+        <h3>Capire non è ricordare</h3>
+        <p>Seguire una spiegazione dà l'illusione di aver imparato. La skill dice all'agente
+          di non fidarsene e di progettare per il ricordo a distanza di settimane.</p>
+      </div>
+      <div class="box">
+        <span class="big">04</span>
+        <div class="tag">Difficoltà desiderabile</div>
+        <h3>Recuperare, distanziare, mescolare</h3>
+        <p>Domande che chiedono di ricordare e non di riconoscere. Pratica distribuita su
+          più sessioni. Argomenti vicini mescolati fra loro.</p>
+      </div>
+    </div>
+    <div class="cols c2" style="margin-top:22px;gap:20px">
+      <div class="box green">
+        <p><b>C'è perfino la cura del dettaglio che ci mettereste voi.</b> Nei quiz tutte le
+          risposte devono avere lo stesso numero di parole, perché la lunghezza non diventi
+          un indizio. È una regola di chi ha corretto tanti test.</p>
+      </div>
+      <div class="box orange">
+        <p><b>Ed è il punto da cui parte l'ora 7.</b> Una skill è didattica messa per
+          iscritto. Se il vostro metodo è chiaro, la skill viene bene. Se non lo è, la skill
+          lo rende evidente.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>teach · la didattica dentro</span><span>12</span></div>
+</section>
+
+<!-- 13 INSTALLARE O ADATTARE -->
+<section class="slide">
+  <div class="rail"><span>Ora 6 · Le skill</span></div>
+  <div class="body">
+    <div class="kicker">Come ci si procura una skill</div>
+    <h2>Quasi mai si parte dal foglio bianco<span class="sub">Tre strade, in ordine di
+      fatica. La terza la percorrete nell'ora 7; oggi vi fermate alla prima.</span></h2>
+    <div class="content">
+      <ol class="num">
+        <li><b>Chiedere all'agente di installarla</b>
+          Gli date l'indirizzo della pagina dove sta, e lui scarica i file e li mette dove
+          vanno. Poi gli chiedete in quale cartella li ha messi, e ve li andate a leggere. È
+          il laboratorio di oggi.</li>
+        <li><b>Prenderne una e riscriverla per voi</b>
+          Aprite <code>SKILL.md</code>, togliete quello che non vi riguarda, cambiate la
+          descrizione e i passi. Il lavoro difficile — la struttura, l'ordine delle
+          operazioni — lo ha già fatto qualcun altro.</li>
+        <li><b>Farsela scrivere per intervista</b>
+          Chiedete all'agente di guidarvi con domande: che cosa fate di ripetitivo, da che
+          materiale partite, che cosa deve venir fuori. Da quelle risposte scrive lui la
+          bozza. <span class="muted">Alcuni strumenti hanno una skill apposta per creare le
+          skill.</span></li>
+      </ol>
+      <div class="cols c2" style="margin-top:24px;gap:20px">
+        <div class="box orange">
+          <p><b>Leggetela prima di installarla.</b> Una skill è un elenco di istruzioni che
+            l'agente eseguirà sulle vostre cartelle. Vale la prudenza di quando si scarica un
+            programma: aprite il file e guardate che cosa ordina di fare.</p>
+        </div>
+        <div class="box green">
+          <p><b>Guardate anche la licenza.</b> Quella che installerete oggi è pubblicata con
+            licenza MIT: si può copiare, modificare e ridistribuire, a patto di portarsi
+            dietro la nota di copyright dell'autore.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Installare o adattare</span><span>13</span></div>
+</section>
+
+<!-- 14 LABORATORIO -->
+<section class="slide lab">
+  <div class="rail"><span>Ora 6 · Le skill</span></div>
+  <div class="body">
+    <div class="kicker">Laboratorio · 20 minuti · da soli, al computer</div>
+    <h2>Installatela, trovatela, leggetela, usatela<span class="sub">Scegliete una cosa che
+      volete imparare voi, non per la classe: uno strumento che non padroneggiate, un
+      argomento di un'altra materia, qualunque cosa vi incuriosisca.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.25fr 1fr;gap:22px;align-items:start">
+      <div class="prompt" style="overflow-wrap:anywhere">
+        <div class="lbl">Passo 1 · da incollare così com'è</div>
+        Installa come skill di questo progetto quella che trovi qui:
+        <code style="background:#2c4a46;color:#dfe6e3;font-size:.8em">https://github.com/mattpocock/skills/tree/main/skills/productivity/teach</code>
+        Scarica <code style="background:#2c4a46;color:#dfe6e3;font-size:.8em">SKILL.md</code>
+        e tutti i file che stanno nella stessa cartella. Poi dimmi in quale cartella li hai
+        messi e perché proprio lì.
+      </div>
+      <div class="cols steps" style="gap:11px">
+        <div class="box">
+          <span class="badge">4 min</span>
+          <p>Cartella nuova, aperta con l'agente. Incollate il passo 1 e annotatevi dove ha
+            messo i file.</p>
+        </div>
+        <div class="box">
+          <span class="badge">6 min</span>
+          <p>Aprite <code>SKILL.md</code> e leggete le prime righe. Poi provate la richiesta
+            trabocchetto: parte o non parte?</p>
+        </div>
+        <div class="box orange">
+          <span class="badge o">10 min</span>
+          <p>Chiamate la skill sul vostro argomento e lasciatevi interrogare. Arrivate alla
+            prima lezione aperta nel browser.</p>
+        </div>
+      </div>
+    </div>
+    <div class="cols c2 regole" style="margin-top:14px;gap:18px">
+      <div class="box orange">
+        <p><b>Da controllare alla fine:</b> sapete dire in che cartella è finita la skill?
+          Avete capito perché non si attiva da sola? Nella cartella ci sono
+          <code>MISSION.md</code> e una lezione che si apre?</p>
+      </div>
+      <div class="box green">
+        <p><b>La skill è in inglese, voi scrivete in italiano.</b> Funziona: vi risponde
+          nella vostra lingua. Chiedetele però in modo esplicito che anche le lezioni e le
+          schede siano in italiano — nella consegna la riga è già pronta.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../consegne/ora-06-lab-installare-skill.md" target="_blank">Consegna su Classroom <b>ora-06-lab-installare-skill.md</b></a><span>14</span></div>
+</section>
+
+<!-- 15 CON GLI STUDENTI -->
+<section class="slide">
+  <div class="rail"><span>Ora 6 · Le skill</span></div>
+  <div class="body">
+    <div class="kicker">Una suggestione, non una proposta</div>
+    <h2>E se quella cartella la tenesse uno studente?<span class="sub">Quello che avete
+      appena provato su voi stessi è, tecnicamente, un percorso di studio personale con
+      memoria. Vale la pena pensarci, senza ancora farne niente.</span></h2>
+    <div class="content cols c3">
+      <div class="box green">
+        <div class="tag">Quello che si intravede</div>
+        <h3>Il recupero</h3>
+        <p>Una cartella per studente, con lo scopo scritto da lui, gli argomenti da
+          recuperare e le schede che restano quando le lezioni sono finite.</p>
+      </div>
+      <div class="box green">
+        <div class="tag">Quello che si intravede</div>
+        <h3>L'approfondimento</h3>
+        <p>Chi va veloce si costruisce il percorso oltre il programma, e voi ne leggete gli
+          appunti numerati per sapere dov'è arrivato.</p>
+      </div>
+      <div class="box orange">
+        <div class="tag">Quello che non sappiamo</div>
+        <h3>Tutto il resto</h3>
+        <ul class="clean">
+          <li>Chi risponde di quello che l'agente insegna, se sbaglia</li>
+          <li>Che fine fanno i dati di uno studente minorenne</li>
+          <li>Se l'età minima dello strumento lo consente</li>
+          <li>Come si valuta un percorso che avete solo letto</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box" style="margin-top:24px">
+      <p><b>La posizione del corso è questa: per ora provatelo su voi stessi.</b> Un mese di
+        uso personale vi dirà più di qualunque discussione se lo strumento regge. Alle
+        questioni di responsabilità e di dati arriviamo nelle ore 7 e 9, che è dove vanno
+        affrontate.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Con gli studenti · suggestione</span><span>15</span></div>
+</section>
+
+<!-- 16 CHIUSURA -->
+<section class="slide">
+  <div class="rail"><span>Ora 6 · Le skill</span></div>
+  <div class="body">
+    <div class="kicker">Chiusura</div>
+    <h2>Quattro cose da portare a casa</h2>
+    <div class="content">
+      <ol class="num">
+        <li><b>Una skill è una cartella con un file dentro.</b>
+          Si apre, si legge, si corregge. Non c'è niente di magico e non serve saper
+          programmare per guardarci dentro.</li>
+        <li><b>Nel file-guida quello che vale sempre, nella skill quello che serve ogni
+          tanto.</b>
+          La prova: se stesse nel file-guida, l'agente lo leggerebbe anche quando non
+          c'entra niente?</li>
+        <li><b>La descrizione decide se la skill parte.</b>
+          Che cosa fa, e soprattutto quando non deve farlo. Il resto del file l'agente lo
+          legge solo dopo aver deciso.</li>
+        <li><b>Le skill buone sono corte e si potano.</b>
+          Si provano su casi veri, si toglie quello che non cambia niente, si torna a
+          rivederle. Mai fermarsi alla prima versione.</li>
+      </ol>
+      <div class="cols c2" style="margin-top:24px;gap:18px">
+        <div class="box green">
+          <p><b>A casa, se volete, adattatela.</b> Aprite <code>SKILL.md</code> e chiedete
+            all'agente di riscriverla per la vostra materia, in italiano. Guardate che cosa
+            decide di togliere: è la potatura vista oggi, fatta da lui.</p>
+        </div>
+        <div class="box orange">
+          <p><b>Prossima ora: scriverne una vostra.</b> Non una procedura qualunque, ma una
+            che poggia su un metodo didattico che conoscete. Portate in mente una cosa che
+            rifate sempre uguale.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Chiusura</span><span>16</span></div>
+</section>
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var body = document.body;
+  var counter = document.getElementById('presentCounter');
+  var hint = document.getElementById('presentHint');
+  var idx = 0;
+  var presenting = false;
+
+  function fitScale(){
+    var s = Math.min(window.innerWidth/1280, window.innerHeight/720);
+    document.documentElement.style.setProperty('--scale', s);
+  }
+
+  function render(){
+    slides.forEach(function(s,i){ s.classList.toggle('active', i===idx); });
+    counter.textContent = (idx+1) + ' / ' + slides.length;
+  }
+
+  function enter(){
+    presenting = true;
+    body.classList.add('present');
+    fitScale();
+    render();
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(function(){});
+    }
+  }
+
+  function exit(){
+    presenting = false;
+    body.classList.remove('present');
+    if (document.fullscreenElement) document.exitFullscreen().catch(function(){});
+  }
+
+  function next(){ if (idx < slides.length-1){ idx++; render(); } }
+  function prev(){ if (idx > 0){ idx--; render(); } }
+
+  document.addEventListener('keydown', function(e){
+    if (!presenting){
+      if (e.key === 'p' || e.key === 'P') enter();
+      return;
+    }
+    switch(e.key){
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown':
+        e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+        e.preventDefault(); prev(); break;
+      case 'Home':
+        e.preventDefault(); idx = 0; render(); break;
+      case 'End':
+        e.preventDefault(); idx = slides.length-1; render(); break;
+      case 'Escape':
+        exit(); break;
+    }
+  });
+
+  document.addEventListener('click', function(e){
+    if (!presenting) return;
+    if (e.target.closest('a')) return;
+    if (e.clientX > window.innerWidth/2) next(); else prev();
+  });
+
+  document.addEventListener('fullscreenchange', function(){
+    if (!document.fullscreenElement && presenting) exit();
+  });
+
+  window.addEventListener('resize', fitScale);
+
+  hint.classList.add('show');
+  setTimeout(function(){ hint.classList.remove('show'); }, 4000);
+
+  // ---- controllo dimensione testo ----
+  var ZOOM_MIN = 0.8, ZOOM_MAX = 1.4, ZOOM_STEP = 0.1;
+  var zoomVal = document.getElementById('zoomVal');
+  var zoomIn = document.getElementById('zoomIn');
+  var zoomOut = document.getElementById('zoomOut');
+  var zoom = 1;
+  try { zoom = parseFloat(localStorage.getItem('slideZoom')) || 1; } catch(e){}
+
+  function applyZoom(){
+    zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom));
+    document.documentElement.style.setProperty('--content-zoom', zoom);
+    zoomVal.textContent = Math.round(zoom * 100) + '%';
+    try { localStorage.setItem('slideZoom', zoom); } catch(e){}
+  }
+
+  zoomIn.addEventListener('click', function(){ zoom += ZOOM_STEP; applyZoom(); });
+  zoomOut.addEventListener('click', function(){ zoom -= ZOOM_STEP; applyZoom(); });
+
+  document.addEventListener('keydown', function(e){
+    if (presenting) return;
+    if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '=')){
+      e.preventDefault(); zoom += ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '-'){
+      e.preventDefault(); zoom -= ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '0'){
+      e.preventDefault(); zoom = 1; applyZoom();
+    }
+  });
+
+  applyZoom();
+})();
+</script>
+
+</body>
+</html>
