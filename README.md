@@ -9,6 +9,8 @@ L'impostazione è **agnostica rispetto al prodotto** — si impara l'impalcatura
 lavoro, non un singolo strumento — e confronta di volta in volta Codex, Claude Code
 e Antigravity, tenendo conto di chi parte dai piani gratuiti.
 
+**I materiali si consultano online: <https://mporfido.github.io/corso-formazione-agenti/>**
+
 > **Lavoro in corso.** Le slide coprono per ora le ore 1-6.
 
 ## Programma
