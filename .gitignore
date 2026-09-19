@@ -4,6 +4,9 @@ materiali/
 # Archivi
 *.zip
 
+# PDF generati dalle slide HTML (si rigenerano stampando il deck)
+slides/pdf/
+
 # Sistema operativo
 Thumbs.db
 desktop.ini
