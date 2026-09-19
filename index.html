@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dalla IA generativa alla IA agentica — Materiali del corso</title>
+<meta name="description" content="Slide e materiali del corso di formazione di 13 ore sugli agenti AI per docenti di scuola superiore.">
+<style>
+:root{
+  --paper:#f2efe9;
+  --card:#fbfaf7;
+  --ink:#1d1c1a;
+  --ink-soft:#5c5850;
+  --line:#ddd7cc;
+  --green:#1a3c3a;
+  --green-soft:#e6ece9;
+  --orange:#c0562f;
+  --orange-soft:#f6e7de;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);font-family:var(--sans);color:var(--ink);
+  -webkit-font-smoothing:antialiased;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:36px 16px 72px}
+
+/* ---------- testata ---------- */
+.hero{background:var(--card);border:1px solid var(--line);
+  display:grid;grid-template-columns:56px 1fr;overflow:hidden;margin-bottom:40px}
+.rail{background:var(--green);color:#f4f1ea;
+  display:flex;align-items:center;justify-content:center}
+.rail span{writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  white-space:nowrap;opacity:.9}
+.hero .body{padding:48px 52px 44px;min-width:0}
+.kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--orange);font-weight:600;margin-bottom:14px}
+h1{font-family:var(--serif);font-size:54px;line-height:1.08;font-weight:600;
+  letter-spacing:-.01em}
+.rule{width:72px;height:3px;background:var(--orange);margin:28px 0 0}
+.lede{margin-top:24px;font-size:18px;color:var(--ink-soft);max-width:44em}
+.meta{margin-top:34px;display:flex;flex-wrap:wrap;gap:20px 44px;
+  font-size:13px;color:var(--ink-soft)}
+.meta b{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--green);margin-bottom:6px;font-weight:600}
+
+/* ---------- titoli di sezione ---------- */
+h2{font-family:var(--serif);font-size:15px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--green);margin-bottom:18px;
+  padding-bottom:10px;border-bottom:2px solid var(--green)}
+.section{margin-bottom:44px}
+
+/* ---------- griglia dei moduli ---------- */
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(310px,1fr))}
+.mod{border:1px solid var(--line);background:#fff;padding:22px 24px 20px;
+  display:flex;flex-direction:column;gap:10px;min-width:0;
+  text-decoration:none;color:inherit;transition:border-color .15s,box-shadow .15s}
+a.mod:hover,a.mod:focus-visible{border-color:var(--green);
+  box-shadow:0 2px 14px rgba(26,60,58,.12);outline:none}
+.mod .idx{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.mod h3{font-family:var(--serif);font-size:22px;font-weight:600;line-height:1.2}
+.mod p{font-size:14.5px;line-height:1.5;color:var(--ink-soft);flex:1}
+.mod .status{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-top:4px;padding-top:12px;border-top:1px solid var(--line);
+  font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+a.mod .status .go{color:var(--green);font-weight:600}
+.mod.soon{background:var(--paper);border-style:dashed}
+.mod.soon .idx,.mod.soon h3,.mod.soon .status .go{color:var(--ink-soft)}
+
+/* ---------- note ---------- */
+.notes{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.note{border:1px solid var(--line);padding:20px 22px;background:#fff;min-width:0}
+.note.green{background:var(--green-soft);border-color:#cbd8d3}
+.note.orange{background:var(--orange-soft);border-color:#ecd4c5}
+.note h3{font-family:var(--serif);font-size:19px;font-weight:600;margin-bottom:8px}
+.note p{font-size:14.5px;color:var(--ink-soft)}
+.note p+p{margin-top:8px}
+kbd{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.88em;
+  border:1px solid var(--line);background:var(--paper);padding:1px 5px}
+a{color:var(--green)}
+
+/* ---------- piede ---------- */
+.foot{margin-top:8px;padding-top:18px;border-top:1px solid var(--line);
+  font-size:12.5px;color:var(--ink-soft);display:flex;flex-wrap:wrap;
+  gap:8px 28px;justify-content:space-between}
+
+@media (max-width:720px){
+  .hero{grid-template-columns:28px 1fr}
+  .rail span{font-size:9px;letter-spacing:.16em}
+  .hero .body{padding:32px 22px 30px}
+  h1{font-size:34px}
+  .lede{font-size:16px}
+  .wrap{padding:20px 16px 56px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="rail"><span>Materiali del corso</span></div>
+  <div class="body">
+    <div class="kicker">Corso di formazione per docenti · 13 ore</div>
+    <h1>Dalla IA generativa<br>alla IA agentica</h1>
+    <div class="rule"></div>
+    <p class="lede">Le slide di ogni ora, da consultare e da stampare. Tredici moduli
+      autonomi che partono dalla differenza fra chatbot e agente e arrivano a una lezione
+      interattiva pubblicata online. Niente prerequisiti tecnici: si impara l&rsquo;impalcatura
+      di lavoro, non un singolo prodotto.</p>
+    <div class="meta">
+      <div><b>Destinatari</b>Docenti di scuola superiore</div>
+      <div><b>Prerequisiti</b>Aver usato ChatGPT o simili</div>
+      <div><b>Struttura</b>13 moduli da un&rsquo;ora</div>
+      <div><b>Piattaforme</b>Codex &middot; Claude Code &middot; Antigravity</div>
+    </div>
+  </div>
+</header>
+
+<section class="section">
+  <h2>Le ore del corso</h2>
+  <div class="grid">
+
+    <a class="mod" href="slides/ora-01.html">
+      <div class="idx">Ora 01</div>
+      <h3>Dal chatbot all&rsquo;agente</h3>
+      <p>Che cosa rende &laquo;agentico&raquo; un sistema e dove pu&ograve; sbagliare. Quali
+        compiti conviene affidargli e quali &egrave; meglio tenere per s&eacute;.</p>
+      <div class="status"><span>18 slide</span><span class="go">Apri &rarr;</span></div>
+    </a>
+
+    <a class="mod" href="slides/ora-02.html">
+      <div class="idx">Ora 02</div>
+      <h3>Orientarsi negli ambienti agentici</h3>
+      <p>I tre prodotti si basano sulla stessa idea: un agente lavora dentro una cartella.
+        Qui quella cartella si apre per la prima volta.</p>
+      <div class="status"><span>21 slide</span><span class="go">Apri &rarr;</span></div>
+    </a>
+
+    <a class="mod" href="slides/ora-03.html">
+      <div class="idx">Ora 03</div>
+      <h3>Il primo workflow controllato</h3>
+      <p>Un compito vero chiesto male, per guardare che cosa succede; da l&igrave; il modo
+        giusto di chiederlo, di controllarlo e di tornare indietro.</p>
+      <div class="status"><span>16 slide</span><span class="go">Apri &rarr;</span></div>
+    </a>
+
+    <a class="mod" href="slides/ora-04.html">
+      <div class="idx">Ora 04</div>
+      <h3>Context engineering e memoria permanente</h3>
+      <p>Che cosa l&rsquo;agente ha davanti quando lavora, che cosa gli manca, e come scrivere
+        una volta sola ci&ograve; che oggi si ripete a ogni conversazione.</p>
+      <div class="status"><span>18 slide</span><span class="go">Apri &rarr;</span></div>
+    </a>
+
+    <a class="mod" href="slides/ora-05.html">
+      <div class="idx">Ora 05</div>
+      <h3>Knowledge base: file, wiki e RAG</h3>
+      <p>Mettere in ordine le fonti della propria disciplina, perch&eacute; l&rsquo;agente le
+        trovi da solo e dica sempre da dove ha preso quello che afferma.</p>
+      <div class="status"><span>16 slide</span><span class="go">Apri &rarr;</span></div>
+    </a>
+
+    <a class="mod" href="slides/ora-06.html">
+      <div class="idx">Ora 06</div>
+      <h3>Usare e comprendere le skill</h3>
+      <p>Il terzo pezzo dopo identit&agrave; e fonti: le procedure. Come si insegna
+        all&rsquo;agente un modo di lavorare che poi richiama da solo, quando serve.</p>
+      <div class="status"><span>17 slide</span><span class="go">Apri &rarr;</span></div>
+    </a>
+
+    <div class="mod soon">
+      <div class="idx">Ora 07</div>
+      <h3>Creare skill fondate sulla pedagogia</h3>
+      <p>Trasformare una pratica professionale in una procedura ripetibile, fondata su
+        obiettivi e criteri pedagogici espliciti.</p>
+      <div class="status"><span>Slide</span><span class="go">In preparazione</span></div>
+    </div>
+
+    <div class="mod soon">
+      <div class="idx">Ora 08</div>
+      <h3>Dalla programmazione al calendario</h3>
+      <p>Generare un calendario didattico motivato e modificabile a partire dalla
+        programmazione annuale del docente.</p>
+      <div class="status"><span>Slide</span><span class="go">In preparazione</span></div>
+    </div>
+
+    <div class="mod soon">
+      <div class="idx">Ora 09</div>
+      <h3>Dal registro alle prossime lezioni</h3>
+      <p>Aggiornare il piano sulla base dello stato reale della classe, senza delegare
+        all&rsquo;agente la decisione finale.</p>
+      <div class="status"><span>Slide</span><span class="go">In preparazione</span></div>
+    </div>
+
+    <div class="mod soon">
+      <div class="idx">Ora 10</div>
+      <h3>Pi&ugrave; agenti per produrre e controllare</h3>
+      <p>Scomporre un compito complesso e coordinare pi&ugrave; agenti per ottenere un
+        materiale unico, coerente e verificato.</p>
+      <div class="status"><span>Slide</span><span class="go">In preparazione</span></div>
+    </div>
+
+    <div class="mod soon">
+      <div class="idx">Ora 11</div>
+      <h3>Progettare una lezione interattiva</h3>
+      <p>Definire l&rsquo;obiettivo pedagogico di una breve attivit&agrave; interattiva prima
+        di affidarne la realizzazione all&rsquo;agente.</p>
+      <div class="status"><span>Slide</span><span class="go">In preparazione</span></div>
+    </div>
+
+    <div class="mod soon">
+      <div class="idx">Ora 12</div>
+      <h3>Laboratorio sul repository barebones</h3>
+      <p>Produrre una lezione interattiva funzionante senza conoscere i dettagli tecnici
+        del motore che la fa girare.</p>
+      <div class="status"><span>Slide</span><span class="go">In preparazione</span></div>
+    </div>
+
+    <div class="mod soon">
+      <div class="idx">Ora 13</div>
+      <h3>Laboratorio aperto e pubblicazione</h3>
+      <p>Applicare il metodo a un&rsquo;esigenza professionale reale e portarsi a casa un
+        progetto o un workflow riutilizzabile.</p>
+      <div class="status"><span>Slide</span><span class="go">In preparazione</span></div>
+    </div>
+
+  </div>
+</section>
+
+<section class="section">
+  <h2>Come si usano queste slide</h2>
+  <div class="notes">
+    <div class="note green">
+      <h3>Consultare e presentare</h3>
+      <p>Ogni deck &egrave; una pagina sola: si scorre dall&rsquo;alto verso il basso come un
+        documento.</p>
+      <p>Premendo <kbd>P</kbd> si entra in modalit&agrave; presentazione &mdash; frecce o barra
+        spaziatrice per avanzare, <kbd>Esc</kbd> per uscire. I pulsanti <kbd>A&minus;</kbd> e
+        <kbd>A+</kbd> in alto a destra regolano la dimensione del testo.</p>
+    </div>
+    <div class="note">
+      <h3>Stampare in PDF</h3>
+      <p>Da browser, <kbd>Ctrl+P</kbd> (su Mac <kbd>Cmd+P</kbd>) e poi <em>Salva come
+        PDF</em>: il layout &egrave; gi&agrave; predisposto, una slide per pagina.</p>
+      <p>Per consultare un deck senza connessione basta salvare la pagina: i file sono
+        autonomi, non serve installare nulla.</p>
+    </div>
+    <div class="note orange">
+      <h3>Dati di esempio</h3>
+      <p>Le esercitazioni lavorano su una classe <strong>completamente inventata</strong>:
+        una 3&ordf; B di Matematica con 21 studenti, voti e annotazioni di fantasia.</p>
+      <p>Durante il corso non inserite mai dati reali dei vostri studenti nelle cartelle di
+        prova.</p>
+    </div>
+  </div>
+</section>
+
+<div class="foot">
+  <span>Dalla IA generativa alla IA agentica &middot; materiali in lavorazione</span>
+  <span>Licenza <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.it">CC BY-SA 4.0</a></span>
+</div>
+
+</div>
+</body>
+</html>
