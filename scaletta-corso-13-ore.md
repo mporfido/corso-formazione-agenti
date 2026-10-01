@@ -114,7 +114,8 @@ procedura esistente senza partire da zero.
 
 **Argomenti**
 
-- Intervista per rendere esplicita una procedura docente.
+- Procedura svolta passo passo con l'agente, corretta dal docente e distillata in skill
+  dopo la verifica del risultato: le correzioni diventano regole.
 - Obiettivi di apprendimento e Tassonomia di Bloom.
 - Progettazione a ritroso, Unita di Apprendimento e compito autentico.
 - Generazione di verifiche, criteri e rubriche.

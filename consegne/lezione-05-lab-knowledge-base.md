@@ -24,7 +24,7 @@ Preparate **tre-cinque fonti** della vostra disciplina: le slide di un corso, un
 normativa, un capitolo, un articolo, i vostri appunti. Bastano file che avete già.
 
 Se siete arrivati senza materiale, su Classroom trovate l'archivio
-`ora-05-fonti-esempio.zip`. Contiene tre documenti pubblici di didattica trasversale — le
+`lezione-05-fonti-esempio.zip`. Contiene tre documenti pubblici di didattica trasversale — le
 Linee guida del Ministero sull'intelligenza artificiale e le due raccomandazioni europee su
 competenze chiave e qualifiche — e dentro c'è un `LEGGIMI.md` che spiega come usarli.
 

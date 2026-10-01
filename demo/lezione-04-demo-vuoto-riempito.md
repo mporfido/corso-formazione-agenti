@@ -1,6 +1,6 @@
 # Ora 4 · Demo — Il vuoto riempito
 
-> Conduce il formatore · circa 6 minuti · slide 7-8 di `slides/ora-04.html`
+> Conduce il formatore · circa 6 minuti · slide 7-8 di `slides/lezione-04.html`
 
 ## Prima della lezione
 

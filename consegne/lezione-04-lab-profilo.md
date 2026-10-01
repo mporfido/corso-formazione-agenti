@@ -68,7 +68,7 @@ solo, senza che glielo diceste.
 
 ## Se non arrivate in fondo
 
-Su Classroom trovate l'archivio `ora-04-profilo-esempio.zip`: il profilo completo di una
+Su Classroom trovate l'archivio `lezione-04-profilo-esempio.zip`: il profilo completo di una
 docente inventata di Italiano e Storia, con un `AGENTS.md` e tre file di dettaglio.
 Estraetelo nella vostra cartella e chiedete all'agente di adattarlo a voi, sempre con
 un'intervista.

@@ -1,6 +1,6 @@
 # Ora 4 · Demo — La scelta silenziosa
 
-> Conduce il formatore · circa 6 minuti · slide 6 di `slides/ora-04.html`
+> Conduce il formatore · circa 6 minuti · slide 6 di `slides/lezione-04.html`
 
 ## Prima della lezione
 

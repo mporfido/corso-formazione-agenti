@@ -1,6 +1,6 @@
 # Ora 3 · Conduzione — Il primo tentativo e la raccolta
 
-> Conduce il formatore · circa 18 minuti in tutto · slide 3 e 4 di `slides/ora-03.html`
+> Conduce il formatore · circa 18 minuti in tutto · slide 3 e 4 di `slides/lezione-03.html`
 
 Nella versione attuale dell'ora 3 non c'è una dimostrazione del formatore. Il «prima» lo
 producono i corsisti, con il primo tentativo a mani nude. Questo file dice come si tiene

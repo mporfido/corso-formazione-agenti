@@ -1,6 +1,6 @@
 # Ora 3 · Demo — Il giudizio dell'ora 1, chiesto bene
 
-> Conduce il formatore · circa 5 minuti · slide 5 di `slides/ora-03.html`
+> Conduce il formatore · circa 5 minuti · slide 5 di `slides/lezione-03.html`
 
 ## Prima della lezione
 

@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Lezione 7 — Creare skill fondate sulla pedagogia</title>
+<style>
+:root{
+  --paper:#f2efe9;
+  --card:#fbfaf7;
+  --ink:#1d1c1a;
+  --ink-soft:#5c5850;
+  --line:#ddd7cc;
+  --green:#1a3c3a;
+  --green-soft:#e6ece9;
+  --orange:#c0562f;
+  --orange-soft:#f6e7de;
+  --blue:#2f5a8c;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);font-family:var(--sans);color:var(--ink);
+  -webkit-font-smoothing:antialiased;padding:28px 0}
+
+/* ---------- slide frame ---------- */
+.slide{
+  position:relative;width:1280px;height:720px;margin:0 auto 28px;
+  background:var(--card);border:1px solid var(--line);
+  display:grid;grid-template-columns:56px 1fr;overflow:hidden;
+}
+.rail{
+  background:var(--green);color:#f4f1ea;
+  display:flex;align-items:center;justify-content:center;
+}
+.rail span{
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  white-space:nowrap;opacity:.9;
+}
+.body{padding:52px 60px 64px;display:flex;flex-direction:column;min-width:0}
+.kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--orange);font-weight:600;margin-bottom:14px}
+h1{font-family:var(--serif);font-size:56px;line-height:1.08;font-weight:600;
+  letter-spacing:-.01em}
+h2{font-family:var(--serif);font-size:40px;line-height:1.12;font-weight:600;
+  letter-spacing:-.01em;margin-bottom:26px}
+h2 .sub{display:block;font-family:var(--sans);font-size:15px;font-weight:400;
+  color:var(--ink-soft);letter-spacing:0;margin-top:10px;line-height:1.45}
+p{font-size:17px;line-height:1.55;color:var(--ink)}
+.muted{color:var(--ink-soft)}
+.foot{position:absolute;left:56px;right:0;bottom:0;height:40px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 60px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-soft);border-top:1px solid var(--line)}
+.content{flex:0 1 auto;min-height:0}
+code{font-family:var(--mono);font-size:.9em;background:var(--green-soft);padding:1px 5px}
+
+/* ---------- cover ---------- */
+.cover .body{justify-content:center}
+.cover h1{font-size:72px;max-width:980px}
+.cover .lede{margin-top:26px;font-size:19px;color:var(--ink-soft);max-width:700px}
+.rule{width:72px;height:3px;background:var(--orange);margin:32px 0 0}
+.meta{margin-top:38px;display:flex;gap:44px;font-size:13px;color:var(--ink-soft)}
+.meta b{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--green);margin-bottom:6px}
+
+/* ---------- generic layout helpers ---------- */
+.cols{display:grid;gap:22px}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c4{grid-template-columns:repeat(4,1fr)}
+.box{border:1px solid var(--line);background:#fff;padding:22px 24px;
+  display:flex;flex-direction:column;gap:10px;min-width:0}
+.box h3{font-family:var(--serif);font-size:22px;font-weight:600;line-height:1.2}
+.box .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.box p,.box li{font-size:15px;line-height:1.5;color:var(--ink-soft)}
+.box.green{background:var(--green-soft);border-color:#cbd8d3}
+.box.orange{background:var(--orange-soft);border-color:#ecd4c5}
+ul.clean{list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.clean li{position:relative;padding-left:18px;font-size:16px;line-height:1.5}
+ul.clean li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;
+  background:var(--orange)}
+.box ul.clean li{font-size:15px}
+ol.num{list-style:none;counter-reset:n;display:flex;flex-direction:column;gap:16px}
+ol.num li{counter-increment:n;position:relative;padding-left:46px;font-size:17px;
+  line-height:1.5}
+ol.num li::before{content:counter(n,decimal-leading-zero);position:absolute;left:0;top:1px;
+  font-size:13px;font-weight:600;color:var(--green);letter-spacing:.06em}
+ol.num li b{display:block;font-family:var(--serif);font-size:20px;font-weight:600;
+  margin-bottom:4px;color:var(--ink)}
+
+/* ---------- tabella ---------- */
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:12px 16px;font-size:15px;line-height:1.45;
+  border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);
+  font-weight:600;border-bottom:2px solid var(--green)}
+td:first-child{font-weight:600;width:30%}
+td.o{color:var(--orange)}
+td.g{color:var(--green)}
+td.n{font-family:var(--serif);font-size:24px;font-weight:600;white-space:nowrap}
+
+/* ---------- prompt / badge ---------- */
+.prompt{background:var(--green);color:#eef2f0;padding:20px 24px;font-family:var(--sans);
+  font-size:15px;line-height:1.6}
+.prompt .lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;margin-bottom:8px}
+.prompt.plain{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.prompt.plain .lbl{color:var(--orange)}
+.badge{display:inline-block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  background:var(--green);color:#fff;padding:4px 9px;align-self:flex-start}
+.badge.o{background:var(--orange)}
+
+/* ---------- barra contesto ---------- */
+.gauge{height:30px;background:#fff;border:1px solid var(--line);display:flex;
+  overflow:hidden}
+.gauge i{display:block;height:100%}
+.g-legend{display:flex;gap:22px;font-size:13px;color:var(--ink-soft);margin-top:10px;
+  flex-wrap:wrap}
+.g-legend span{display:flex;align-items:center;gap:7px}
+.g-legend b{width:10px;height:10px;display:inline-block}
+
+/* ---------- sorgente Markdown ---------- */
+.src{background:#1f2624;color:#dfe6e3;font-family:var(--mono);font-size:13.5px;
+  line-height:1.65;padding:18px 22px;white-space:pre-wrap;overflow-wrap:anywhere}
+.src .h{color:#f1b28f}
+.src .k{color:#9fd3c2}
+.src .dim{color:#7f8c87}
+.src .hl{background:#3b4f3c;color:#fff;display:block;margin:0 -22px;padding:0 22px;
+  border-left:4px solid #f1b28f}
+.src .hl.o{background:#4d3a30}
+.src .hd{display:block;margin:-18px -22px 12px;padding:8px 22px;background:#161c1a;
+  font-family:var(--sans);font-size:12px;letter-spacing:.04em;color:#9fbdb4}
+
+/* ---------- la mappa e i file di dettaglio ---------- */
+.files{display:flex;flex-direction:column;gap:12px}
+.file{border:1px solid var(--line);background:#fff;padding:14px 18px;
+  display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline}
+.file .ic{grid-row:1/3;font-family:var(--mono);font-size:12px;color:#fff;
+  background:var(--green);padding:3px 7px;align-self:start;margin-top:2px}
+.file b{font-family:var(--mono);font-size:14px;font-weight:600;overflow-wrap:anywhere}
+.file span{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+.steps .box{padding:14px 20px;gap:8px}
+.file:not(.main){margin-left:34px;position:relative}
+.file:not(.main)::before{content:"";position:absolute;left:-22px;top:-13px;width:16px;
+  height:calc(50% + 13px);border-left:2px solid #cbd8d3;border-bottom:2px solid #cbd8d3}
+.file.main{background:var(--green-soft);border-color:#cbd8d3}
+.file.main .ic{background:var(--orange)}
+
+/* ---------- scheda piattaforma ---------- */
+.scheda{border:1px solid #cbd8d3;background:#fff}
+.scheda .concept{background:var(--green);color:#eef2f0;padding:14px 20px;
+  display:grid;grid-template-columns:170px 1fr;gap:16px;align-items:baseline}
+.scheda .concept b{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;font-weight:600}
+.scheda .concept span{font-size:16px;line-height:1.45}
+.scheda table th{padding:11px 16px}
+.scheda table td{padding:10px 16px;font-size:14px;line-height:1.4}
+.scheda table td:first-child{width:18%;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--green);padding-top:13px}
+.scheda .stamp{display:flex;justify-content:space-between;gap:20px;padding:9px 16px;
+  font-size:11px;letter-spacing:.08em;color:var(--ink-soft);background:#f7f5f0}
+.check{color:var(--orange);border-bottom:1px dashed var(--orange)}
+
+/* ---------- tipi di slide: dimostrazione e laboratorio ----------
+   Basta aggiungere .demo o .lab alla <section class="slide">: cambiano rail,
+   fondo, kicker e compare il timbro. Il link al file sta nel piè di pagina. */
+.slide.demo{background:#eef2f7}
+.slide.lab{background:#fcf2ea}
+.slide.demo .rail{background:var(--blue)}
+.slide.lab .rail{background:var(--orange)}
+.slide.demo .rail span,.slide.lab .rail span{display:none}
+.slide.demo .rail::before,.slide.lab .rail::before{
+  writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;
+  font-size:14px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:#fff}
+.slide.demo .rail::before{content:"Dimostrazione"}
+.slide.lab .rail::before{content:"Laboratorio"}
+.slide.demo::after,.slide.lab::after{
+  position:absolute;top:18px;right:22px;padding:7px 14px;color:#fff;
+  font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase}
+.slide.demo::after{content:"◉\00a0\00a0Guardate lo schermo";background:var(--blue)}
+.slide.lab::after{content:"✎\00a0\00a0Tocca a voi";background:var(--orange)}
+.slide.demo .kicker{color:var(--blue)}
+.slide.demo .foot,.slide.lab .foot{border-top-color:rgba(0,0,0,.08)}
+.foot a.task{display:inline-flex;align-items:center;gap:10px;margin-left:-12px;
+  padding:6px 12px;color:#fff;text-decoration:none;font-weight:700;letter-spacing:.12em}
+.foot a.task b{font-family:var(--mono);font-weight:400;font-size:12px;letter-spacing:0;
+  text-transform:none;opacity:.95}
+.slide.demo .foot a.task{background:var(--blue)}
+.slide.lab .foot a.task{background:var(--orange)}
+.foot a.task:hover{filter:brightness(1.1)}
+
+/* ---------- print ---------- */
+.slide{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:13.333in 7.5in;margin:0}
+@media print{
+  body{background:#fff;padding:0}
+  .slide{margin:0;border:none;page-break-after:always;box-shadow:none}
+  .slide:last-child{page-break-after:auto}
+}
+
+/* ---------- presentation mode ---------- */
+body.present{padding:0;overflow:hidden;background:#000}
+body.present .slide{
+  display:none;margin:0;border:none;
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(var(--scale,1));
+  transform-origin:center center;
+}
+body.present .slide.active{display:grid}
+.present-hint{
+  position:fixed;bottom:14px;right:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.present-hint.show{opacity:1}
+.present-counter{
+  position:fixed;bottom:14px;left:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  display:none;
+}
+body.present .present-counter{display:block}
+
+/* ---------- controllo dimensione testo ---------- */
+:root{--content-zoom:1}
+.body{zoom:var(--content-zoom)}
+.zoom-ctrl{
+  position:fixed;top:14px;right:18px;z-index:60;
+  display:flex;align-items:center;gap:2px;
+  background:rgba(29,28,26,.88);border-radius:4px;padding:4px;
+  font-family:var(--sans);
+}
+.zoom-ctrl button{
+  width:28px;height:28px;border:none;border-radius:3px;background:transparent;
+  color:#f4f1ea;font-size:14px;font-weight:600;cursor:pointer;line-height:1;
+}
+.zoom-ctrl button:hover{background:rgba(255,255,255,.15)}
+.zoom-ctrl .val{
+  min-width:38px;text-align:center;font-size:11px;letter-spacing:.04em;
+  color:#cfcabf;user-select:none;
+}
+body.present .zoom-ctrl{display:none}
+@media print{.zoom-ctrl{display:none}}
+
+/* ---------- percorso indice → pagina → fonte ---------- */
+.trail{display:grid;grid-template-columns:1fr 36px 1fr 36px 1fr;align-items:stretch}
+.trail .step{border:1px solid var(--line);background:#fff;padding:16px 18px;
+  display:flex;flex-direction:column;gap:8px;min-width:0}
+.trail .step .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--green)}
+.trail .step b{font-family:var(--mono);font-size:13.5px;overflow-wrap:anywhere}
+.trail .step p{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+.trail .arrow{display:flex;align-items:center;justify-content:center;
+  color:var(--orange);font-size:22px}
+.trail .step.src-step{background:var(--green-soft);border-color:#cbd8d3}
+
+/* ---------- le quattro accortezze di scrittura (slide 5) ---------- */
+.regole .box{padding:15px 20px;gap:7px}
+
+/* ---------- screenshot con zone numerate ---------- */
+.shotwrap{position:relative;border:1px solid #bfc9c4;line-height:0}
+.shotwrap img{width:100%;display:block}
+.shotwrap .pin{position:absolute;transform:translate(-50%,-50%);
+  box-shadow:0 0 0 2px #fff,0 1px 4px rgba(0,0,0,.35)}
+.pin{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;
+  border-radius:50%;background:var(--orange);color:#fff;font-size:12px;font-weight:700;
+  font-family:var(--sans);line-height:1;flex:none}
+.zone{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+.zone > div{display:flex;gap:10px;align-items:baseline}
+.zone > div span{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="present-counter" id="presentCounter"></div>
+<div class="present-hint" id="presentHint">Premi P per entrare in modalità presentazione · frecce/spazio per avanzare · Esc per uscire</div>
+<div class="zoom-ctrl">
+  <button id="zoomOut" title="Riduci testo" aria-label="Riduci testo">A−</button>
+  <span class="val" id="zoomVal">100%</span>
+  <button id="zoomIn" title="Aumenta testo" aria-label="Aumenta testo">A+</button>
+</div>
+
+
+<style>
+/* ---------- due colonne a confronto (come nell'ora 6) ---------- */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:stretch}
+.duo .side{border:1px solid var(--line);background:#fff;padding:20px 22px;
+  display:flex;flex-direction:column;gap:12px;min-width:0}
+.duo .side.g{background:var(--green-soft);border-color:#cbd8d3}
+.duo .side .lbl{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.duo .side h3{font-family:var(--serif);font-size:23px;font-weight:600;line-height:1.2}
+.duo .side p,.duo .side li{font-size:14.5px;line-height:1.5;color:var(--ink-soft)}
+/* ---------- voce · spiegazione, accanto a un sorgente ---------- */
+.fm{display:flex;flex-direction:column;gap:9px}
+.fm > div{display:grid;grid-template-columns:170px 1fr;gap:14px;align-items:baseline;
+  border-bottom:1px solid var(--line);padding-bottom:9px}
+.fm b{font-family:var(--serif);font-size:16px;color:var(--green);overflow-wrap:anywhere}
+.fm span{font-size:14px;line-height:1.45;color:var(--ink-soft)}
+/* ---------- ora 7: mappa domanda → parte della skill ---------- */
+.qmap{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.qmap .q{border:1px solid var(--line);background:#fff;padding:14px 18px;
+  display:flex;flex-direction:column;gap:6px;min-width:0}
+.qmap .q .ask{font-family:var(--serif);font-size:18px;font-weight:600;line-height:1.25}
+.qmap .q .to{font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;
+  color:var(--orange)}
+.qmap .q p{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+/* ---------- scala di Bloom ---------- */
+.bloom{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;align-items:end}
+.bloom div{background:var(--green-soft);border:1px solid #cbd8d3;padding:10px 12px;
+  display:flex;flex-direction:column;gap:4px;min-width:0}
+.bloom div.hots{background:var(--orange-soft);border-color:#ecd4c5}
+.bloom b{font-family:var(--serif);font-size:16px;font-weight:600}
+.bloom span{font-size:12.5px;line-height:1.4;color:var(--ink-soft)}
+.bloom .s1{min-height:76px}.bloom .s2{min-height:92px}.bloom .s3{min-height:108px}
+.bloom .s4{min-height:124px}.bloom .s5{min-height:140px}.bloom .s6{min-height:156px}
+.lh{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;font-weight:600;margin-top:8px}
+.lh span:first-child{color:var(--green)}.lh span:last-child{color:var(--orange)}
+/* ---------- obiettivo scomposto ---------- */
+.obj{display:grid;grid-template-columns:auto 1fr;border:1px solid var(--line);background:#fff}
+.obj .v{background:var(--orange);color:#fff;padding:12px 16px;font-family:var(--serif);
+  font-size:19px;font-weight:600}
+.obj .c{padding:12px 16px;font-family:var(--serif);font-size:19px}
+.obj-lbl{display:grid;grid-template-columns:auto 1fr;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;font-weight:600;color:var(--ink-soft);margin-top:6px}
+.obj-lbl span:first-child{padding-right:16px}
+/* ---------- a ritroso ---------- */
+.back{display:grid;grid-template-columns:1fr 36px 1fr 36px 1fr;align-items:stretch}
+.back .step{border:1px solid var(--line);background:#fff;padding:16px 18px;
+  display:flex;flex-direction:column;gap:7px;min-width:0}
+.back .step .n{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--orange);
+  line-height:1}
+.back .step h3{font-family:var(--serif);font-size:20px;font-weight:600;line-height:1.2}
+.back .step p{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+.back .step.first{background:var(--green-soft);border-color:#cbd8d3}
+.back .arrow{display:flex;align-items:center;justify-content:center;color:var(--orange);
+  font-size:22px}
+/* ---------- ciclo in quattro passi ---------- */
+.loop4{display:grid;grid-template-columns:1fr 30px 1fr 30px 1fr 30px 1fr;align-items:stretch}
+.loop4 .step{border:1px solid var(--line);background:#fff;padding:16px 18px;
+  display:flex;flex-direction:column;gap:7px;min-width:0}
+.loop4 .step .n{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--orange);
+  line-height:1}
+.loop4 .step h3{font-family:var(--serif);font-size:20px;font-weight:600;line-height:1.2}
+.loop4 .step p{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+.loop4 .step.first{background:var(--green-soft);border-color:#cbd8d3}
+.loop4 .arrow{display:flex;align-items:center;justify-content:center;color:var(--orange);
+  font-size:20px}
+/* ---------- il caso vero ---------- */
+.case td,.case th{padding:9px 14px;font-size:13.5px}
+.case td:first-child{width:27%}
+.case td.fix{color:var(--orange);font-family:var(--serif);font-size:15px}
+/* ---------- rubrica in miniatura ---------- */
+.rub td,.rub th{padding:9px 12px;font-size:13.5px}
+.rub th{font-size:10px}
+.rub td:first-child{width:auto;font-weight:600}
+.rub td.lv{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--green);
+  width:44px;text-align:center}
+.rub td .crit{display:block;font-weight:400;font-size:12.5px;line-height:1.4;
+  color:var(--ink-soft);margin-top:6px}
+.rub td.pts{white-space:nowrap;font-size:13px;color:var(--ink-soft);width:82px}
+.rub tr.soglia td{background:var(--orange-soft)}
+.rub tr.soglia td.pts b{color:var(--orange)}
+/* ---------- descrittori: no / sì ---------- */
+.dx{display:flex;flex-direction:column;gap:9px}
+.dx div{border:1px solid var(--line);background:#fff;padding:10px 14px;font-size:14.5px;
+  line-height:1.45;display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:baseline}
+.dx i{font-style:normal;font-weight:700}
+.dx.no i{color:var(--orange)}
+.dx.si div{background:var(--green-soft);border-color:#cbd8d3}
+.dx.si i{color:var(--green)}
+/* ---------- matrice di coerenza ---------- */
+.align td{padding:9px 14px;font-size:14px}
+.align td:first-child{width:40%;font-weight:600}
+.align td.pt{font-family:var(--serif);font-size:18px;font-weight:600;white-space:nowrap}
+.align tr.hi td{background:var(--orange-soft)}
+/* ---------- semaforo ---------- */
+.lights .box{border-top-width:5px}
+.lights .box.g{border-top-color:var(--green)}
+.lights .box.a{border-top-color:#d69a2d}
+.lights .box.r{border-top-color:var(--orange)}
+</style>
+
+<!-- 01 COVER -->
+<section class="slide cover">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">Dalla IA generativa alla IA agentica · Lezione 7</div>
+    <h1>Creare skill fondate<br>sulla pedagogia</h1>
+    <div class="rule"></div>
+    <p class="lede">Nell'ora 6 avete letto la skill di un altro. Oggi ne costruite una vostra,
+      su una cosa che fate già: dagli obiettivi alla verifica. Prima la fate fare all'agente,
+      un passo alla volta, e la correggete. Quando funziona, diventa una procedura che
+      l'agente ripete e che voi potete controllare.</p>
+    <div class="meta">
+      <div><b>Destinatari</b>Docenti di scuola superiore</div>
+      <div><b>Serve</b>La programmazione di dipartimento</div>
+      <div><b>Durata</b>Un'ora, pausa compresa</div>
+      <div><b>Modulo</b>7 di 13</div>
+    </div>
+  </div>
+  <div class="foot"><span>Corso agenti IA</span><span>01</span></div>
+</section>
+
+<!-- 02 OBIETTIVI E MAPPA -->
+<section class="slide">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">Obiettivi e mappa</div>
+    <h2>Alla fine di quest'ora<span class="sub">Il punto non è far scrivere verifiche
+      all'agente: quello lo sa già fare, male o bene a seconda di come glielo chiedete. Il
+      punto è che le faccia come le fate voi, e che si possa controllare.</span></h2>
+    <ol class="num" style="margin-bottom:26px">
+      <li><b>Avete una skill vostra, ricavata da una procedura che avete fatto fare e corretto</b>
+        Parte dalla programmazione di dipartimento e arriva a una verifica coerente con gli
+        obiettivi.</li>
+      <li><b>Sapete dove la decisione valutativa resta vostra</b>
+        E lo avete scritto dentro la skill, non solo pensato.</li>
+    </ol>
+    <div class="content cols c4" style="gap:16px">
+      <div class="box">
+        <div class="tag">10 min</div>
+        <h3>Un esempio</h3>
+        <p>La skill <code>btc-task</code>: un metodo didattico in 500 parole</p>
+      </div>
+      <div class="box">
+        <div class="tag">10 min</div>
+        <h3>Prima si fa</h3>
+        <p>Far fare, correggere, distillare. Un caso vero e una dimostrazione</p>
+      </div>
+      <div class="box">
+        <div class="tag">12 min</div>
+        <h3>Il metodo dentro</h3>
+        <p>Obiettivi, Bloom, a ritroso, rubriche, coerenza. E chi decide</p>
+      </div>
+      <div class="box orange">
+        <div class="tag">20 min</div>
+        <h3>Laboratorio</h3>
+        <p>Dalla vostra programmazione a una skill</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Obiettivi e mappa</span><span>02</span></div>
+</section>
+
+<!-- 03 DUE TIPI DI SKILL -->
+<section class="slide">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">Il ponte dall'ora 6</div>
+    <h2>Una skill può portare un'operazione, o un metodo<span class="sub">La differenza non
+      sta nella lunghezza. Sta in che cosa succede se l'agente la ignora: nel primo caso
+      sbaglia un'operazione, nel secondo fa lezione a modo suo.</span></h2>
+    <div class="content duo">
+      <div class="side">
+        <div class="lbl">Skill operativa</div>
+        <h3>Dice che cosa fare</h3>
+        <p>Passi tecnici, sempre uguali, che si possono verificare a occhio.</p>
+        <ul class="clean">
+          <li>«Salva il lavoro nella storia del progetto»</li>
+          <li>«Converti la verifica in PDF con l'intestazione della scuola»</li>
+          <li>«Rinomina i file secondo questo schema»</li>
+        </ul>
+        <p style="margin-top:2px"><b>Si controlla</b> guardando se il file c'è.</p>
+      </div>
+      <div class="side g">
+        <div class="lbl" style="color:var(--green)">Skill fondata su un metodo</div>
+        <h3>Dice come ragionare</h3>
+        <p>Porta dentro un quadro didattico con un nome, e ne fa rispettare i principi.</p>
+        <ul class="clean">
+          <li><code>teach</code>: sviluppo prossimale, recupero attivo, pratica distanziata</li>
+          <li><code>btc-task</code>: <i>Building Thinking Classrooms</i> di Liljedahl</li>
+          <li>la vostra, fra mezz'ora: obiettivi, Bloom, rubrica</li>
+        </ul>
+        <p style="margin-top:2px"><b>Si controlla</b> solo se sapete che cosa il metodo
+          chiede.</p>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:20px">
+      <p><b>È la frase con cui si è chiusa l'ora 6:</b> una skill è didattica messa per
+        iscritto. Se il vostro metodo è chiaro, la skill viene bene. Se non lo è, la skill lo
+        rende evidente, ed è la parte utile.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Operazione o metodo</span><span>03</span></div>
+</section>
+
+<!-- 04 BTC-TASK: IL SORGENTE -->
+<section class="slide">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">Un esempio scritto da un docente</div>
+    <h2>La skill <code style="font-size:.78em">btc-task</code><span class="sub">Data un'idea
+      di matematica, propone l'avvio di una lezione nello stile di <i>Building Thinking
+      Classrooms</i>. Circa 500 parole, un terzo di <code>teach</code>. Scritta da chi
+      conduce questo corso, e usata spesso.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.12fr .88fr;gap:24px;align-items:start">
+      <div class="src" style="font-size:11.4px;line-height:1.55"><span class="hd">btc-task / SKILL.md — estratti</span><span class="hl">name: btc-task
+disable-model-invocation: true</span>
+<span class="h">## Purpose and boundaries</span>
+This skill does <span class="k">one thing only</span>: [...] a lesson idea
+made up of: 1. The Hook  2. Development (Thin-slicing)
+<span class="hl o">Stop there. Do NOT produce anything else,
+even if it would be part of the BTC framework.</span>
+<span class="h">## What is needed before producing output</span>
+If the teacher provides only the topic, that is fine:
+proceed with reasonable assumptions [...]
+<span class="h">## BTC principles to respect</span>
+- <span class="k">Thinking task, not exercise.</span>
+- <span class="k">Low floor, high ceiling</span>
+- <span class="k">Thin-slicing:</span> micro-increments in difficulty.
+  Each slice changes *one* thing [...]
+<span class="h">## Output format</span>
+<span class="dim">Topic · The Hook · Development — Thin-slicing
+Do not add any sections beyond these.</span></div>
+      <div class="fm">
+        <div><b>un quadro con un nome</b><span>Non spiega che cos'è Liljedahl: il modello lo
+          conosce. La skill sceglie quali principi contano e li rende vincolanti</span></div>
+        <div><b>un confine netto</b><span>«Fermati lì». Senza, l'agente aggiunge verifica,
+          rubrica e compiti per casa, per zelo</span></div>
+        <div><b>un'ipotesi dichiarata</b><span>Se il docente dà solo l'argomento, non lo
+          tempesta di domande: sceglie il livello più plausibile e va avanti</span></div>
+        <div><b>un criterio controllabile</b><span>«Ogni passo cambia una sola cosa». Lo potete
+          verificare voi, riga per riga</span></div>
+        <div style="border:none"><b>un formato fisso</b><span>Tre sezioni, sempre quelle. Due
+          uscite diverse si confrontano a colpo d'occhio</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>btc-task · il sorgente</span><span>04</span></div>
+</section>
+
+<!-- 05 DEMO BTC-TASK -->
+<section class="slide demo">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">Dimostrazione · 4 minuti</div>
+    <h2>Vediamola all'opera sulla 3ª B<span class="sub">L'argomento lo prendiamo dalla
+      cartella di prova: nella verifica 2 molti hanno studiato bene il segno, e poi
+      hanno sbagliato a scrivere l'insieme delle soluzioni.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.1fr 1fr;gap:24px;align-items:start">
+      <div class="cols" style="gap:14px">
+        <div class="prompt">
+          <div class="lbl">La richiesta</div>
+          Usa la skill btc-task. Argomento: dal grafico di una parabola all'insieme delle
+          soluzioni di una disequazione di secondo grado. Classe terza di un istituto
+          tecnico.
+        </div>
+        <div class="box">
+          <p><b>La skill è in inglese, la richiesta in italiano.</b> L'uscita arriva in
+            italiano: è scritto nella skill stessa, alla voce <i>Language</i>.</p>
+        </div>
+      </div>
+      <div class="cols" style="gap:12px">
+        <div class="box green">
+          <div class="tag">Che cosa guardare · 1</div>
+          <p><b>Si ferma dove deve?</b> Aggancio e sequenza di passi, niente verifica,
+            niente rubrica. Se aggiunge altro, il confine non ha tenuto.</p>
+        </div>
+        <div class="box green">
+          <div class="tag">Che cosa guardare · 2</div>
+          <p><b>Ogni passo cambia una cosa sola?</b> Contate. Il primo deve essere quasi
+            banale, l'ultimo deve aprire a un «e se…?».</p>
+        </div>
+        <div class="box orange">
+          <div class="tag">Che cosa guardare · 3</div>
+          <p><b>Lo usereste domani?</b> È la domanda che la skill non può farsi da sola. Il
+            giudizio sulla sequenza resta al docente.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../demo/lezione-07-demo-btc-task.md" target="_blank">Copione <b>lezione-07-demo-btc-task.md</b></a><span>05</span></div>
+</section>
+
+<!-- 06 PRIMA SI FA, POI SI SCRIVE -->
+<section class="slide">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">Rendere esplicita una procedura</div>
+    <h2>Prima si fa, poi si scrive<span class="sub">Quello che fate da anni non riuscite a
+      descriverlo a freddo: lo riconoscete quando lo vedete fatto male. Per questo la skill
+      non si detta. Si fa fare la procedura all'agente, un passo alla volta, e la si
+      corregge.</span></h2>
+    <div class="content loop4">
+      <div class="step first"><span class="n">1</span>
+        <h3>Fare</h3>
+        <p>Un passo alla volta, sul materiale vero. Non «fammi la verifica»: prima gli
+          obiettivi, poi la prova.</p></div>
+      <div class="arrow">→</div>
+      <div class="step"><span class="n">2</span>
+        <h3>Correggere</h3>
+        <p>Ogni volta che il risultato non è come lo fareste voi, lo dite. Con il
+          motivo.</p></div>
+      <div class="arrow">→</div>
+      <div class="step"><span class="n">3</span>
+        <h3>Distillare</h3>
+        <p>Quando funziona: «trasforma quello che abbiamo fatto in una skill. Le mie
+          correzioni diventano regole».</p></div>
+      <div class="arrow">→</div>
+      <div class="step"><span class="n">4</span>
+        <h3>Riprovare</h3>
+        <p>Sessione nuova, un'altra unità. Se dovete ripetere una correzione, la skill non
+          l'ha presa.</p></div>
+    </div>
+    <div class="cols c2" style="margin-top:22px;gap:20px">
+      <div class="box green">
+        <p><b>Perché non a domande e risposte.</b> Se vi chiedono «come prepari una
+          verifica?», rispondete con quello che pensate di fare. Davanti a una verifica fatta
+          male dite quello che fate davvero, e perché.</p>
+      </div>
+      <div class="box orange">
+        <p><b>Le correzioni sono la parte preziosa.</b> Sono le regole che l'agente da solo
+          non avrebbe mai scritto: la vostra didattica, non quella media che ha
+          imparato.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Prima si fa, poi si scrive</span><span>06</span></div>
+</section>
+
+<!-- 07 UN CASO VERO -->
+<section class="slide">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">Com'è andata davvero</div>
+    <h2>Matematica, classi prime, quattro richieste<span class="sub">Chi conduce il corso ha
+      fatto questo percorso sulla programmazione del proprio dipartimento, dove i contenuti
+      minimi sono segnati con una stella. Le richieste sono in quest'ordine, e l'ordine è
+      quello della progettazione a ritroso.</span></h2>
+    <div class="content">
+      <table class="case">
+        <tr><th>La richiesta</th><th>Che cosa è uscito</th><th>Che cosa ha corretto il docente</th></tr>
+        <tr><td>Obiettivi con i verbi di Bloom, divisi nei quattro bimestri</td>
+          <td>12 unità, 72 obiettivi sui sei livelli, solo sui contenuti minimi</td>
+          <td class="fix">«I criteri di congruenza mettili fra i minimi» · «I contenuti senza
+            stella non sono esclusi: sono opzionali»</td></tr>
+        <tr><td>Come uso obiettivi e griglia per la verifica?</td>
+          <td>La griglia di dipartimento non ha un indicatore per il ricordare, e il livello 2
+            su tutti gli indicatori fa esattamente 6</td>
+          <td class="muted">Niente: l'ha trovato l'agente, leggendo la griglia</td></tr>
+        <tr><td>La verifica del primo bimestre</td>
+          <td>Prima la tabella esercizio · obiettivo · indicatore, poi la prova</td>
+          <td class="fix">«Due parti indipendenti, ognuna con esercizi facili e difficili»</td></tr>
+        <tr><td>Le lezioni, settimana per settimana</td>
+          <td>Ogni settimana dice quali esercizi della verifica rende affrontabili</td>
+          <td class="fix">«Prevedi di dare la prima parte a metà bimestre»</td></tr>
+      </table>
+    </div>
+    <div class="cols c2" style="margin-top:18px;gap:20px">
+      <div class="box orange">
+        <p><b>Ogni correzione è una riga della skill che ne verrà fuori.</b> Nessuna sarebbe
+          uscita da un elenco di domande: sono venute fuori davanti al risultato.</p>
+      </div>
+      <div class="box green">
+        <p><b>Oggi vi fermate alla verifica.</b> Il quarto passo, le lezioni sul calendario
+          vero, è il lavoro dell'ora 8.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Un caso vero</span><span>07</span></div>
+</section>
+
+<!-- 08 DEMO: DALLA PROCEDURA ALLA SKILL -->
+<section class="slide demo">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">Dimostrazione · 5 minuti</div>
+    <h2>Dalla procedura alla skill, sulla 3ª B<span class="sub">Una sola unità, una
+      correzione, poi la skill. Alla fine una sessione nuova, per vedere se la correzione è
+      rimasta.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.15fr 1fr;gap:24px;align-items:start">
+      <div class="cols" style="gap:10px">
+        <div class="prompt" style="padding:14px 20px">
+          <div class="lbl">1 · Fare</div>
+          Dalla programmazione annuale ricava gli obiettivi di apprendimento dell'unità U2,
+          con i verbi della tassonomia di Bloom.
+        </div>
+        <div class="prompt" style="padding:14px 20px">
+          <div class="lbl">2 · Correggere</div>
+          Da ora in poi: al massimo sei obiettivi per unità, e accanto a ognuno l'indicatore
+          della griglia delle verifiche scritte che lo misura.
+        </div>
+        <div class="prompt" style="padding:14px 20px">
+          <div class="lbl">3 · Distillare</div>
+          Trasforma quello che abbiamo fatto in una skill chiamata obiettivi-unita. La
+          correzione che ti ho fatto diventa una regola.
+        </div>
+        <div class="prompt plain" style="padding:14px 20px">
+          <div class="lbl">4 · Riprovare, in una sessione nuova</div>
+          Usa la skill obiettivi-unita sull'unità U3.
+        </div>
+      </div>
+      <div class="cols" style="gap:12px">
+        <div class="box green">
+          <div class="tag">Che cosa guardare · 1</div>
+          <p><b>La correzione è nel file?</b> Aprite <code>SKILL.md</code> e cercatela. Deve
+            essere scritta come regola generale, non come «nell'unità U2».</p>
+        </div>
+        <div class="box green">
+          <div class="tag">Che cosa guardare · 2</div>
+          <p><b>Nella sessione nuova tiene?</b> Sei obiettivi al massimo, ognuno con il suo
+            indicatore, senza doverlo ripetere.</p>
+        </div>
+        <div class="box orange">
+          <div class="tag">Che cosa guardare · 3</div>
+          <p><b>Quale obiettivo fatica a trovare un indicatore?</b> La griglia della 3ª B
+            misura comprensione, procedura, calcolo e linguaggio. Guardate dove finiscono gli
+            obiettivi di «valutare» e «creare»: è la stessa domanda del caso vero.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../demo/lezione-07-demo-dalla-procedura-alla-skill.md" target="_blank">Copione <b>lezione-07-demo-dalla-procedura-alla-skill.md</b></a><span>08</span></div>
+</section>
+
+<!-- 09 CHE COSA CERCARE IN SKILL.md -->
+<section class="slide">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">Rileggere la skill distillata</div>
+    <h2>Ogni parte del file risponde a una domanda<span class="sub">Quando l'agente vi
+      consegna la skill, leggetela cercando queste sei parti. Se ne manca una, l'agente la
+      riempirà da solo, con il suo gusto e non con il vostro: è il vuoto riempito dell'ora
+      4.</span></h2>
+    <div class="content qmap">
+      <div class="q"><div class="to">→ la descrizione</div>
+        <div class="ask">Quando si usa, e quando no?</div>
+        <p>Verifiche scritte sì, interrogazioni no. Da qui nascono il criterio e il
+          confine.</p></div>
+      <div class="q"><div class="to">→ che cosa chiedere prima</div>
+        <div class="ask">Da che cosa parte?</div>
+        <p>La programmazione, l'unità, la durata. E gli obiettivi, se non ci sono
+          ancora.</p></div>
+      <div class="q"><div class="to">→ i passi</div>
+        <div class="ask">In che ordine lavora?</div>
+        <p>Quello che avete seguito voi: obiettivi, tabella, verifica. Non un ordine
+          inventato.</p></div>
+      <div class="q"><div class="to">→ il formato d'uscita</div>
+        <div class="ask">Com'è fatto il risultato?</div>
+        <p>Quanti esercizi, in che ordine di difficoltà, con quale griglia. Quello che avete
+          approvato.</p></div>
+      <div class="q"><div class="to">→ le regole</div>
+        <div class="ask">Dove sono le vostre correzioni?</div>
+        <p>Ognuna dev'esserci, scritta in modo che valga per tutte le unità e non solo per
+          quella di oggi.</p></div>
+      <div class="q"><div class="to">→ il controllo finale</div>
+        <div class="ask">Come capisce che è venuta bene?</div>
+        <p>La tabella di coerenza, prima della verifica. Ne parla la slide 14.</p></div>
+    </div>
+    <div class="box green" style="margin-top:18px">
+      <p><b>Manca una parte? Non scrivetela a mano.</b> Rifate fare quel passo all'agente e
+        correggetelo: la correzione entra nel file, e il file resta vostro.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Rileggere la skill</span><span>09</span></div>
+</section>
+
+<!-- 10 OBIETTIVI E BLOOM -->
+<section class="slide">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">Il metodo dentro · 1</div>
+    <h2>Si parte dagli obiettivi, scritti con un verbo<span class="sub">Un obiettivo di
+      apprendimento ha sempre due parti: l'azione che lo studente compie e il contenuto su
+      cui la compie. «Conoscere le disequazioni» non ha un'azione che si possa vedere.</span></h2>
+    <div class="content">
+      <div class="obj"><div class="v">Ricavare</div><div class="c">dal grafico di una parabola
+        l'insieme delle soluzioni di una disequazione, e motivarlo a parole</div></div>
+      <div class="obj-lbl"><span>Azione = abilità</span><span>Contenuto = conoscenze</span></div>
+      <div class="bloom" style="margin-top:22px">
+        <div class="s1"><b>Ricordare</b><span>elencare, definire, riconoscere</span></div>
+        <div class="s2"><b>Comprendere</b><span>spiegare, descrivere, riformulare</span></div>
+        <div class="s3"><b>Applicare</b><span>risolvere, calcolare, usare</span></div>
+        <div class="s4 hots"><b>Analizzare</b><span>confrontare, distinguere, classificare</span></div>
+        <div class="s5 hots"><b>Valutare</b><span>giustificare, verificare, scegliere</span></div>
+        <div class="s6 hots"><b>Creare</b><span>progettare, formulare, costruire</span></div>
+      </div>
+      <div class="lh"><span>Ordine non elevato · LOTS</span><span>Ordine elevato · HOTS</span></div>
+    </div>
+    <div class="box orange" style="margin-top:16px">
+      <p><b>Nella skill, i verbi di Bloom diventano un elenco chiuso.</b> «Scrivi ogni obiettivo
+        con un verbo preso da questo elenco» è una riga sola, e toglie di mezzo «conoscere»,
+        «capire», «padroneggiare»: i verbi che non si possono osservare.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Obiettivi e tassonomia di Bloom</span><span>10</span></div>
+</section>
+
+<!-- 11 A RITROSO, UDA, COMPITO AUTENTICO -->
+<section class="slide">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">Il metodo dentro · 2</div>
+    <h2>La prova si progetta prima delle lezioni<span class="sub">È la progettazione a
+      ritroso: dal traguardo al percorso, non dal programma alla verifica di fine capitolo.
+      L'Unità di Apprendimento ne è la forma scolastica.</span></h2>
+    <div class="content back">
+      <div class="step first"><span class="n">1</span>
+        <h3>Che cosa devono saper fare</h3>
+        <p>Competenze e obiettivi, con il verbo. Nell'UdA: competenze disciplinari e di
+          cittadinanza, conoscenze e abilità.</p></div>
+      <div class="arrow">→</div>
+      <div class="step"><span class="n">2</span>
+        <h3>Da che cosa lo capirò</h3>
+        <p>Le prove, e al centro un compito di realtà: un problema vero, con un prodotto da
+          consegnare. La rubrica nasce qui.</p></div>
+      <div class="arrow">→</div>
+      <div class="step"><span class="n">3</span>
+        <h3>Che cosa faremo in classe</h3>
+        <p>Le attività, i tempi, il metodo. Vengono per ultime, perché servono a portare
+          alla prova del passo 2.</p></div>
+    </div>
+    <div class="cols c2" style="margin-top:20px;gap:20px">
+      <div class="box">
+        <div class="tag">Compito autentico · per la 3ª B</div>
+        <p>Il comitato studentesco organizza una festa. Con un biglietto a <i>p</i> euro, il
+          guadagno è una parabola in <i>p</i>. Per quali prezzi non si va in perdita? Scrivete
+          la proposta al comitato, con il grafico.</p>
+      </div>
+      <div class="box green">
+        <div class="tag">Che cosa cambia nella skill</div>
+        <p>L'ordine dei passi è l'ordine a ritroso. Se chiedete subito «fammi la verifica»,
+          la skill vi chiede prima gli obiettivi. Una riga, ed è la differenza fra un
+          esercizio e una prova.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Progettazione a ritroso e UdA</span><span>11</span></div>
+</section>
+
+<!-- 12 RUBRICHE -->
+<section class="slide">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">Il metodo dentro · 3</div>
+    <h2>Una rubrica ha quattro piani, sempre quelli<span class="sub">Dimensione, criterio,
+      livello, descrittore. È una struttura fissa, e le strutture fisse sono quelle che un
+      agente rispetta meglio. Qui un indicatore della griglia di matematica del caso
+      vero, con le parole del dipartimento.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.3fr 1fr;gap:24px;align-items:start">
+      <table class="rub">
+        <tr><th>Indicatore · criterio</th><th>Liv.</th><th>Descrittore</th><th>Punti</th></tr>
+        <tr><td rowspan="4">Argomentare<span class="crit">Commentare e giustificare la scelta
+          della strategia, i passaggi e la coerenza dei risultati con il problema</span></td>
+          <td class="lv">4</td><td>Giustifica in modo completo ed esauriente la scelta della
+          strategia risolutiva</td><td class="pts">2,25–2,5</td></tr>
+        <tr><td class="lv">3</td><td>Giustifica in modo completo la scelta della strategia
+          risolutiva</td><td class="pts">1,75–2</td></tr>
+        <tr class="soglia"><td class="lv">2</td><td>Giustifica in modo parziale la scelta della
+          strategia risolutiva</td><td class="pts"><b>1,5</b></td></tr>
+        <tr><td class="lv">1</td><td>Giustifica in modo confuso e frammentato la scelta della
+          strategia risolutiva</td><td class="pts">0–0,75</td></tr>
+      </table>
+      <div class="cols" style="gap:14px">
+        <div class="box green">
+          <div class="tag">La griglia intera</div>
+          <p>Quattro indicatori da 2,5 punti: <b>Comprendere, Individuare, Sviluppare il
+            processo risolutivo, Argomentare</b>. Il livello 2, in grassetto, vale 1,5 su
+            tutti e quattro: fa 6. La soglia di sufficienza sta già dentro lo strumento.</p>
+        </div>
+        <div class="box">
+          <div class="tag">Che cosa manca</div>
+          <p>Un indicatore per il ricordare. Una verifica di sole definizioni lascerebbe tre
+            righe su quattro senza niente da valutare. L'agente l'ha notato leggendo la
+            griglia; nessuno gliel'aveva chiesto.</p>
+        </div>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:18px">
+      <p><b>La scala si scrive nella skill.</b> Qui livelli da 1 a 4 con fasce di punti; la
+        certificazione delle competenze usa A-B-C-D. Quale vale va detto, non lasciato al
+        modello. Le Linee guida MIM (2025) prevedono l'IA accanto al docente nelle rubriche.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Verifiche, criteri, rubriche</span><span>12</span></div>
+</section>
+
+<!-- 13 DESCRITTORI OSSERVABILI -->
+<section class="slide">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">Il metodo dentro · 4</div>
+    <h2>Un descrittore si vede sul foglio<span class="sub">I descrittori del dipartimento
+      devono valere per ogni prova, e per questo parlano per avverbi: parziale, adeguato,
+      completo. La skill li traduce, esercizio per esercizio, in cose che due colleghi
+      vedrebbero allo stesso modo.</span></h2>
+    <div class="content cols c2" style="gap:24px;align-items:start">
+      <div>
+        <div class="tag" style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--orange);margin-bottom:10px">Nella griglia · livello 2</div>
+        <div class="dx no">
+          <div><i>?</i>Giustifica in modo parziale la scelta della strategia risolutiva</div>
+          <div><i>?</i>Analizza la situazione problematica in modo parziale</div>
+          <div><i>?</i>Esegue numerosi errori di calcolo. Al livello 3: «qualche
+            errore». Dove passa il confine?</div>
+        </div>
+      </div>
+      <div>
+        <div class="tag" style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--green);margin-bottom:10px">Esercizio dei due sconti · Argomentare, livelli 1-3</div>
+        <div class="dx si">
+          <div><i>1</i>Scrive che il compagno sbaglia, senza un calcolo che lo mostri</div>
+          <div><i>2</i>Mostra che uno sconto unico del 45 % darebbe 44 € e non 48 €</div>
+          <div><i>3</i>Spiega che il secondo sconto si applica a un prezzo già ridotto, e
+            trova lo sconto equivalente: 40 %</div>
+        </div>
+      </div>
+    </div>
+    <div class="cols c2" style="margin-top:20px;gap:20px">
+      <div class="box green">
+        <div class="tag">La griglia non si riscrive</div>
+        <p>È del dipartimento, approvata e illustrata agli studenti. La skill le aggiunge
+          sotto, per ogni esercizio, che cosa vuol dire «parziale» su quel foglio. Voi
+          controllate che sia vero.</p>
+      </div>
+      <div class="box orange">
+        <div class="tag">Un errore vero</div>
+        <p>In un'UdA reale, preparata per un corso di formazione, i livelli sono scritti
+          «A. Avanzato – B. Intermedio – <b>C. Iniziale – D. Base</b>». C e D sono invertiti. Un
+          agente che parte da quel documento lo copia, e con sicurezza, se la scala giusta
+          non è scritta nella skill.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Descrittori osservabili</span><span>13</span></div>
+</section>
+
+<!-- 14 COERENZA -->
+<section class="slide">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">Il metodo dentro · 5</div>
+    <h2>Prima della verifica, una tabella<span class="sub">Ogni esercizio accanto al livello
+      di Bloom che attiva e agli indicatori della griglia a cui dà evidenza. La skill la
+      produce prima della prova, e voi la guardate per prima. Qui la prima parte della
+      verifica del caso vero, sui numeri.</span></h2>
+    <div class="content">
+      <table class="align">
+        <tr><th>Esercizio</th><th>Livello di Bloom</th><th>Indicatori della griglia</th></tr>
+        <tr><td>A1 · espressioni in Z e in Q</td><td>Applicare</td><td>Sviluppare</td></tr>
+        <tr><td>A2 · M.C.D. e m.c.m.; «51 è primo?»</td><td>Ricordare · Comprendere ·
+          Valutare</td><td>Comprendere · Sviluppare · Argomentare</td></tr>
+        <tr class="hi"><td>A3 · due sconti successivi, e il compagno del 45 %</td>
+          <td>da Comprendere a Valutare</td><td>tutti e quattro</td></tr>
+        <tr><td>A4 · trova l'errore in −2⁴</td><td>Analizzare · Valutare</td>
+          <td>Individuare · Argomentare</td></tr>
+        <tr><td>A5 · scrivi un'espressione che valga 1</td><td>Creare</td><td>Individuare</td></tr>
+        <tr><td>A6 · finito o periodico, senza dividere</td><td>Analizzare · Valutare</td>
+          <td>Comprendere · Argomentare</td></tr>
+      </table>
+    </div>
+    <div class="cols c2" style="margin-top:18px;gap:20px">
+      <div class="box orange">
+        <p><b>Che cosa si vede.</b> Nessun esercizio sul solo ricordare: la griglia non ha
+          dove metterlo, e la conoscenza entra in A2 come prerequisito. Argomentare, un quarto
+          del voto, ha evidenze da quattro esercizi su sei. Gli esercizi non hanno punti: si
+          valuta per indicatore, sull'intera prova.</p>
+      </div>
+      <div class="box green">
+        <p><b>Che cosa cercare.</b> Righe vuote, e indicatori appesi a un solo esercizio.
+          Qui ciascuno ne ha almeno tre. Nella seconda parte l'agente aveva scritto tre dove
+          erano due, e se n'è accorto da solo rifacendo il conto.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Coerenza obiettivi · attività · valutazione</span><span>14</span></div>
+</section>
+
+<!-- 15 DEMO: L'INDICATORE PIÙ DEBOLE -->
+<section class="slide demo">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">Dimostrazione · 4 minuti</div>
+    <h2>La griglia non rende l'agente più bravo<span class="sub">Rende voi in grado di
+      controllarlo. Una domanda che col solo voto finale sarebbe impossibile, sui dati
+      della verifica 2.</span></h2>
+    <div class="content cols" style="grid-template-columns:1fr 1.1fr;gap:24px;align-items:start">
+      <div class="cols" style="gap:14px">
+        <div class="prompt">
+          <div class="lbl">La richiesta</div>
+          Nella verifica 2, su quale dei quattro indicatori la classe ha perso più punti?
+          Dimmi anche come hai fatto il conto.
+        </div>
+        <div class="box">
+          <p><b>La seconda frase è quella che conta.</b> Senza, avreste un nome di indicatore
+            e nessun modo di sapere come ci è arrivato.</p>
+        </div>
+      </div>
+      <table>
+        <tr><th>Indicatore</th><th>Punti / massimo</th><th>%</th></tr>
+        <tr><td class="o">Linguaggio e ordine</td><td>23,5 / 40</td><td class="o"><b>58,8 %</b></td></tr>
+        <tr><td class="o">Calcolo</td><td>36,5 / 60 · <b class="o" style="color:var(--orange)">23,5 persi</b></td><td>60,8 %</td></tr>
+        <tr><td>Procedura</td><td>37 / 60</td><td>61,7 %</td></tr>
+        <tr><td>Comprensione</td><td>25 / 40</td><td>62,5 %</td></tr>
+      </table>
+    </div>
+    <div class="box orange" style="margin-top:20px">
+      <p><b>Di nuovo la scelta silenziosa.</b> In percentuale il più debole è il linguaggio; in
+        punti persi è il calcolo, 23,5 contro 16,5. Due risposte, tutte e due difendibili. Quale
+        scegliere è una decisione didattica: dove mettere le prossime ore di recupero. Tocca a
+        voi, e adesso avete i numeri per prenderla.</p>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../demo/lezione-07-demo-indicatore-debole.md" target="_blank">Copione <b>lezione-07-demo-indicatore-debole.md</b></a><span>15</span></div>
+</section>
+
+<!-- 16 SCHEDA NORMATIVA -->
+<section class="slide">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">La revisione umana · 1</div>
+    <h2>Valutare gli apprendimenti è un uso ad alto rischio</h2>
+    <div class="content scheda">
+      <div class="concept"><b>Concetto stabile</b>
+        <span>L'intelligenza artificiale può preparare, proporre, confrontare. La decisione
+          su uno studente resta a una persona che la può controllare, spiegare e
+          smentire.</span></div>
+      <table>
+        <tr><th></th><th>Che cosa dice</th></tr>
+        <tr><td>AI Act (UE) 2024/1689</td>
+          <td>L'Allegato III classifica <b>ad alto rischio</b> i sistemi usati per valutare i
+            risultati dell'apprendimento, perché possono decidere il percorso di vita di una
+            persona (considerando 56). Chi li usa deve garantire la sorveglianza di personale
+            formato.</td></tr>
+        <tr><td>Linee guida MIM · 9/8/2025</td>
+          <td>Intervento e sorveglianza umana come requisito etico: il ruolo umano resta
+            «centrale e insostituibile» in tutto ciò che tocca gli studenti. Fra gli usi
+            indicati per i docenti, la stesura delle rubriche.</td></tr>
+        <tr><td>Il principio in una riga</td>
+          <td>Non esclusività della decisione algoritmica: nel processo ci dev'essere una
+            persona capace di <b>controllare, validare o smentire</b>.</td></tr>
+      </table>
+      <div class="stamp"><span>Linee guida lette nel testo firmato del 9/8/2025</span>
+        <span class="check">Calendario degli obblighi per l'alto rischio: da ricontrollare la
+          settimana della lezione</span></div>
+    </div>
+    <div class="box green" style="margin-top:16px">
+      <p><b>Scrivere una rubrica con l'agente non è valutare uno studente.</b> Lo diventa quando
+        l'agente legge un compito e propone un livello. È lì che passa il confine, ed è di quello
+        che parla la prossima slide.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Scheda · AI Act e Linee guida MIM</span><span>16</span></div>
+</section>
+
+<!-- 17 DOVE PASSA IL CONFINE -->
+<section class="slide">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">La revisione umana · 2</div>
+    <h2>Tre zone, e la skill deve sapere in quale si trova<span class="sub">Non è una questione
+      di prudenza generica. Cambia che cosa scrivete nella skill, e che cosa controllate
+      quando vi consegna il lavoro.</span></h2>
+    <div class="content cols c3 lights">
+      <div class="box g">
+        <div class="tag" style="color:var(--green)">Preparare</div>
+        <h3>Nessuno studente coinvolto</h3>
+        <p>Obiettivi, verifica, varianti, rubrica in bozza, tabella di coerenza. L'agente
+          lavora liberamente, voi rileggete come rileggereste il lavoro di un collega.</p>
+      </div>
+      <div class="box a">
+        <div class="tag" style="color:#b07a17">Analizzare la classe</div>
+        <h3>Dati, ma non decisioni</h3>
+        <p>L'indicatore più debole, una scheda di recupero. Solo dati inventati o ridotti al
+          minimo (se ne parla nell'ora 9). L'agente propone, il criterio lo scegliete voi.</p>
+      </div>
+      <div class="box r">
+        <div class="tag">Decidere su uno studente</div>
+        <h3>Voto, livello, giudizio</h3>
+        <p>Si decide sempre a mano. Se l'agente propone un punteggio, ogni punteggio lo
+          rivedete voi sul compito, non sulla sua spiegazione.</p>
+      </div>
+    </div>
+    <div class="prompt" style="margin-top:22px">
+      <div class="lbl">Tre righe da mettere in ogni skill di valutazione</div>
+      Non attribuire mai voti o livelli a studenti con nome e cognome. · Quando scegli un
+      criterio che nessuno ti ha dato, dichiaralo. · Consegna tutto come bozza da approvare,
+      con le scelte fatte elencate in fondo.
+    </div>
+  </div>
+  <div class="foot"><span>Dove passa il confine</span><span>17</span></div>
+</section>
+
+<!-- 18 LABORATORIO -->
+<section class="slide lab">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">Laboratorio · 20 minuti · da soli, al computer</div>
+    <h2>Dalla vostra programmazione a una skill<span class="sub">Cartella nuova, con dentro
+      solo la programmazione di dipartimento della vostra materia. Scegliete un'unità che
+      farete nelle prossime settimane.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.2fr 1fr;gap:22px;align-items:start">
+      <div class="prompt">
+        <div class="lbl">Passo 1 · da incollare, con le vostre parentesi</div>
+        In questa cartella c'è la programmazione di [materia] per le classi [anno], decisa
+        in riunione di dipartimento. Per l'unità «[titolo]» ricava gli obiettivi di
+        apprendimento, con i verbi della tassonomia di Bloom. Se qualcosa non è chiaro,
+        chiedimelo prima di scrivere.
+      </div>
+      <div class="cols steps" style="gap:8px">
+        <div class="box">
+          <span class="badge">6 min</span>
+          <p>Gli obiettivi. Correggeteli almeno una volta, con il motivo.</p>
+        </div>
+        <div class="box">
+          <span class="badge">7 min</span>
+          <p>La tabella esercizio · obiettivo · indicatore, poi la verifica. Correggete.</p>
+        </div>
+        <div class="box">
+          <span class="badge">4 min</span>
+          <p>Distillate la skill. Aprite <code>SKILL.md</code> e cercate le vostre
+            correzioni.</p>
+        </div>
+        <div class="box orange">
+          <span class="badge o">3 min</span>
+          <p>Sessione nuova, un'altra unità. Tiene senza ripetere niente?</p>
+        </div>
+      </div>
+    </div>
+    <div class="cols c2 regole" style="margin-top:14px;gap:18px">
+      <div class="box orange">
+        <p><b>Da controllare alla fine:</b> le vostre correzioni sono nella skill? Nella
+          sessione nuova le ha rispettate? Chiede gli obiettivi prima degli esercizi? C'è una
+          riga che le vieta di dare voti?</p>
+      </div>
+      <div class="box green">
+        <p><b>Nessun dato di studenti.</b> La programmazione è un documento della scuola, e
+          obiettivi e verifica non riguardano nessuno in particolare. I dati della classe
+          tornano nell'ora 9.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../consegne/lezione-07-lab-skill-verifica.md" target="_blank">Consegna su Classroom <b>lezione-07-lab-skill-verifica.md</b></a><span>18</span></div>
+</section>
+
+<!-- 19 CHIUSURA -->
+<section class="slide">
+  <div class="rail"><span>Lezione 7 · Skill e pedagogia</span></div>
+  <div class="body">
+    <div class="kicker">Chiusura</div>
+    <h2>Quattro cose da portare a casa</h2>
+    <div class="content">
+      <ol class="num">
+        <li><b>Una skill didattica si ricava da una procedura riuscita.</b>
+          Prima la fate fare all'agente, un passo alla volta, e la correggete. Le correzioni
+          sono le regole che più serve scrivere.</li>
+        <li><b>Il metodo si scrive come struttura chiusa.</b>
+          Verbi di Bloom, livelli A-B-C-D, ordine a ritroso. Le strutture fisse sono quelle che
+          l'agente rispetta, e che voi potete controllare.</li>
+        <li><b>La tabella di coerenza viene prima della verifica.</b>
+          Obiettivi, esercizi, punti. Si guarda per prima, e si cercano le righe vuote.</li>
+        <li><b>La decisione valutativa resta vostra, e sta scritto nella skill.</b>
+          L'agente prepara e propone; voto, livello e giudizio si decidono a mano.</li>
+      </ol>
+      <div class="cols c2" style="margin-top:24px;gap:18px">
+        <div class="box green">
+          <p><b>A casa, se volete, potatela.</b> Usatela su due verifiche vere, poi togliete una
+            regola alla volta e guardate se cambia qualcosa. Quello che non cambia niente, via:
+            è la prova della cancellazione dell'ora 6.</p>
+        </div>
+        <div class="box orange">
+          <p><b>Prossima ora: dalla programmazione al calendario.</b> Il passo che oggi manca al
+            percorso a ritroso: le lezioni, sui giorni veri. Un lavoro che l'agente, senza
+            istruzioni, riempirebbe di ipotesi silenziose.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Chiusura</span><span>19</span></div>
+</section>
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var body = document.body;
+  var counter = document.getElementById('presentCounter');
+  var hint = document.getElementById('presentHint');
+  var idx = 0;
+  var presenting = false;
+
+  function fitScale(){
+    var s = Math.min(window.innerWidth/1280, window.innerHeight/720);
+    document.documentElement.style.setProperty('--scale', s);
+  }
+
+  function render(){
+    slides.forEach(function(s,i){ s.classList.toggle('active', i===idx); });
+    counter.textContent = (idx+1) + ' / ' + slides.length;
+  }
+
+  function enter(){
+    presenting = true;
+    body.classList.add('present');
+    fitScale();
+    render();
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(function(){});
+    }
+  }
+
+  function exit(){
+    presenting = false;
+    body.classList.remove('present');
+    if (document.fullscreenElement) document.exitFullscreen().catch(function(){});
+  }
+
+  function next(){ if (idx < slides.length-1){ idx++; render(); } }
+  function prev(){ if (idx > 0){ idx--; render(); } }
+
+  document.addEventListener('keydown', function(e){
+    if (!presenting){
+      if (e.key === 'p' || e.key === 'P') enter();
+      return;
+    }
+    switch(e.key){
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown':
+        e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+        e.preventDefault(); prev(); break;
+      case 'Home':
+        e.preventDefault(); idx = 0; render(); break;
+      case 'End':
+        e.preventDefault(); idx = slides.length-1; render(); break;
+      case 'Escape':
+        exit(); break;
+    }
+  });
+
+  document.addEventListener('click', function(e){
+    if (!presenting) return;
+    if (e.target.closest('a')) return;
+    if (e.clientX > window.innerWidth/2) next(); else prev();
+  });
+
+  document.addEventListener('fullscreenchange', function(){
+    if (!document.fullscreenElement && presenting) exit();
+  });
+
+  window.addEventListener('resize', fitScale);
+
+  hint.classList.add('show');
+  setTimeout(function(){ hint.classList.remove('show'); }, 4000);
+
+  // ---- controllo dimensione testo ----
+  var ZOOM_MIN = 0.8, ZOOM_MAX = 1.4, ZOOM_STEP = 0.1;
+  var zoomVal = document.getElementById('zoomVal');
+  var zoomIn = document.getElementById('zoomIn');
+  var zoomOut = document.getElementById('zoomOut');
+  var zoom = 1;
+  try { zoom = parseFloat(localStorage.getItem('slideZoom')) || 1; } catch(e){}
+
+  function applyZoom(){
+    zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom));
+    document.documentElement.style.setProperty('--content-zoom', zoom);
+    zoomVal.textContent = Math.round(zoom * 100) + '%';
+    try { localStorage.setItem('slideZoom', zoom); } catch(e){}
+  }
+
+  zoomIn.addEventListener('click', function(){ zoom += ZOOM_STEP; applyZoom(); });
+  zoomOut.addEventListener('click', function(){ zoom -= ZOOM_STEP; applyZoom(); });
+
+  document.addEventListener('keydown', function(e){
+    if (presenting) return;
+    if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '=')){
+      e.preventDefault(); zoom += ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '-'){
+      e.preventDefault(); zoom -= ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '0'){
+      e.preventDefault(); zoom = 1; applyZoom();
+    }
+  });
+
+  applyZoom();
+})();
+</script>
+
+</body>
+</html>

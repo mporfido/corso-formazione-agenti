@@ -1,6 +1,6 @@
 # Ora 4 · Demo — Che cosa finisce nella lettera
 
-> Conduce il formatore · circa 3 minuti · slide 9 di `slides/ora-04.html`
+> Conduce il formatore · circa 3 minuti · slide 9 di `slides/lezione-04.html`
 
 ## Prima della lezione
 

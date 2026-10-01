@@ -1,6 +1,6 @@
 # Ora 1 · Demo — A mani nude: l'invenzione
 
-> Conduce il formatore · circa 5 minuti · slide 12 di `slides/ora-01.html`
+> Conduce il formatore · circa 5 minuti · slide 12 di `slides/lezione-01.html`
 
 ## Prima della lezione
 

@@ -17,7 +17,7 @@ aperte.
 
 ## Scelte di impianto
 
-- **Un deck per ora**: `slides/ora-01.html` … `ora-13.html`, stile Manuale. Gli argomenti della
+- **Un deck per ora**: `slides/lezione-01.html` … `lezione-13.html`, stile Manuale. Gli argomenti della
   scaletta sono i punti chiave delle slide.
 - **Agnostico rispetto al prodotto**: si impara l'impalcatura, non lo strumento. Il file-guida
   canonico è `AGENTS.md`; `CLAUDE.md` e `GEMINI.md` sono solo rimandi. Molti docenti partono
@@ -44,7 +44,7 @@ aperte.
 | Classe inventata: Matematica 3ª B, 21 studenti, fine gennaio 2026 | `cartella-di-prova/` | 1-4, 7-10 |
 | Prompt, numeri di controllo, note per chi conduce | `LABORATORIO.md` | tutte |
 | Slide del vecchio Modulo 1, da smontare | `slides/modulo-1.html` | 1-3 |
-| Profilo disciplinare d'esempio (Italiano e Storia) | `materiali/ora-04-profilo-esempio/` | 4 |
+| Profilo disciplinare d'esempio (Italiano e Storia) | `materiali/lezione-04-profilo-esempio/` | 4 |
 | Wiki navigabile come esempio vivo di knowledge base | `wiki-didattica-scuola/` | 5 |
 | Repository barebones per le lezioni interattive | Geode (`C:\Users\mikil\Documents\Repository\geode`) | 11-13 |
 
@@ -52,11 +52,11 @@ aperte.
 
 | Ora | Titolo | Demo e laboratorio | Stato slide |
 |---|---|---|---|
-| 1 | Dal chatbot all'agente | Chat vs agente dal vivo · giudizio a mani nude · matrice dei casi d'uso | bozza: `slides/ora-01.html` |
-| 2 | Orientarsi negli ambienti agentici | Aprire la cartella, fiducia, contatori, Markdown | bozza: `slides/ora-02.html` |
-| 3 | Il primo workflow controllato | Brief in quattro righe · piano · modifica di un file | bozza: `slides/ora-03.html` |
-| 4 | Context engineering e memoria permanente | Scelta silenziosa · invenzione con e senza `AGENTS.md` · profilo disciplinare | bozza: `slides/ora-04.html` |
-| 5 | Knowledge base: file, wiki e RAG | Navigare una LLM wiki · l'agente monta la wiki dal testo di Karpathy | bozza: `slides/ora-05.html` |
+| 1 | Dal chatbot all'agente | Chat vs agente dal vivo · giudizio a mani nude · matrice dei casi d'uso | bozza: `slides/lezione-01.html` |
+| 2 | Orientarsi negli ambienti agentici | Aprire la cartella, fiducia, contatori, Markdown | bozza: `slides/lezione-02.html` |
+| 3 | Il primo workflow controllato | Brief in quattro righe · piano · modifica di un file | bozza: `slides/lezione-03.html` |
+| 4 | Context engineering e memoria permanente | Scelta silenziosa · invenzione con e senza `AGENTS.md` · profilo disciplinare | bozza: `slides/lezione-04.html` |
+| 5 | Knowledge base: file, wiki e RAG | Navigare una LLM wiki · l'agente monta la wiki dal testo di Karpathy | bozza: `slides/lezione-05.html` |
 | 6 | Usare e comprendere le skill | Skill `teach` · adattare una skill | da fare |
 | 7 | Creare skill fondate sulla pedagogia | Griglia a 4 indicatori · skill verifica/rubrica | da fare |
 | 8 | Dalla programmazione al calendario | Skill calendario dall'anno scolastico | da fare |
@@ -169,7 +169,7 @@ alla modalità piano dentro l'agente senza dichiarare il cambio di ambiente. Dec
 - **Primo tentativo (10 min):** copia di sicurezza, poi «sistema questa scheda» e basta, in
   modalità manuale. I corsisti producono loro il «prima».
 - **Raccolta (8 min):** si mettono in fila i guai usciti dai gruppi. Conduzione in
-  `demo/ora-03-conduzione-primo-tentativo.md`.
+  `demo/lezione-03-conduzione-primo-tentativo.md`.
 - **Workflow (17 min):** brief, criterio, reti di sicurezza, piano, modalità, lettura delle
   modifiche, verifica. Ogni pezzo risponde a un guaio appena visto.
 - **Secondo tentativo (20 min):** stesso compito dalla copia intatta, con tutti e cinque i
@@ -178,7 +178,7 @@ alla modalità piano dentro l'agente senza dichiarare il cambio di ambiente. Dec
 Il prima/dopo del formatore sul giudizio quadrimestrale **è uscito dalle slide**: il
 confronto lo fanno i corsisti sui propri due tentativi. Il prompt resta in
 `LABORATORIO.md § Ora 3` per chi conduce. La versione precedente del deck è conservata in
-`slides/ora-03-OLD.html`.
+`slides/lezione-03-OLD.html`.
 
 **Laboratorio (piccoli gruppi):** in due parti — «sistema questa scheda» → raccolta →
 brief scritto → piano → approvazione → esecuzione → verifica e confronto, sulla scheda
@@ -217,22 +217,22 @@ facendosi intervistare dall'agente. Nel contesto permanente nessun dato personal
 **Il nodo dell'ora:** il vecchio Modulo 2 occupava quattro ore; qui ce n'è una. Deciso
 (14/09/2026):
 - scelta silenziosa, vuoto riempito e comunicazione alle famiglie come tre **demo condotte
-  dal formatore**, circa 15 minuti in tutto (copioni in `demo/ora-04-demo-*.md`);
+  dal formatore**, circa 15 minuti in tutto (copioni in `demo/lezione-04-demo-*.md`);
 - laboratorio sul **profilo disciplinare**, 20 minuti, in una cartella nuova
-  (`consegne/ora-04-lab-profilo.md`);
+  (`consegne/lezione-04-lab-profilo.md`);
 - «la regola che manca» come esercizio facoltativo da fare a casa, in fondo alla consegna.
 
 **Scheda piattaforma (la terza):** dove ciascuna legge il file-guida, il file-guida per tutte
 le cartelle, la memoria automatica. Del vecchio Modulo 4 restano `MEMORY.md`, le lezioni
 imparate e `plan.md` come cenno (slide 12).
 
-**Profilo d'esempio:** `materiali/ora-04-profilo-esempio/`, una docente inventata di Italiano
+**Profilo d'esempio:** `materiali/lezione-04-profilo-esempio/`, una docente inventata di Italiano
 e Storia in un istituto tecnico — `AGENTS.md` a mappa, rimandi `CLAUDE.md` e `GEMINI.md`, tre
 file di dettaglio in `profilo/`. Mostrato nella slide 15; si distribuisce come zip su
 Classroom per chi non arriva in fondo al laboratorio. La sua `valutazione.md` fissa la media
 del quadrimestre: è la risposta alla scelta silenziosa.
 
-**Materiali da preparare:** lo zip `ora-04-profilo-esempio.zip` per Classroom.
+**Materiali da preparare:** lo zip `lezione-04-profilo-esempio.zip` per Classroom.
 
 ## Ora 5 — Knowledge base: file, wiki e RAG
 
@@ -267,14 +267,14 @@ copia locale:
 riferimento punta a una revisione precisa).
 
 **Materiali — tutti pronti (19/09/2026):**
-- `consegne/ora-05-lab-knowledge-base.md`, la consegna per Classroom;
+- `consegne/lezione-05-lab-knowledge-base.md`, la consegna per Classroom;
 - la sezione «Ora 5» di `LABORATORIO.md`: demo, laboratorio e note di conduzione;
-- `slides/img/ora-05-notebooklm.png`, lo screenshot con tre zone numerate nella slide 11;
-- `materiali/ora-05-fonti-esempio.zip` per chi arriva senza materiale. Tre documenti
+- `slides/img/lezione-05-notebooklm.png`, lo screenshot con tre zone numerate nella slide 11;
+- `materiali/lezione-05-fonti-esempio.zip` per chi arriva senza materiale. Tre documenti
   pubblici (Linee guida MIM sull'IA 2025, Raccomandazione UE competenze chiave 2018,
   Raccomandazione UE EQF 2008) in una cartella `fonti/`, più un `LEGGIMI.md`. Soltanto
   documenti istituzionali, per non distribuire materiale di terzi;
-- `materiali/ora-05-llm-wiki/`, il piano B se un prodotto non apre gli URL: copia locale del
+- `materiali/lezione-05-llm-wiki/`, il piano B se un prodotto non apre gli URL: copia locale del
   testo di Karpathy e istruzioni per usarlo dalla cartella.
 
 **Aperto:** la licenza del gist di Karpathy. Non ne dichiara una, quindi la copia locale
@@ -305,9 +305,9 @@ resta un piano B da passare in aula. Da chiarire prima di caricarla su Classroom
 **Laboratorio:** installare `teach` chiedendolo all'agente con il link a GitHub; scoprire in
 quale cartella è finita; leggerne il sorgente e verificare che non si attivi da sola; usarla
 su un argomento personale. L'adattamento alla propria materia è compito a casa facoltativo.
-Consegna: `consegne/ora-06-lab-installare-skill.md`. Nessuna demo.
+Consegna: `consegne/lezione-06-lab-installare-skill.md`. Nessuna demo.
 
-**Materiali da preparare:** fatto — `materiali/ora-06-skill-teach/` (copia locale della
+**Materiali da preparare:** fatto — `materiali/lezione-06-skill-teach/` (copia locale della
 skill con `LICENSE` e `LEGGIMI.md`, più lo zip per Classroom). Serve solo da piano B se
 l'agente non arriva in rete. Le skill da smontare in aula sono quelle di Geode, mostrate
 nelle slide 8 e 10.
@@ -333,7 +333,7 @@ percorsi delle skill nei tre prodotti non ci sono.
 **Fonti wiki:** did:obiettivo-di-apprendimento, did:tassonomia-di-bloom,
 did:progettazione-a-ritroso, did:unita-di-apprendimento-uda, did:rubrica-di-valutazione,
 did:livelli-di-padronanza, did:competenza, did:sintesi-uda-a-caccia-di-spot;
-[[tecniche/workflow-progetto-agentico]] (l'intervista), [[tecniche/llm-come-giudice]],
+[[tecniche/workflow-progetto-agentico]], [[tecniche/llm-come-giudice]],
 [[concetti/verifica-agenti]].
 
 **Da riusare dal vecchio blocco D:**
@@ -347,13 +347,36 @@ did:livelli-di-padronanza, did:competenza, did:sintesi-uda-a-caccia-di-spot;
   invertiti.
 
 **Da costruire:**
-- l'intervista che rende esplicita una procedura docente;
+- la procedura fatta fare passo passo all'agente, corretta, e distillata in skill solo dopo
+  che ha funzionato (sostituisce l'intervista, 29/09/2026). Il caso vero della slide 7 è
+  una conversazione dell'autore nel progetto `Progetti/Scuola` («Progettazione matematica
+  primo biennio»): obiettivi di Bloom per bimestre, verifica dalla griglia di dipartimento,
+  scaletta delle lezioni. Le correzioni del docente sono le regole della skill.
+  Le slide 12-14 (rubrica, descrittori, coerenza) usano la griglia vera di quel caso
+  (`Progetti/Scuola/Programmazioni/ProgrammazioneDidDisc_PRIME_Tec_26-27.docx`, allegato:
+  quattro indicatori da 2,5, livelli 1-4) e la Parte A di
+  `Verifica_PrimoBimestre_Matematica_PRIME.docx`, non la cartella di prova;
 - coerenza obiettivi → attività → valutazione; descrittori osservabili;
 - revisione umana delle decisioni valutative. Qui entrano le Linee guida MIM del 09/08/2025 e
   l'AI Act, che classifica la valutazione degli apprendimenti come uso ad alto rischio.
 
-**Laboratorio:** dall'intervista a una skill che genera verifica e rubrica coerenti con gli
-obiettivi dichiarati.
+**Laboratorio:** dalla programmazione di dipartimento del corsista (portata da casa,
+annunciato alla fine dell'ora 6) a obiettivi, tabella di specificazione e verifica di
+un'unità; poi la skill `verifica-a-ritroso` distillata dalla conversazione e provata in
+una sessione nuova su un'altra unità. Consegna: `consegne/lezione-07-lab-skill-verifica.md`.
+
+**Demo:** `demo/lezione-07-demo-btc-task.md` (slide 5) — la skill
+[btc-task](https://github.com/mporfido/skills/tree/main/teaching/btc-task) dell'autore del
+corso, esempio di skill fondata su un metodo (*Building Thinking Classrooms*);
+`demo/lezione-07-demo-dalla-procedura-alla-skill.md` (slide 8) — il ciclo fare, correggere,
+distillare, riprovare sulla U2 della 3ª B;
+`demo/lezione-07-demo-indicatore-debole.md` (slide 15) — la scelta silenziosa sulla griglia
+della verifica 2.
+
+**Deck:** `slides/lezione-07.html`, 19 slide. Le Linee guida MIM sono citate dal testo firmato
+(`wiki-didattica-scuola/fonti/`), non ancora ingerite in wiki. Per l'AI Act il deck riporta
+solo Allegato III e considerando 56, come li cita il MIM; il calendario degli obblighi per
+l'alto rischio è segnato da ricontrollare.
 
 **Materiali da preparare:** ingerire le Linee guida MIM, che stanno in
 `wiki-didattica-scuola/fonti/` ma non sono state ingerite; reperire una fonte affidabile
@@ -377,9 +400,23 @@ U0-U7 con ore previste, tre ore settimanali il lunedì, mercoledì e venerdì).
   una vista HTML per la revisione;
 - prima versione della skill `calendario-lezioni`.
 
-**Materiali da preparare:** calendario scolastico 2025/26 fittizio ma plausibile (inizio e
-fine lezioni, festività, sospensioni, un'uscita didattica) da aggiungere in
-`cartella-di-prova/`; un calendario già pronto per chi non arriva in fondo, che serve all'ora 9.
+**Esempi dal sistema dell'autore** (`C:\Users\mikil\Progetti\Uno\Scuola`, a.s. 2025/26, cinque
+classi): la catena `genera-piano-lezioni` → `pianifica-settimana` → `confronta-riepilogo-piano`
+(slide 3); il piano della 3BI del 29/12/2025, con le date sfalsate da gennaio e le ore tolte
+per feste di sabato (slide 8); il piano aggiornato con sei settimane di ritardo (slide 10) e i
+numeri complessi tolti in una nota (slide 12); il `SKILL.md` riletto (slide 15).
+
+**Laboratorio:** ore e ipotesi prima del calendario, poi la skill `calendario-lezioni` scritta
+con le regole, poi usata in una sessione nuova. Consegna: `consegne/lezione-08-lab-skill-calendario.md`.
+
+**Demo:** `demo/lezione-08-demo-mani-nude.md` (slide 6) — il calendario chiesto senza istruzioni.
+
+**Deck:** `slides/lezione-08.html`, 17 slide.
+
+**Materiali pronti:** `cartella-di-prova/02-programmazione/calendario-scolastico-2025-26.md`
+(coerente con il diario: 98 lezioni, 51 + 47; pausa didattica 9-13/02; assemblee senza data);
+`materiali/lezione-08-calendario-pronto/` (98 righe CSV e ipotesi dichiarate), da distribuire a
+fine ora e da usare nell'ora 9. Resta fuori dalla cartella di prova apposta.
 
 ## Ora 9 — Dal registro alle prossime lezioni
 
@@ -397,10 +434,28 @@ interrogazioni del secondo giro da completare, prova di recupero a metà febbrai
 - proposta motivata delle lezioni successive, con le incertezze dichiarate;
 - l'approvazione resta al docente. Richiamo a MIM e AI Act (vedi ora 7).
 
-**Laboratorio:** secondo passaggio del workflow — una skill che aggiorna il piano.
+**Laboratorio:** secondo passaggio del workflow — una skill che aggiorna il piano
+(`aggiorna-piano`). Consegna prevista: `consegne/lezione-09-lab-skill-aggiorna-piano.md`.
 
-**Materiali da preparare:** il PDF del registro, con un'impaginazione generica da registro
-elettronico, non riconducibile a un fornitore reale.
+**Demo:** `demo/lezione-09-demo-mani-nude.md` (slide 6) — il piano aggiornato chiesto senza
+istruzioni. Non ancora scritto.
+
+**Deck:** `slides/lezione-09.html`, 17 slide. Numeri di controllo, calcolati confrontando
+`materiali/lezione-08-calendario-pronto/calendario-lezioni.csv` con il diario:
+- scarto in lezioni per argomento: sempre 0-2, a fine gennaio 1 (slide 8);
+- verifiche: 16/10 (piano 27/10), 27/11 (piano 01/12), 22/01 (piano 23/01), tutte di giovedì;
+- cinque argomenti del piano assenti nel registro: scomposizione del trinomio (08/10),
+  disequazioni di grado superiore (10 e 12/11), problemi con le disequazioni (26/11), valore
+  assoluto («cenni», 24/11), fasci di rette («cenni», 14/01). **Nessuno è nominato nella
+  programmazione**: è il punto della slide 10;
+- interrogazioni e recupero: 1 ora nel piano (28/01), 7 nel registro (5 `[I]` + 2 recuperi);
+- dal 2/02 restano 47 lezioni: 3 di pausa didattica e 3 di margine, tutte a fine anno.
+
+**Materiali da preparare:** il PDF del registro (nome usato nelle slide: riepilogo degli
+argomenti svolti, 3ª B, fino al 31/01), con un'impaginazione generica da registro
+elettronico, non riconducibile a un fornitore reale; la demo e la consegna del laboratorio.
+Attenzione: `02-programmazione/argomenti-svolti.md` sta già nella cartella di prova e
+l'agente potrebbe leggere quello invece del PDF.
 
 ## Ora 10 — Più agenti per produrre e controllare materiali
 
@@ -484,7 +539,7 @@ piattaforma).
   prodotti. L'intera ora regge su quello che l'agente combina qui. Che cosa fa della regola di
   consegna e di «x2» → «x²»; se riempie la tabella con le soluzioni; se invece chiede
   chiarimenti e non fa danni. I guai che escono davvero vanno riportati nella colonna destra
-  della slide 4 e nella tabella di `demo/ora-03-conduzione-primo-tentativo.md`
+  della slide 4 e nella tabella di `demo/lezione-03-conduzione-primo-tentativo.md`
 - ⬜ Da provare: la divergenza della scelta silenziosa su due sessioni diverse (ora 4)
 - ⬜ Da provare: il grado di invenzione sui 21 giudizi, con e senza `AGENTS.md` (ora 4). Con
   la memoria automatica spenta: quella di Claude Code è attiva di default e può portarsi

@@ -1,6 +1,6 @@
 # Ora 1 · Demo — La stessa domanda a chat e agente
 
-> Conduce il formatore · circa 5 minuti · slide 6 di `slides/ora-01.html`
+> Conduce il formatore · circa 5 minuti · slide 6 di `slides/lezione-01.html`
 > Numeri di controllo anche in `LABORATORIO.md` § Ora 1
 
 ## Prima della lezione

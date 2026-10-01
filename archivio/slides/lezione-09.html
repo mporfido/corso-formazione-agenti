@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Ora 9 — Dal registro alle prossime lezioni</title>
+<style>
+:root{
+  --paper:#f2efe9;
+  --card:#fbfaf7;
+  --ink:#1d1c1a;
+  --ink-soft:#5c5850;
+  --line:#ddd7cc;
+  --green:#1a3c3a;
+  --green-soft:#e6ece9;
+  --orange:#c0562f;
+  --orange-soft:#f6e7de;
+  --blue:#2f5a8c;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);font-family:var(--sans);color:var(--ink);
+  -webkit-font-smoothing:antialiased;padding:28px 0}
+
+/* ---------- slide frame ---------- */
+.slide{
+  position:relative;width:1280px;height:720px;margin:0 auto 28px;
+  background:var(--card);border:1px solid var(--line);
+  display:grid;grid-template-columns:56px 1fr;overflow:hidden;
+}
+.rail{
+  background:var(--green);color:#f4f1ea;
+  display:flex;align-items:center;justify-content:center;
+}
+.rail span{
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  white-space:nowrap;opacity:.9;
+}
+.body{padding:52px 60px 64px;display:flex;flex-direction:column;min-width:0}
+.kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--orange);font-weight:600;margin-bottom:14px}
+h1{font-family:var(--serif);font-size:56px;line-height:1.08;font-weight:600;
+  letter-spacing:-.01em}
+h2{font-family:var(--serif);font-size:40px;line-height:1.12;font-weight:600;
+  letter-spacing:-.01em;margin-bottom:26px}
+h2 .sub{display:block;font-family:var(--sans);font-size:15px;font-weight:400;
+  color:var(--ink-soft);letter-spacing:0;margin-top:10px;line-height:1.45}
+p{font-size:17px;line-height:1.55;color:var(--ink)}
+.muted{color:var(--ink-soft)}
+.foot{position:absolute;left:56px;right:0;bottom:0;height:40px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 60px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-soft);border-top:1px solid var(--line)}
+.content{flex:0 1 auto;min-height:0}
+code{font-family:var(--mono);font-size:.9em;background:var(--green-soft);padding:1px 5px}
+
+/* ---------- cover ---------- */
+.cover .body{justify-content:center}
+.cover h1{font-size:72px;max-width:980px}
+.cover .lede{margin-top:26px;font-size:19px;color:var(--ink-soft);max-width:700px}
+.rule{width:72px;height:3px;background:var(--orange);margin:32px 0 0}
+.meta{margin-top:38px;display:flex;gap:44px;font-size:13px;color:var(--ink-soft)}
+.meta b{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--green);margin-bottom:6px}
+
+/* ---------- generic layout helpers ---------- */
+.cols{display:grid;gap:22px}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c4{grid-template-columns:repeat(4,1fr)}
+.box{border:1px solid var(--line);background:#fff;padding:22px 24px;
+  display:flex;flex-direction:column;gap:10px;min-width:0}
+.box h3{font-family:var(--serif);font-size:22px;font-weight:600;line-height:1.2}
+.box .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.box p,.box li{font-size:15px;line-height:1.5;color:var(--ink-soft)}
+.box.green{background:var(--green-soft);border-color:#cbd8d3}
+.box.orange{background:var(--orange-soft);border-color:#ecd4c5}
+ul.clean{list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.clean li{position:relative;padding-left:18px;font-size:16px;line-height:1.5}
+ul.clean li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;
+  background:var(--orange)}
+.box ul.clean li{font-size:15px}
+ol.num{list-style:none;counter-reset:n;display:flex;flex-direction:column;gap:16px}
+ol.num li{counter-increment:n;position:relative;padding-left:46px;font-size:17px;
+  line-height:1.5}
+ol.num li::before{content:counter(n,decimal-leading-zero);position:absolute;left:0;top:1px;
+  font-size:13px;font-weight:600;color:var(--green);letter-spacing:.06em}
+ol.num li b{display:block;font-family:var(--serif);font-size:20px;font-weight:600;
+  margin-bottom:4px;color:var(--ink)}
+
+/* ---------- tabella ---------- */
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:12px 16px;font-size:15px;line-height:1.45;
+  border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);
+  font-weight:600;border-bottom:2px solid var(--green)}
+td:first-child{font-weight:600;width:30%}
+td.o{color:var(--orange)}
+td.g{color:var(--green)}
+td.n{font-family:var(--serif);font-size:24px;font-weight:600;white-space:nowrap}
+
+/* ---------- prompt / badge ---------- */
+.prompt{background:var(--green);color:#eef2f0;padding:20px 24px;font-family:var(--sans);
+  font-size:15px;line-height:1.6}
+.prompt .lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;margin-bottom:8px}
+.prompt.plain{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.prompt.plain .lbl{color:var(--orange)}
+.badge{display:inline-block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  background:var(--green);color:#fff;padding:4px 9px;align-self:flex-start}
+.badge.o{background:var(--orange)}
+
+/* ---------- barra contesto ---------- */
+.gauge{height:30px;background:#fff;border:1px solid var(--line);display:flex;
+  overflow:hidden}
+.gauge i{display:block;height:100%}
+.g-legend{display:flex;gap:22px;font-size:13px;color:var(--ink-soft);margin-top:10px;
+  flex-wrap:wrap}
+.g-legend span{display:flex;align-items:center;gap:7px}
+.g-legend b{width:10px;height:10px;display:inline-block}
+
+/* ---------- sorgente Markdown ---------- */
+.src{background:#1f2624;color:#dfe6e3;font-family:var(--mono);font-size:13.5px;
+  line-height:1.65;padding:18px 22px;white-space:pre-wrap;overflow-wrap:anywhere}
+.src .h{color:#f1b28f}
+.src .k{color:#9fd3c2}
+.src .dim{color:#7f8c87}
+.src .hl{background:#3b4f3c;color:#fff;display:block;margin:0 -22px;padding:0 22px;
+  border-left:4px solid #f1b28f}
+.src .hl.o{background:#4d3a30}
+.src .hd{display:block;margin:-18px -22px 12px;padding:8px 22px;background:#161c1a;
+  font-family:var(--sans);font-size:12px;letter-spacing:.04em;color:#9fbdb4}
+
+/* ---------- la mappa e i file di dettaglio ---------- */
+.files{display:flex;flex-direction:column;gap:12px}
+.file{border:1px solid var(--line);background:#fff;padding:14px 18px;
+  display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline}
+.file .ic{grid-row:1/3;font-family:var(--mono);font-size:12px;color:#fff;
+  background:var(--green);padding:3px 7px;align-self:start;margin-top:2px}
+.file b{font-family:var(--mono);font-size:14px;font-weight:600;overflow-wrap:anywhere}
+.file span{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+.steps .box{padding:14px 20px;gap:8px}
+.file:not(.main){margin-left:34px;position:relative}
+.file:not(.main)::before{content:"";position:absolute;left:-22px;top:-13px;width:16px;
+  height:calc(50% + 13px);border-left:2px solid #cbd8d3;border-bottom:2px solid #cbd8d3}
+.file.main{background:var(--green-soft);border-color:#cbd8d3}
+.file.main .ic{background:var(--orange)}
+
+/* ---------- scheda piattaforma ---------- */
+.scheda{border:1px solid #cbd8d3;background:#fff}
+.scheda .concept{background:var(--green);color:#eef2f0;padding:14px 20px;
+  display:grid;grid-template-columns:170px 1fr;gap:16px;align-items:baseline}
+.scheda .concept b{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;font-weight:600}
+.scheda .concept span{font-size:16px;line-height:1.45}
+.scheda table th{padding:11px 16px}
+.scheda table td{padding:10px 16px;font-size:14px;line-height:1.4}
+.scheda table td:first-child{width:18%;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--green);padding-top:13px}
+.scheda .stamp{display:flex;justify-content:space-between;gap:20px;padding:9px 16px;
+  font-size:11px;letter-spacing:.08em;color:var(--ink-soft);background:#f7f5f0}
+.check{color:var(--orange);border-bottom:1px dashed var(--orange)}
+
+/* ---------- tipi di slide: dimostrazione e laboratorio ----------
+   Basta aggiungere .demo o .lab alla <section class="slide">: cambiano rail,
+   fondo, kicker e compare il timbro. Il link al file sta nel piè di pagina. */
+.slide.demo{background:#eef2f7}
+.slide.lab{background:#fcf2ea}
+.slide.demo .rail{background:var(--blue)}
+.slide.lab .rail{background:var(--orange)}
+.slide.demo .rail span,.slide.lab .rail span{display:none}
+.slide.demo .rail::before,.slide.lab .rail::before{
+  writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;
+  font-size:14px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:#fff}
+.slide.demo .rail::before{content:"Dimostrazione"}
+.slide.lab .rail::before{content:"Laboratorio"}
+.slide.demo::after,.slide.lab::after{
+  position:absolute;top:18px;right:22px;padding:7px 14px;color:#fff;
+  font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase}
+.slide.demo::after{content:"◉\00a0\00a0Guardate lo schermo";background:var(--blue)}
+.slide.lab::after{content:"✎\00a0\00a0Tocca a voi";background:var(--orange)}
+.slide.demo .kicker{color:var(--blue)}
+.slide.demo .foot,.slide.lab .foot{border-top-color:rgba(0,0,0,.08)}
+.foot a.task{display:inline-flex;align-items:center;gap:10px;margin-left:-12px;
+  padding:6px 12px;color:#fff;text-decoration:none;font-weight:700;letter-spacing:.12em}
+.foot a.task b{font-family:var(--mono);font-weight:400;font-size:12px;letter-spacing:0;
+  text-transform:none;opacity:.95}
+.slide.demo .foot a.task{background:var(--blue)}
+.slide.lab .foot a.task{background:var(--orange)}
+.foot a.task:hover{filter:brightness(1.1)}
+
+/* ---------- print ---------- */
+.slide{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:13.333in 7.5in;margin:0}
+@media print{
+  body{background:#fff;padding:0}
+  .slide{margin:0;border:none;page-break-after:always;box-shadow:none}
+  .slide:last-child{page-break-after:auto}
+}
+
+/* ---------- presentation mode ---------- */
+body.present{padding:0;overflow:hidden;background:#000}
+body.present .slide{
+  display:none;margin:0;border:none;
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(var(--scale,1));
+  transform-origin:center center;
+}
+body.present .slide.active{display:grid}
+.present-hint{
+  position:fixed;bottom:14px;right:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.present-hint.show{opacity:1}
+.present-counter{
+  position:fixed;bottom:14px;left:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  display:none;
+}
+body.present .present-counter{display:block}
+
+/* ---------- controllo dimensione testo ---------- */
+:root{--content-zoom:1}
+.body{zoom:var(--content-zoom)}
+.zoom-ctrl{
+  position:fixed;top:14px;right:18px;z-index:60;
+  display:flex;align-items:center;gap:2px;
+  background:rgba(29,28,26,.88);border-radius:4px;padding:4px;
+  font-family:var(--sans);
+}
+.zoom-ctrl button{
+  width:28px;height:28px;border:none;border-radius:3px;background:transparent;
+  color:#f4f1ea;font-size:14px;font-weight:600;cursor:pointer;line-height:1;
+}
+.zoom-ctrl button:hover{background:rgba(255,255,255,.15)}
+.zoom-ctrl .val{
+  min-width:38px;text-align:center;font-size:11px;letter-spacing:.04em;
+  color:#cfcabf;user-select:none;
+}
+body.present .zoom-ctrl{display:none}
+@media print{.zoom-ctrl{display:none}}
+
+/* ---------- percorso indice → pagina → fonte ---------- */
+.trail{display:grid;grid-template-columns:1fr 36px 1fr 36px 1fr;align-items:stretch}
+.trail .step{border:1px solid var(--line);background:#fff;padding:16px 18px;
+  display:flex;flex-direction:column;gap:8px;min-width:0}
+.trail .step .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--green)}
+.trail .step b{font-family:var(--mono);font-size:13.5px;overflow-wrap:anywhere}
+.trail .step p{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+.trail .arrow{display:flex;align-items:center;justify-content:center;
+  color:var(--orange);font-size:22px}
+.trail .step.src-step{background:var(--green-soft);border-color:#cbd8d3}
+
+/* ---------- le quattro accortezze di scrittura (slide 5) ---------- */
+.regole .box{padding:15px 20px;gap:7px}
+
+/* ---------- screenshot con zone numerate ---------- */
+.shotwrap{position:relative;border:1px solid #bfc9c4;line-height:0}
+.shotwrap img{width:100%;display:block}
+.shotwrap .pin{position:absolute;transform:translate(-50%,-50%);
+  box-shadow:0 0 0 2px #fff,0 1px 4px rgba(0,0,0,.35)}
+.pin{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;
+  border-radius:50%;background:var(--orange);color:#fff;font-size:12px;font-weight:700;
+  font-family:var(--sans);line-height:1;flex:none}
+.zone{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+.zone > div{display:flex;gap:10px;align-items:baseline}
+.zone > div span{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="present-counter" id="presentCounter"></div>
+<div class="present-hint" id="presentHint">Premi P per entrare in modalità presentazione · frecce/spazio per avanzare · Esc per uscire</div>
+<div class="zoom-ctrl">
+  <button id="zoomOut" title="Riduci testo" aria-label="Riduci testo">A−</button>
+  <span class="val" id="zoomVal">100%</span>
+  <button id="zoomIn" title="Aumenta testo" aria-label="Aumenta testo">A+</button>
+</div>
+
+
+<style>
+/* ---------- due colonne a confronto (come nell'ora 7) ---------- */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:stretch}
+.duo .side{border:1px solid var(--line);background:#fff;padding:20px 22px;
+  display:flex;flex-direction:column;gap:12px;min-width:0}
+.duo .side.g{background:var(--green-soft);border-color:#cbd8d3}
+.duo .side .lbl{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.duo .side h3{font-family:var(--serif);font-size:23px;font-weight:600;line-height:1.2}
+.duo .side p,.duo .side li{font-size:14.5px;line-height:1.5;color:var(--ink-soft)}
+/* ---------- voce · spiegazione, accanto a un sorgente ---------- */
+.fm{display:flex;flex-direction:column;gap:9px}
+.fm > div{display:grid;grid-template-columns:170px 1fr;gap:14px;align-items:baseline;
+  border-bottom:1px solid var(--line);padding-bottom:9px}
+.fm b{font-family:var(--serif);font-size:16px;color:var(--green);overflow-wrap:anywhere}
+.fm b.o{color:var(--orange)}
+.fm span{font-size:14px;line-height:1.45;color:var(--ink-soft)}
+/* ---------- ora 8: la catena di un sistema vero ---------- */
+.flow{display:grid;grid-template-columns:1fr 30px 1fr 30px 1fr 30px 1fr;align-items:stretch}
+.flow .node{border:1px solid var(--line);background:#fff;padding:14px 16px;
+  display:flex;flex-direction:column;gap:7px;min-width:0}
+.flow .node .by{font-family:var(--mono);font-size:11.5px;color:var(--orange);
+  overflow-wrap:anywhere}
+.flow .node h3{font-family:var(--serif);font-size:19px;font-weight:600;line-height:1.2}
+.flow .node p{font-size:13px;line-height:1.45;color:var(--ink-soft)}
+.flow .node.now{background:var(--green-soft);border-color:#cbd8d3}
+.flow .arrow{display:flex;align-items:center;justify-content:center;color:var(--orange);
+  font-size:22px}
+.span{display:grid;grid-template-columns:1fr 30px 1fr 30px 1fr 30px 1fr;margin-top:10px}
+.span div{border-top:3px solid var(--green);padding-top:7px;font-size:10px;
+  letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--green)}
+.span div.o{border-color:var(--orange);color:var(--orange)}
+/* ---------- l'anno in settimane ---------- */
+.weeks{display:grid;grid-template-columns:repeat(38,1fr);gap:3px;align-items:end;height:92px;
+  position:relative}
+.weeks i{display:block;background:var(--green);min-height:3px}
+.weeks i.h3{height:84px}.weeks i.h2{height:56px;background:#d69a2d}
+.weeks i.h1{height:28px;background:var(--orange)}
+.weeks i.h0{height:3px;background:var(--orange)}
+.weeks i.pd{background:repeating-linear-gradient(45deg,var(--green) 0 5px,#8fb0a8 5px 10px)}
+.weeks i.q{box-shadow:4px 0 0 -1px var(--card),5px 0 0 0 var(--ink)}
+.months{display:grid;grid-template-columns:repeat(38,1fr);gap:3px;margin-top:7px;
+  font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.wk-legend{display:flex;gap:20px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-soft);
+  margin-top:12px}
+.wk-legend span{display:flex;align-items:center;gap:7px}
+.wk-legend b{width:12px;height:12px;display:inline-block}
+/* ---------- il conto delle ore ---------- */
+.conto td,.conto th{padding:9px 14px;font-size:15px}
+.conto td:first-child{width:auto;font-weight:400}
+.conto td.n,.conto th.n{text-align:right;width:92px}
+.conto td.n{font-family:var(--serif);font-size:21px;font-weight:600}
+.conto tr.tot td{border-top:2px solid var(--green);font-weight:600}
+.conto tr.tot td.n{color:var(--green);font-size:25px}
+.conto tr.need td{background:var(--orange-soft)}
+.conto tr.need td.n{color:var(--orange)}
+/* ---------- un piano vero, annotato ---------- */
+.real td,.real th{padding:9px 12px;font-size:14px}
+.real td:first-child{width:52px;font-weight:600;text-align:center}
+.real td.d{font-family:var(--mono);font-size:13px;white-space:nowrap}
+.real td.h{font-family:var(--serif);font-size:19px;font-weight:600;text-align:center;width:52px}
+.real td.why{font-size:13.5px;color:var(--ink-soft)}
+.real td.why b{color:var(--orange)}
+.real tr.ok td.why b{color:var(--green)}
+.real tr.bad td.d,.real tr.bad td.h{color:var(--orange)}
+/* ---------- l'anno per unità ---------- */
+.yr{position:relative;padding-top:26px;padding-bottom:30px}
+.yr .strip{display:flex;height:58px;border:1px solid var(--line);background:#fff}
+.yr .strip div{display:flex;align-items:center;justify-content:center;min-width:0;
+  font-size:12px;font-weight:600;color:#fff;border-right:1px solid rgba(255,255,255,.55);
+  overflow:hidden;white-space:nowrap}
+.yr .u{background:var(--green)}.yr .u.b{background:#2c5a56}
+.yr .v{background:var(--orange)}
+.yr .m{background:#d69a2d}
+.yr .p{background:repeating-linear-gradient(45deg,#8fb0a8 0 5px,#a9c3bc 5px 10px);color:var(--ink)!important}
+.yr .ms{position:absolute;top:0;bottom:0;border-left:2px dashed var(--ink);}
+.yr .ms span{position:absolute;bottom:0;left:6px;font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink);white-space:nowrap;font-weight:600}
+.yr .ms.top span{top:0;bottom:auto}
+/* ---------- prerequisiti ---------- */
+.chain{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chain span{border:1px solid #cbd8d3;background:var(--green-soft);padding:5px 10px;
+  font-size:13.5px;line-height:1.3}
+.chain i{font-style:normal;color:var(--orange);font-weight:700}
+/* ---------- ipotesi ---------- */
+.hyp td,.hyp th{padding:10px 14px;font-size:14px}
+.hyp td:first-child{width:34%;font-family:var(--serif);font-size:16px;font-weight:600}
+.hyp td.o{color:var(--orange)}
+/* ---------- opzioni di taglio ---------- */
+.opt{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start;
+  border:1px solid var(--line);background:#fff;padding:12px 16px}
+.opt .l{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--green);line-height:1}
+.opt p{font-size:14px;line-height:1.45;color:var(--ink-soft)}
+.opt p b{color:var(--ink)}
+/* ---------- riepilogo ore per unità ---------- */
+.rie td,.rie th{padding:6px 12px;font-size:13.5px}
+.rie td:first-child{width:auto;font-weight:600}
+.rie td.n,.rie th.n{text-align:right;font-family:var(--serif);font-size:16px}
+.rie th.n{font-family:var(--sans);font-size:10px}
+.rie tr.cut td{color:var(--orange)}
+.rie tr.tot td{border-top:2px solid var(--green);font-weight:600}
+</style>
+
+<style>
+/* ---------- ora 9: il registro, il confronto ---------- */
+.doc{background:#fff;border:1px solid #cfc9bd;box-shadow:0 2px 0 #e6e1d6;padding:16px 20px 14px}
+.doc .dh{display:flex;justify-content:space-between;align-items:baseline;
+  border-bottom:2px solid #55606b;padding-bottom:7px;margin-bottom:6px}
+.doc .dh b{font-size:14px;letter-spacing:.02em;color:#2b3640}
+.doc .dh span{font-size:11.5px;color:#66727d}
+.doc table td,.doc table th{padding:5px 8px;font-size:12.5px;line-height:1.35;color:#2b3640}
+.doc table th{font-size:9.5px;color:#66727d;border-bottom:1px solid #b9c1c8}
+.doc table td:first-child{width:auto;font-weight:400}
+.doc table td.d{font-family:var(--mono);font-size:12px;white-space:nowrap;width:118px}
+.doc table td.gap{text-align:center;color:#8a949c;letter-spacing:.3em;padding:2px}
+.doc table tr.hi td{background:#fdf1e8}
+.doc .df{margin-top:8px;font-size:10.5px;color:#8a949c;letter-spacing:.04em}
+/* ---------- due colonne: si esporta / resta ---------- */
+.dose{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.dose .col{border:1px solid var(--line);background:#fff;padding:18px 22px;display:flex;
+  flex-direction:column;gap:9px;min-width:0}
+.dose .col.yes{background:var(--green-soft);border-color:#cbd8d3}
+.dose .col.no{background:var(--orange-soft);border-color:#ecd4c5}
+.dose .col h3{font-family:var(--serif);font-size:22px;font-weight:600}
+.dose .col ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.dose .col li{position:relative;padding-left:24px;font-size:15px;line-height:1.4}
+.dose .col.yes li::before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:700}
+.dose .col.no li::before{content:"✕";position:absolute;left:0;color:var(--orange);font-weight:700}
+/* ---------- tre modi di allineare ---------- */
+.modi{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.modi .m{border:1px solid var(--line);background:#fff;padding:18px 20px;display:flex;
+  flex-direction:column;gap:9px;min-width:0}
+.modi .m.win{background:var(--green-soft);border-color:#cbd8d3}
+.modi .m h3{font-family:var(--serif);font-size:21px;font-weight:600}
+.modi .m .q{font-size:14px;line-height:1.45;color:var(--ink-soft)}
+.modi .m .x{font-size:13.5px;line-height:1.45;padding-top:9px;border-top:1px solid var(--line)}
+.modi .m .x b{color:var(--orange)}
+.modi .m.win .x b{color:var(--green)}
+/* ---------- lo scarto, argomento per argomento ---------- */
+.off{display:grid;grid-template-columns:repeat(17,1fr);gap:4px;align-items:end;height:112px;
+  border-bottom:2px solid var(--ink)}
+.off i{display:block;background:var(--green);min-height:4px}
+.off i.o1{height:44px;background:#d69a2d}.off i.o2{height:84px;background:var(--orange)}
+.off i.o0{height:4px}
+.offl{display:grid;grid-template-columns:repeat(17,1fr);gap:4px;margin-top:6px;
+  font-family:var(--mono);font-size:10px;color:var(--ink-soft);text-align:center}
+.offy{position:relative;height:0}
+.offy span{position:absolute;left:-2px;font-size:10px;letter-spacing:.1em;color:var(--ink-soft)}
+/* ---------- numeri grandi ---------- */
+.big{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.big .n{border:1px solid var(--line);background:#fff;padding:16px 20px}
+.big .n b{display:block;font-family:var(--serif);font-size:54px;line-height:1;font-weight:600;
+  color:var(--green)}
+.big .n.o b{color:var(--orange)}
+.big .n span{display:block;margin-top:8px;font-size:13.5px;line-height:1.4;color:var(--ink-soft)}
+.slim td,.slim th{padding:8px 12px;font-size:14px}
+.slim td:first-child{width:auto}
+.slim td.m{font-family:var(--mono);font-size:12.5px;white-space:nowrap;width:1%}
+.slim td.o{color:var(--orange)}
+</style>
+
+<!-- 01 COVER -->
+<section class="slide cover">
+  <div class="rail"><span>Ora 9 · Dal registro alle prossime lezioni</span></div>
+  <div class="body">
+    <div class="kicker">Dalla IA generativa alla IA agentica · Ora 9</div>
+    <h1>Dal registro<br>alle prossime lezioni</h1>
+    <div class="rule"></div>
+    <p class="lede">A settembre avete un piano. A febbraio avete un registro che dice che cosa è
+      successo davvero. Metterli a confronto è un lavoro da agente; decidere che cosa fare
+      delle differenze no. Oggi il secondo passaggio del workflow, con una classe inventata e
+      dati sintetici.</p>
+    <div class="meta">
+      <div><b>Destinatari</b>Docenti di scuola superiore</div>
+      <div><b>Serve</b>Il calendario dell'ora 8 e il registro della 3ª B</div>
+      <div><b>Durata</b>Un'ora, pausa compresa</div>
+      <div><b>Modulo</b>9 di 13</div>
+    </div>
+  </div>
+  <div class="foot"><span>Corso agenti IA</span><span>01</span></div>
+</section>
+
+<!-- 02 OBIETTIVI E MAPPA -->
+<section class="slide">
+  <div class="rail"><span>Ora 9 · Dal registro alle prossime lezioni</span></div>
+  <div class="body">
+    <div class="kicker">Obiettivi e mappa</div>
+    <h2>Alla fine di quest'ora<span class="sub">Un piano aggiornato l'agente ve lo produce in un
+      minuto. Per farlo deve decidere che cosa vuol dire «in ritardo», che cosa conta come «fatto»
+      e che cosa si può togliere. Oggi lo obblighiamo a dirlo.</span></h2>
+    <ol class="num" style="margin-bottom:26px">
+      <li><b>Avete il secondo anello della catena: una skill, <code>aggiorna-piano</code></b>
+        Confronta il calendario con il registro, elenca gli scarti con la prova, propone e si
+        ferma.</li>
+      <li><b>Sapete che cosa esportare dal registro, e che cosa lasciare dove sta</b>
+        Date e argomenti sì. Assenze, note e voti no.</li>
+    </ol>
+    <div class="content cols c4" style="gap:16px">
+      <div class="box">
+        <div class="tag">12 min</div>
+        <h3>Gli ingredienti</h3>
+        <p>La catena, che cosa esce dal registro, com'è fatto il file. E l'agente senza istruzioni</p>
+      </div>
+      <div class="box">
+        <div class="tag">14 min</div>
+        <h3>Il confronto</h3>
+        <p>Per argomento, non per data. Ritardi, anticipi, argomenti a metà</p>
+      </div>
+      <div class="box">
+        <div class="tag">8 min</div>
+        <h3>La proposta</h3>
+        <p>Incertezze dichiarate, alternative con il loro costo, approvazione</p>
+      </div>
+      <div class="box orange">
+        <div class="tag">18 min</div>
+        <h3>Laboratorio</h3>
+        <p>La skill <code>aggiorna-piano</code> sulla 3ª B, a fine gennaio</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Obiettivi e mappa</span><span>02</span></div>
+</section>
+
+<!-- 03 LA CATENA -->
+<section class="slide">
+  <div class="rail"><span>Ora 9 · Dal registro alle prossime lezioni</span></div>
+  <div class="body">
+    <div class="kicker">Gli ingredienti · 1</div>
+    <h2>Il secondo anello: dal registro al piano aggiornato<span class="sub">Nell'ora 8 il piano
+      è nato a settembre, dalla programmazione. Oggi è il 1° febbraio 2026: il primo quadrimestre
+      è chiuso e il piano ha incontrato l'anno vero.</span></h2>
+    <div class="content">
+      <div class="flow">
+        <div class="node">
+          <div class="by">scritta a settembre</div>
+          <h3>La programmazione</h3>
+          <p>Unità, contenuti, ore previste. Non dice mai i singoli argomenti di ogni lezione.</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node">
+          <div class="by">calendario-lezioni · ora 8</div>
+          <h3>Il piano delle lezioni</h3>
+          <p>Una riga per lezione: 98 righe, con verifiche, margine e ipotesi dichiarate.</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node now">
+          <div class="by">l'esportazione · ora 9</div>
+          <h3>Il registro, ridotto</h3>
+          <p>Date e argomenti svolti fino al 31 gennaio. Un PDF, come lo scarica chiunque.</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node now">
+          <div class="by">aggiorna-piano · ora 9</div>
+          <h3>Il piano aggiornato</h3>
+          <p>Gli scarti, le incertezze, alcune proposte per le lezioni da febbraio in poi.</p>
+        </div>
+      </div>
+      <div class="span">
+        <div style="grid-column:1/4">Ora 8: dalla programmazione al piano</div>
+        <div class="o" style="grid-column:5/8">Ora 9: dal registro al piano aggiornato</div>
+      </div>
+    </div>
+    <div class="cols c2" style="margin-top:22px;gap:20px">
+      <div class="box green">
+        <p><b>Nell'ora 8 il piano lo scrivevate voi.</b> Qui c'è un ingrediente che nessun agente
+          ha prodotto: un file scritto da un docente, in giorni diversi, con parole sue. È
+          meno pulito, e per questo è più vero.</p>
+      </div>
+      <div class="box orange">
+        <p><b>Nel sistema dell'autore</b> questo passaggio ha una skill sua: legge il riepilogo
+          scaricato dal registro, misura il ritardo, ripianifica il resto dell'anno. Ne
+          vedremo una versione, e i punti in cui la prima versione sbaglia.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Un secondo passaggio del workflow</span><span>03</span></div>
+</section>
+
+<!-- 04 MINIMIZZAZIONE -->
+<section class="slide">
+  <div class="rail"><span>Ora 9 · Dal registro alle prossime lezioni</span></div>
+  <div class="body">
+    <div class="kicker">Gli ingredienti · 2 · dati e privacy</div>
+    <h2>Dal registro si esporta solo ciò che serve<span class="sub">Un registro elettronico
+      contiene molto di più degli argomenti. Per aggiornare un piano basta sapere che cosa si è
+      fatto e quando: il resto non deve uscire, né arrivare a un agente.</span></h2>
+    <div class="content dose">
+      <div class="col yes">
+        <div class="tag" style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+          font-weight:600;color:var(--green)">Si esporta</div>
+        <h3>Quello che serve al piano</h3>
+        <ul>
+          <li>Le date delle lezioni, per la sola materia e la sola classe</li>
+          <li>L'argomento svolto, come l'avete scritto</li>
+          <li>Il tipo di ora, se il registro lo riporta: verifica, interrogazioni, recupero</li>
+          <li>Il periodo: dall'inizio dell'anno alla data di oggi</li>
+        </ul>
+      </div>
+      <div class="col no">
+        <div class="tag">Resta nel registro</div>
+        <h3>Quello che al piano non serve</h3>
+        <ul>
+          <li>Assenze, ritardi, uscite anticipate degli studenti</li>
+          <li>Note disciplinari e annotazioni sui singoli</li>
+          <li>Voti, anche quelli scritti nello stesso giorno</li>
+          <li>Nomi e cognomi, PDP, BES, comunicazioni alle famiglie</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cols c2" style="margin-top:20px;gap:20px">
+      <div class="box">
+        <p><b>Il principio ha un nome:</b> minimizzazione dei dati, quella del GDPR, art. 5. Si
+          raccolgono e si trattano i dati necessari alla finalità. Quello che non esce non serve
+          proteggerlo, e non si può divulgare per errore.</p>
+      </div>
+      <div class="box orange">
+        <p><b>Nel corso: una classe inventata e dati sintetici, sempre.</b> A casa, sul registro
+          vero, prima di allegare aprite il file esportato e guardatelo: il controllo si fa sul
+          file, non sulla fiducia nel pulsante «esporta».</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Minimizzazione dei dati</span><span>04</span></div>
+</section>
+
+<!-- 05 IL PDF -->
+<section class="slide">
+  <div class="rail"><span>Ora 9 · Dal registro alle prossime lezioni</span></div>
+  <div class="body">
+    <div class="kicker">Gli ingredienti · 3</div>
+    <h2>Il riepilogo del registro, com'è fatto<span class="sub">Il PDF fittizio della 3ª B: una
+      riga per lezione, data e argomento. Impaginazione generica, di un registro che non esiste.
+      Sei righe di ottobre e una di gennaio.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.35fr 1fr;gap:26px;align-items:start">
+      <div class="doc">
+        <div class="dh"><b>Riepilogo argomenti · Matematica</b><span>Classe 3ª B · a.s. 2025/26 · fino al 31/01/2026</span></div>
+        <table>
+          <tr><th>Data</th><th>Argomento svolto</th></tr>
+          <tr><td class="d">mer 08/10/2025</td><td>Relazioni fra radici e coefficienti (somma e prodotto).</td></tr>
+          <tr><td class="d">ven 10/10/2025</td><td>Equazioni frazionarie di secondo grado: condizioni di esistenza.</td></tr>
+          <tr><td class="d">mer 15/10/2025</td><td>Esercitazione di preparazione alla verifica.</td></tr>
+          <tr class="hi"><td class="d">gio 16/10/2025</td><td>Verifica scritta n. 1 — Equazioni di secondo grado.</td></tr>
+          <tr><td class="d">lun 20/10/2025</td><td>Correzione della verifica. Analisi degli errori più frequenti.</td></tr>
+          <tr><td class="d">mer 22/10/2025</td><td>Equazioni di grado superiore al secondo: binomie e trinomie.</td></tr>
+          <tr><td class="gap" colspan="2">···</td></tr>
+          <tr class="hi"><td class="d">mer 14/01/2026</td><td>Fasci di rette (propri e impropri): cenni.</td></tr>
+        </table>
+        <div class="df">Documento d'esempio · dati inventati · non riconducibile a un fornitore</div>
+      </div>
+      <div class="cols" style="gap:12px">
+        <div class="box green" style="padding:14px 20px">
+          <div class="tag" style="color:var(--green)">Testo libero</div>
+          <p>Scritto da voi, a lezione finita, con parole che non sono quelle del piano.</p>
+        </div>
+        <div class="box orange" style="padding:14px 20px">
+          <div class="tag">Date vere</div>
+          <p>Il 16 ottobre è un giovedì: matematica, quel giorno, la 3ª B non ce l'ha.</p>
+        </div>
+        <div class="box orange" style="padding:14px 20px">
+          <div class="tag">Una parola nuova</div>
+          <p><b>«Cenni».</b> Il piano non la conosce: o una lezione c'è, o non c'è.</p>
+        </div>
+        <div class="box" style="padding:14px 20px">
+          <div class="tag" style="color:var(--green)">Colonne che mancano</div>
+          <p>Assenze, note, voti: per scelta, come alla slide 4.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Lettura del PDF fittizio</span><span>05</span></div>
+</section>
+
+<!-- 06 DEMO A MANI NUDE -->
+<section class="slide demo">
+  <div class="rail"><span>Ora 9 · Dal registro alle prossime lezioni</span></div>
+  <div class="body">
+    <div class="kicker">Dimostrazione · 5 minuti</div>
+    <h2>Aggiornami il piano, e basta<span class="sub">Il calendario di settembre e il registro,
+      allegati, e nessuna istruzione su come confrontarli. Guardate il risultato, poi guardate
+      che cosa ha deciso per arrivarci.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.1fr 1fr;gap:24px;align-items:start">
+      <div class="cols" style="gap:14px">
+        <div class="prompt">
+          <div class="lbl">La richiesta · allegati: calendario-lezioni.csv e il PDF del registro</div>
+          Siamo al 1° febbraio 2026. Ti allego il calendario delle lezioni che avevo pianificato a
+          settembre per la 3ª B e il riepilogo degli argomenti svolti fino a oggi, esportato dal
+          registro. Aggiornami il piano da qui a fine anno.
+        </div>
+        <div class="box">
+          <p><b>Nessuno dei due file è stato corretto per l'occasione.</b> Il calendario è quello
+            dell'ora 8, con le sue ipotesi; il PDF è quello della slide 5.</p>
+        </div>
+      </div>
+      <div class="cols" style="gap:10px">
+        <div class="box green" style="padding:14px 20px">
+          <div class="tag">Che cosa guardare · 1</div>
+          <p><b>Come ha messo in fila i due elenchi?</b> Per data, per numero d'ordine, per
+            argomento? Lo dice?</p>
+        </div>
+        <div class="box green" style="padding:14px 20px">
+          <div class="tag">Che cosa guardare · 2</div>
+          <p><b>Le verifiche del 16/10, del 27/11 e del 22/01.</b> Sono anticipate o mancate? E
+            «per cenni»: fatto o non fatto?</p>
+        </div>
+        <div class="box green" style="padding:14px 20px">
+          <div class="tag">Che cosa guardare · 3</div>
+          <p><b>Il file di settembre.</b> È rimasto com'era, o l'ha riscritto?</p>
+        </div>
+        <div class="box orange" style="padding:14px 20px">
+          <div class="tag">Che cosa guardare · 4</div>
+          <p><b>Chi ha deciso che cosa recuperare e che cosa lasciare?</b> Cercate la frase in
+            cui l'agente vi ha chiesto qualcosa. C'è?</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../demo/ora-09-demo-mani-nude.md" target="_blank">Copione <b>ora-09-demo-mani-nude.md</b></a><span>06</span></div>
+</section>
+
+<!-- 07 TRE MODI DI ALLINEARE -->
+<section class="slide">
+  <div class="rail"><span>Ora 9 · Dal registro alle prossime lezioni</span></div>
+  <div class="body">
+    <div class="kicker">Il confronto · 1</div>
+    <h2>Si confronta per argomento<span class="sub">Due elenchi di lezioni, uno pianificato e uno
+      svolto. Per dire che cosa è in ritardo bisogna sapere quale riga dell'uno corrisponde a
+      quale riga dell'altro, e i modi per farlo sono tre.</span></h2>
+    <div class="content modi">
+      <div class="m">
+        <span class="badge o">Regge poco</span>
+        <h3>Per numero d'ordine</h3>
+        <p class="q">«La 20ª lezione del piano è la 20ª del registro.»</p>
+        <p class="x"><b>Basta una lezione in più</b> (un'interrogazione, un recupero) e tutte le
+          righe dopo risultano sfasate. Non dice niente su che cosa si è fatto.</p>
+      </div>
+      <div class="m">
+        <span class="badge o">Sembra ovvio</span>
+        <h3>Per data</h3>
+        <p class="q">«Il 27/10 c'era la verifica 1: nel registro il 27/10 non c'è.»</p>
+        <p class="x"><b>La verifica è del 16/10.</b> Per data l'agente la vede come una verifica
+          mancata e un'altra fuori posto. E il 27/10 il registro dice tutt'altro.</p>
+      </div>
+      <div class="m win">
+        <span class="badge">Regge</span>
+        <h3>Per argomento</h3>
+        <p class="q">«Il discriminante: previsto il 03/10, svolto il 06/10.»</p>
+        <p class="x"><b>È l'unico che risponde alla domanda.</b> Costa una lettura vera: nel
+          registro le parole sono le vostre. Un argomento del piano può diventare due righe, o
+          nessuna.</p>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:20px">
+      <p><b>Dov'è l'ambiguità:</b> il piano dice «Sistemi di secondo grado»; il registro, il
+        27/10, «metodo di sostituzione», e il 29/10 «sistemi simmetrici». Una riga è diventata
+        due. Se l'agente non è sicuro di un abbinamento, deve dirlo. Non deve scegliere.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Confronto tra pianificato e svolto</span><span>07</span></div>
+</section>
+
+<!-- 08 LO SCARTO -->
+<section class="slide">
+  <div class="rail"><span>Ora 9 · Dal registro alle prossime lezioni</span></div>
+  <div class="body">
+    <div class="kicker">Il confronto · 2</div>
+    <h2>Un ritardo non è un numero<span class="sub">Ogni colonna è un argomento del piano,
+      con la data in cui era previsto. L'altezza dice di quante lezioni il registro è in ritardo
+      su quell'argomento. Diciassette argomenti, da settembre a gennaio.</span></h2>
+    <div class="content">
+      <div class="off">
+        <i class="o1"></i><i class="o1"></i><i class="o1"></i><i class="o0"></i><i class="o2"></i>
+        <i class="o2"></i><i class="o2"></i><i class="o2"></i><i class="o1"></i><i class="o0"></i>
+        <i class="o2"></i><i class="o2"></i><i class="o2"></i><i class="o2"></i><i class="o2"></i>
+        <i class="o1"></i><i class="o1"></i>
+      </div>
+      <div class="offl">
+        <span>26/09</span><span>03/10</span><span>06/10</span><span>10/10</span><span>15/10</span>
+        <span>22/10</span><span>29/10</span><span>31/10</span><span>14/11</span><span>19/11</span>
+        <span>03/12</span><span>10/12</span><span>12/12</span><span>15/12</span><span>17/12</span>
+        <span>09/01</span><span>16/01</span>
+      </div>
+      <div class="wk-legend">
+        <span><b style="background:var(--green)"></b>allineato</span>
+        <span><b style="background:#d69a2d"></b>1 lezione dopo il piano</span>
+        <span><b style="background:var(--orange)"></b>2 lezioni dopo il piano</span>
+        <span>Data del piano, per argomento</span>
+      </div>
+    </div>
+    <div class="cols c3" style="margin-top:18px;gap:16px">
+      <div class="box">
+        <div class="tag">Non cresce e basta</div>
+        <p>Mai più di due lezioni. A ottobre e a novembre si risale a zero: nel registro
+          qualcosa è stato saltato, e il ritardo «si è recuperato» così.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Un dato, tante storie</div>
+        <p>A fine gennaio: una lezione. Ma dietro quella cifra ci sono lezioni non fatte,
+          fatte a metà, e ore usate per altro. Un solo numero le nasconde.</p>
+      </div>
+      <div class="box orange">
+        <div class="tag">Che cosa chiedere</div>
+        <p>Non «quanto sono in ritardo?». Ma <b>«che cosa non è stato fatto, e che cosa è
+          stato fatto in più?»</b> Una lista, con la riga del registro accanto.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Ritardi e anticipi</span><span>08</span></div>
+</section>
+
+<!-- 09 LE VERIFICHE SPOSTATE -->
+<section class="slide">
+  <div class="rail"><span>Ora 9 · Dal registro alle prossime lezioni</span></div>
+  <div class="body">
+    <div class="kicker">Il confronto · 3</div>
+    <h2>Tre verifiche, tre date diverse dal piano<span class="sub">Tutte anticipate, tutte di
+      giovedì. Per il registro la data giusta è quella in cui si è svolta la prova: il piano,
+      invece, aveva riservato un'ora di lezione.</span></h2>
+    <div class="content">
+      <table class="real" style="background:#fff">
+        <tr><th>Verifica</th><th>Nel piano</th><th>Nel registro</th><th>Scarto</th><th>Che cosa c'è al posto</th></tr>
+        <tr><td>1</td><td class="d">lun 27/10</td><td class="d">gio 16/10</td><td class="h" style="width:70px">−11 gg</td>
+          <td class="why">Anticipata per l'uscita del venerdì. Il 27/10: <b>sistemi di secondo grado.</b></td></tr>
+        <tr><td>2</td><td class="d">lun 01/12</td><td class="d">gio 27/11</td><td class="h" style="width:70px">−4 gg</td>
+          <td class="why">Fatta in un'ora di compresenza. L'1/12: <b>correzione della verifica.</b></td></tr>
+        <tr><td>3</td><td class="d">ven 23/01</td><td class="d">gio 22/01</td><td class="h" style="width:70px">−1 g</td>
+          <td class="why">Il registro riporta il 23/01 con la nota «svolta giovedì 22/01».</td></tr>
+      </table>
+    </div>
+    <div class="cols c3" style="margin-top:18px;gap:16px">
+      <div class="box orange">
+        <div class="tag">Non è una mancanza</div>
+        <p>Confrontando per data, la verifica risulta «non svolta» il 27/10 e «non
+          prevista» il 16/10. È la stessa verifica.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Un indizio</div>
+        <p>Il giovedì, la 3ª B non ha matematica. Una data che non cade nei giorni di lezione può
+          essere una prova fuori orario: si chiede, non si scarta.</p>
+      </div>
+      <div class="box green">
+        <div class="tag">Il paletto resta</div>
+        <p>Le tre verifiche erano i paletti del piano. Nel piano aggiornato ci sono le date
+          vere, e le prossime tre si ripianificano intorno a quelle.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Verifiche spostate</span><span>09</span></div>
+</section>
+
+<!-- 10 ARGOMENTI MANCANTI -->
+<section class="slide">
+  <div class="rail"><span>Ora 9 · Dal registro alle prossime lezioni</span></div>
+  <div class="body">
+    <div class="kicker">Il confronto · 4</div>
+    <h2>Cinque argomenti del piano che nel registro mancano<span class="sub">Tre non compaiono
+      affatto, due sono segnati «cenni». Nessuno dei cinque è nominato nella programmazione:
+      erano scelte del piano dell'ora 8.</span></h2>
+    <div class="content">
+      <table class="slim" style="background:#fff">
+        <tr><th>Argomento del piano</th><th>Previsto</th><th>Registro</th><th>Nella programmazione?</th></tr>
+        <tr><td>Scomposizione del trinomio di secondo grado</td><td class="m">08/10</td>
+          <td class="o">non compare</td><td>No. Unità 0: «scomposizioni»</td></tr>
+        <tr><td>Disequazioni di grado superiore</td><td class="m">10/11 · 12/11</td>
+          <td class="o">non compaiono</td><td>No. Unità 2: «di secondo grado, frazionarie e sistemi»</td></tr>
+        <tr><td>Problemi con le disequazioni</td><td class="m">26/11</td>
+          <td class="o">non compaiono</td><td>No</td></tr>
+        <tr><td>Disequazioni con valore assoluto</td><td class="m">24/11</td>
+          <td class="o">«cenni»</td><td>No</td></tr>
+        <tr><td>Fasci di rette, propri e impropri</td><td class="m">12/01 · 14/01</td>
+          <td class="o">14/01: «cenni»</td><td>No. Unità 3: «il piano cartesiano e la retta»</td></tr>
+      </table>
+    </div>
+    <div class="cols c2" style="margin-top:16px;gap:20px">
+      <div class="box green">
+        <p><b>Non svolto non vuol dire in ritardo.</b> Se un argomento c'era solo nel piano, e non
+          nella programmazione, l'agente non può sapere se il docente lo ritiene dovuto. Lo
+          chiede.</p>
+      </div>
+      <div class="box orange">
+        <p><b>«Per cenni» lo giudica il docente.</b> Fatto o non fatto dipende da che cosa
+          serve dopo. Per l'agente è solo una parola: se non gli si dice come contarla, sceglie lui.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Argomenti incompleti</span><span>10</span></div>
+</section>
+
+<!-- 11 DOVE SONO ANDATE LE ORE -->
+<section class="slide">
+  <div class="rail"><span>Ora 9 · Dal registro alle prossime lezioni</span></div>
+  <div class="body">
+    <div class="kicker">Il confronto · 5</div>
+    <h2>Dove sono andate le ore<span class="sub">Il piano di settembre aveva argomenti,
+      verifiche e un po' di margine. Il registro dice che cosa ha occupato il resto.</span></h2>
+    <div class="content cols" style="grid-template-columns:1fr 1.05fr;gap:24px;align-items:start">
+      <div class="cols" style="gap:14px">
+        <div class="big">
+          <div class="n"><b>1</b><span>ora per interrogazioni e recupero, nel piano: quella del 28/01</span></div>
+          <div class="n o"><b>7</b><span>nel registro: cinque ore di interrogazioni e due di recupero in itinere</span></div>
+        </div>
+        <div class="box orange">
+          <p><b>Il piano non aveva un posto per loro.</b> Quando il calendario non ne ha, il posto
+            lo prendono gli argomenti: è qui che finiscono i «cenni» e le righe che mancano.</p>
+        </div>
+      </div>
+      <div class="cols" style="gap:14px">
+        <div class="box">
+          <div class="tag" style="color:var(--green)">Cinque ore, due giri</div>
+          <p><b>Primo giro:</b> 14, 21 e 28 novembre. <b>Secondo giro:</b> 21 e 28 gennaio. Il
+            registro ne segna un altro pezzo, in una nota: <i>quattro studenti ancora da
+            interrogare</i>.</p>
+        </div>
+        <div class="box green">
+          <div class="tag">Lo sa il piano?</div>
+          <p><b>Fino al 5 giugno c'è un'ora sola</b> con scritto «interrogazioni»: il 3 giugno, in
+            margine. Quelle quattro, come stanno, aspettano fino a lì.</p>
+        </div>
+        <div class="box">
+          <div class="tag" style="color:var(--green)">La prova di recupero</div>
+          <p>Il registro la annuncia per metà febbraio. Nel piano c'è già: 11 febbraio, in pausa
+            didattica. Qui piano e registro dicono la stessa cosa.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Interrogazioni, recuperi, margine</span><span>11</span></div>
+</section>
+
+<!-- 12 INCERTEZZE -->
+<section class="slide">
+  <div class="rail"><span>Ora 9 · Dal registro alle prossime lezioni</span></div>
+  <div class="body">
+    <div class="kicker">La proposta · 1</div>
+    <h2>Le incertezze, dette prima di proporre<span class="sub">Lo stesso gesto dell'ora 8: si
+      elenca ciò che non si sa e si aspetta. Con una differenza: qui gli scarti sono
+      fatti, e vanno mostrati con la riga del registro che li prova.</span></h2>
+    <div class="content">
+      <table class="hyp" style="background:#fff">
+        <tr><th>Che cosa non dice nessun file</th><th>Che cosa succede se non si chiede</th></tr>
+        <tr><td>«Per cenni» basta?</td>
+          <td class="o">Lo conta in un modo o nell'altro, e non sempre lo dice.</td></tr>
+        <tr><td>Ciò che c'era solo nel piano va recuperato?</td>
+          <td class="o">Lo recupera: togliendo ore altrove, senza dirlo.</td></tr>
+        <tr><td>Chi deve recuperare? Chi va interrogato?</td>
+          <td class="o">Non può saperlo: non ha né voti né nomi. Se lo dice, lo inventa.</td></tr>
+        <tr><td>Nuove date: assemblee, prove, attività?</td>
+          <td class="o">Restano quelle di settembre, che nel frattempo possono essere cambiate.</td></tr>
+      </table>
+    </div>
+    <div class="cols" style="grid-template-columns:1.25fr 1fr;margin-top:18px;gap:20px">
+      <div class="prompt">
+        <div class="lbl">La riga che cambia tutto</div>
+        Prima di proporre, elenca gli scarti che hai trovato, ciascuno con la riga del registro che
+        lo prova, e le cose che non puoi sapere. Poi fermati e aspetta le mie risposte.
+      </div>
+      <div class="box green">
+        <p><b>Il terzo punto è un pregio.</b> Non gli abbiamo dato i voti perché non servono: non
+          può dire chi recuperare, e va bene così. Quella decisione richiede dati che stanno nel
+          registro, e lì restano.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Incertezze e minimizzazione</span><span>12</span></div>
+</section>
+
+<!-- 13 ALTERNATIVE -->
+<section class="slide">
+  <div class="rail"><span>Ora 9 · Dal registro alle prossime lezioni</span></div>
+  <div class="body">
+    <div class="kicker">La proposta · 2</div>
+    <h2>Che cosa recuperare è una decisione didattica<span class="sub">Da qui al 5 giugno restano
+      47 lezioni: 3 di pausa didattica e 3 di margine, tutte a fine anno. I cinque argomenti
+      valgono sei ore; le quattro interrogazioni ancora da fare non ne hanno nessuna.</span></h2>
+    <div class="content cols" style="grid-template-columns:1fr 1.15fr;gap:24px;align-items:start">
+      <div class="cols" style="gap:14px">
+        <div class="box orange">
+          <div class="tag">Il rischio</div>
+          <p>Sei ore da collocare, tre di margine. Un agente che recupera tutto lo fa togliendo
+            dal futuro, e lo scrive, se va bene, in una nota in fondo.</p>
+        </div>
+        <div class="box green">
+          <div class="tag">Che cosa chiedere, invece</div>
+          <p>Due o tre alternative, con quello che costa ciascuna. Poi si sceglie, o se ne propone
+            una quarta. Non «fai tu, dimmi dopo».</p>
+        </div>
+      </div>
+      <div class="cols" style="gap:10px">
+        <div class="tag" style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--green)">Tre alternative per la 3ª B, a partire da lunedì 2 febbraio</div>
+        <div class="opt"><div class="l">A</div>
+          <p><b>Non recuperare, e dirlo.</b> Nessuno dei cinque è in programmazione: si annota
+            nella relazione di fine anno. Costa: fasci impropri e valore assoluto restano
+            cenni; le interrogazioni vanno tutte nel margine.</p></div>
+        <div class="opt"><div class="l">B</div>
+          <p><b>Riprendere i due «cenni» in pausa didattica.</b> Il 9 e il 13 febbraio: non sono
+            argomenti nuovi, sono già stati introdotti. Costa: due ore di recupero e
+            potenziamento in meno.</p></div>
+        <div class="opt"><div class="l">C</div>
+          <p><b>Recuperare tutto: un'ora in meno a U5, U6 e U7, più le ore di margine.</b> Costa:
+            margine a zero fino a giugno. La prima assemblea manda il piano fuori rotta.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Proposta motivata delle lezioni successive</span><span>13</span></div>
+</section>
+
+<!-- 14 L'USCITA -->
+<section class="slide">
+  <div class="rail"><span>Ora 9 · Dal registro alle prossime lezioni</span></div>
+  <div class="body">
+    <div class="kicker">La proposta · 3</div>
+    <h2>Un file nuovo accanto a quello di settembre<span class="sub">Il piano aggiornato non
+      sostituisce l'originale: gli sta a fianco, con una colonna per dire che cosa è cambiato
+      e perché. Quello di settembre resta come l'avete lasciato, correzioni a mano comprese.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.3fr 1fr;gap:24px;align-items:start">
+      <div class="src" style="font-size:12px;line-height:1.6"><span class="hd">calendario-lezioni-aggiornato.csv — estratto, come esempio di proposta B</span><span class="dim">data;giorno;unita;argomento;tipo;stato;nota</span>
+02/02/2026;lun;U4;La parabola come luogo geometrico;lezione;invariata;
+04/02/2026;mer;U4;Equazione della parabola con asse parallelo all'asse y;lezione;invariata;
+06/02/2026;ven;U4;Vertice, fuoco, direttrice, asse;lezione;invariata;
+<span class="hl o">09/02/2026;lun;-;Pausa didattica: fasci di rette impropri;pausa didattica;modificata;da confermare: registro 14/01 «cenni»</span>11/02/2026;mer;-;Pausa didattica: prova di recupero;pausa didattica;invariata;
+<span class="hl o">13/02/2026;ven;-;Pausa didattica: disequazioni con valore assoluto;pausa didattica;modificata;da confermare: registro 24/11 «cenni»</span>18/02/2026;mer;U4;Il grafico di una parabola di data equazione;lezione;invariata;</div>
+      <div class="fm">
+        <div><b class="o">stato</b><span>Invariata, modificata, aggiunta, tolta. Si filtra e si vede in un
+          colpo che cosa è stato toccato</span></div>
+        <div><b class="o">nota</b><span>Il perché, con il riferimento: una riga del registro, una
+          decisione presa qui</span></div>
+        <div><b>il file di settembre</b><span>Non si riscrive. Il piano corretto diventa un file a
+          parte, e le skill della catena leggono quello</span></div>
+        <div style="border:none"><b>la vista</b><span>Se serve decidere, una pagina HTML con le
+          differenze evidenziate: per voi, mentre il file è per l'agente</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Un output modificabile</span><span>14</span></div>
+</section>
+
+<!-- 15 APPROVAZIONE -->
+<section class="slide">
+  <div class="rail"><span>Ora 9 · Dal registro alle prossime lezioni</span></div>
+  <div class="body">
+    <div class="kicker">La proposta · 4 · approvazione</div>
+    <h2>L'agente propone, voi decidete<span class="sub">Il livello di controllo dipende da che
+      cosa si sta controllando: i conti si verificano con un programma, le scelte le verifica
+      una persona.</span></h2>
+    <div class="content duo">
+      <div class="side">
+        <div class="lbl">Con un programma</div>
+        <h3>I conti e i fatti</h3>
+        <ul class="clean">
+          <li>Il numero di righe del file torna con le ore che l'agente dichiara.</li>
+          <li>Le date sono giorni in cui la 3ª B ha lezione: lunedì, mercoledì, venerdì.</li>
+          <li>Il file di settembre è identico a com'era: due copie a confronto lo dicono.</li>
+          <li>Ogni scarto elencato ha una riga del registro: si controlla a campione, e si
+            trova.</li>
+        </ul>
+      </div>
+      <div class="side g">
+        <div class="lbl" style="color:var(--green)">Con voi</div>
+        <h3>Le scelte</h3>
+        <ul class="clean">
+          <li>Se «per cenni» basta, argomento per argomento.</li>
+          <li>Se ciò che c'era solo nel piano si recupera.</li>
+          <li>Quale alternativa: A, B, C, o una quarta.</li>
+          <li>Chi va interrogato e chi ha bisogno di recupero: dati che stanno nel registro, non
+            nel file.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:20px">
+      <p><b>Come nell'ora 7:</b> la proposta è dell'agente, la decisione è del docente. Qui non
+        si valuta nessuno studente, ed è un'altra cosa rispetto all'ora 7. Se un giorno il confronto
+        includesse anche i voti, il quadro cambierebbe: si tornerebbe alle Linee guida MIM e
+        all'AI Act, e ai dati che oggi lasciamo fuori.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Approvazione del docente</span><span>15</span></div>
+</section>
+
+<!-- 16 LABORATORIO -->
+<section class="slide lab">
+  <div class="rail"><span>Ora 9 · Dal registro alle prossime lezioni</span></div>
+  <div class="body">
+    <div class="kicker">Laboratorio · 18 minuti · da soli, al computer</div>
+    <h2>La skill <code style="font-size:.8em">aggiorna-piano</code><span class="sub">Nella cartella
+      di prova, sulla 3ª B. Ancora una volta si parte dal lavoro fatto una volta a mano e poi lo si
+      mette per iscritto: prima il confronto, poi la skill, poi la prova in una sessione
+      nuova.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.2fr 1fr;gap:22px;align-items:start">
+      <div class="prompt">
+        <div class="lbl">Passo 1 · da incollare così com'è, con i due allegati</div>
+        Siamo al 1° febbraio 2026. Ti allego il calendario delle lezioni pianificato a settembre
+        (calendario-lezioni.csv) e il riepilogo degli argomenti svolti esportato dal registro.
+        Non modificare il calendario. Confronta i due per argomento, non per data né per numero
+        d'ordine. Elenca ritardi, anticipi e argomenti incompleti, ciascuno con la riga del
+        registro che lo prova, e dimmi che cosa non puoi sapere. Poi fermati e aspetta le mie
+        risposte.
+      </div>
+      <div class="cols steps" style="gap:10px">
+        <div class="box">
+          <span class="badge">6 min</span>
+          <p>Il confronto. Rispondete voi alle incertezze, una per una: sono le vostre
+            decisioni.</p>
+        </div>
+        <div class="box">
+          <span class="badge">6 min</span>
+          <p>Fate scrivere la skill con le regole del passo 2 della consegna. Aprite
+            <code>SKILL.md</code> e leggetelo.</p>
+        </div>
+        <div class="box orange">
+          <span class="badge o">6 min</span>
+          <p>Sessione nuova: usatela. Si ferma? Ha lasciato intatto il file di settembre?</p>
+        </div>
+      </div>
+    </div>
+    <div class="cols c2 regole" style="margin-top:14px;gap:18px">
+      <div class="box orange">
+        <p><b>Da controllare alla fine:</b> ogni scarto ha la sua riga di registro? Le tre verifiche
+          sono anticipate, non mancate? Le alternative hanno un costo scritto? Le scelte sono
+          vostre?</p>
+      </div>
+      <div class="box green">
+        <p><b>A casa, sul vostro registro.</b> Esportate solo la vostra materia e solo il periodo;
+          aprite il file prima di allegarlo; niente assenze, note, voti.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../consegne/ora-09-lab-skill-aggiorna-piano.md" target="_blank">Consegna su Classroom <b>ora-09-lab-skill-aggiorna-piano.md</b></a><span>16</span></div>
+</section>
+
+<!-- 17 CHIUSURA -->
+<section class="slide">
+  <div class="rail"><span>Ora 9 · Dal registro alle prossime lezioni</span></div>
+  <div class="body">
+    <div class="kicker">Chiusura</div>
+    <h2>Quattro cose da portare a casa</h2>
+    <div class="content">
+      <ol class="num">
+        <li><b>Dal registro si esporta il minimo: date e argomenti.</b>
+          Assenze, note e voti restano dove sono. Il file si guarda prima di allegarlo.</li>
+        <li><b>Il confronto si fa per argomento.</b>
+          Non per data, non per numero d'ordine: una verifica anticipata non è una verifica
+          mancata.</li>
+        <li><b>Un ritardo è un elenco, non un numero.</b>
+          Che cosa è saltato, che cosa è stato fatto «per cenni», che cosa ha occupato le ore
+          che il piano non aveva previsto.</li>
+        <li><b>La proposta è dell'agente, il sì è vostro.</b>
+          Alternative con il loro costo, un file nuovo accanto a quello di settembre, e
+          niente da recuperare in silenzio.</li>
+      </ol>
+      <div class="cols c2" style="margin-top:24px;gap:18px">
+        <div class="box green">
+          <p><b>A casa, se volete:</b> sulla vostra classe, con il calendario dell'ora 8 e il
+            registro esportato ridotto. Confrontate che cosa dice il piano con che cosa è
+            successo davvero.</p>
+        </div>
+        <div class="box orange">
+          <p><b>Prossima ora: più agenti per produrre e controllare materiali.</b> Finora
+            l'agente era uno. Quando conviene dividere il lavoro, e chi controlla chi.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Chiusura</span><span>17</span></div>
+</section>
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var body = document.body;
+  var counter = document.getElementById('presentCounter');
+  var hint = document.getElementById('presentHint');
+  var idx = 0;
+  var presenting = false;
+
+  function fitScale(){
+    var s = Math.min(window.innerWidth/1280, window.innerHeight/720);
+    document.documentElement.style.setProperty('--scale', s);
+  }
+
+  function render(){
+    slides.forEach(function(s,i){ s.classList.toggle('active', i===idx); });
+    counter.textContent = (idx+1) + ' / ' + slides.length;
+  }
+
+  function enter(){
+    presenting = true;
+    body.classList.add('present');
+    fitScale();
+    render();
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(function(){});
+    }
+  }
+
+  function exit(){
+    presenting = false;
+    body.classList.remove('present');
+    if (document.fullscreenElement) document.exitFullscreen().catch(function(){});
+  }
+
+  function next(){ if (idx < slides.length-1){ idx++; render(); } }
+  function prev(){ if (idx > 0){ idx--; render(); } }
+
+  document.addEventListener('keydown', function(e){
+    if (!presenting){
+      if (e.key === 'p' || e.key === 'P') enter();
+      return;
+    }
+    switch(e.key){
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown':
+        e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+        e.preventDefault(); prev(); break;
+      case 'Home':
+        e.preventDefault(); idx = 0; render(); break;
+      case 'End':
+        e.preventDefault(); idx = slides.length-1; render(); break;
+      case 'Escape':
+        exit(); break;
+    }
+  });
+
+  document.addEventListener('click', function(e){
+    if (!presenting) return;
+    if (e.target.closest('a')) return;
+    if (e.clientX > window.innerWidth/2) next(); else prev();
+  });
+
+  document.addEventListener('fullscreenchange', function(){
+    if (!document.fullscreenElement && presenting) exit();
+  });
+
+  window.addEventListener('resize', fitScale);
+
+  hint.classList.add('show');
+  setTimeout(function(){ hint.classList.remove('show'); }, 4000);
+
+  // ---- controllo dimensione testo ----
+  var ZOOM_MIN = 0.8, ZOOM_MAX = 1.4, ZOOM_STEP = 0.1;
+  var zoomVal = document.getElementById('zoomVal');
+  var zoomIn = document.getElementById('zoomIn');
+  var zoomOut = document.getElementById('zoomOut');
+  var zoom = 1;
+  try { zoom = parseFloat(localStorage.getItem('slideZoom')) || 1; } catch(e){}
+
+  function applyZoom(){
+    zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom));
+    document.documentElement.style.setProperty('--content-zoom', zoom);
+    zoomVal.textContent = Math.round(zoom * 100) + '%';
+    try { localStorage.setItem('slideZoom', zoom); } catch(e){}
+  }
+
+  zoomIn.addEventListener('click', function(){ zoom += ZOOM_STEP; applyZoom(); });
+  zoomOut.addEventListener('click', function(){ zoom -= ZOOM_STEP; applyZoom(); });
+
+  document.addEventListener('keydown', function(e){
+    if (presenting) return;
+    if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '=')){
+      e.preventDefault(); zoom += ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '-'){
+      e.preventDefault(); zoom -= ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '0'){
+      e.preventDefault(); zoom = 1; applyZoom();
+    }
+  });
+
+  applyZoom();
+})();
+</script>
+
+</body>
+</html>

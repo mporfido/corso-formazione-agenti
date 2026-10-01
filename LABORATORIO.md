@@ -32,7 +32,8 @@ rimandano dal piè di pagina:
 | 4 | La scelta silenziosa · Il vuoto riempito · Trenta secondi · Il profilo disciplinare · La regola che manca (facoltativa) |
 | 5 | Navigare una wiki vera · La wiki costruita da una descrizione |
 | 7 | Con i dati strutturati |
-| 6, 8-13 | da scrivere |
+| 8 | Il calendario, chiesto e basta · La prima versione di calendario-lezioni |
+| 6, 9-13 | da scrivere |
 
 ---
 
@@ -126,7 +127,7 @@ sempre il modello di punta.
 
 L'ora si apre al computer: i corsisti fanno il compito **due volte**, prima chiedendolo
 male e poi con il workflow completo. Non c'è demo del formatore; la conduzione del primo
-tentativo e della raccolta sta in `demo/ora-03-conduzione-primo-tentativo.md`.
+tentativo e della raccolta sta in `demo/lezione-03-conduzione-primo-tentativo.md`.
 
 ### Primo tentativo — a mani nude
 
@@ -216,9 +217,9 @@ Confrontate le domande che vi fa con quelle che vi sareste fatti voi.
 ## Ora 4 — Context engineering e memoria permanente
 
 Le prime tre prove sono **demo condotte dal formatore** (copioni:
-`demo/ora-04-demo-scelta-silenziosa.md`, `demo/ora-04-demo-vuoto-riempito.md`,
-`demo/ora-04-demo-comunicazione-famiglie.md`): il laboratorio dei partecipanti è
-il profilo disciplinare (`consegne/ora-04-lab-profilo.md`). Se il gruppo è
+`demo/lezione-04-demo-scelta-silenziosa.md`, `demo/lezione-04-demo-vuoto-riempito.md`,
+`demo/lezione-04-demo-comunicazione-famiglie.md`): il laboratorio dei partecipanti è
+il profilo disciplinare (`consegne/lezione-04-lab-profilo.md`). Se il gruppo è
 piccolo e il tempo c'è, le prove si possono far rifare a coppie.
 
 Se il prodotto ha una **memoria automatica** (Claude Code ce l'ha attiva di
@@ -391,7 +392,7 @@ resti presa.
 ## Ora 5 — Knowledge base: file, wiki e RAG
 
 L'ora ha **una demo condotta dal formatore** (navigare una wiki vera) e **un
-laboratorio dei partecipanti** (`consegne/ora-05-lab-knowledge-base.md`). È
+laboratorio dei partecipanti** (`consegne/lezione-05-lab-knowledge-base.md`). È
 l'unica ora che non lavora sulla cartella di prova: la demo gira su
 `wiki-didattica-scuola`, il laboratorio su una cartella nuova di ciascuno.
 
@@ -483,11 +484,11 @@ Karpathy descrive un modello, non detta un formato.
   prompt funziona solo se l'agente sa aprire un URL. Da verificare nei tre
   prodotti prima della lezione, con le impostazioni predefinite dei piani
   gratuiti, e da sapere che cosa chiedono all'utente prima di farlo. Il piano B
-  è pronto in `materiali/ora-05-llm-wiki/`: si passa il file al corsista, lui lo
+  è pronto in `materiali/lezione-05-llm-wiki/`: si passa il file al corsista, lui lo
   mette nella cartella e cambia la prima riga del prompt in «leggi il file
   `llm-wiki.md` che trovi in questa cartella». Il `LEGGIMI.md` lì dentro segnala
   anche la questione della licenza, da chiarire prima di caricarlo su Classroom.
-- **Chi arriva senza fonti proprie** usa `materiali/ora-05-fonti-esempio.zip`.
+- **Chi arriva senza fonti proprie** usa `materiali/lezione-05-fonti-esempio.zip`.
   Dentro c'è una cartella `fonti/` con tre documenti pubblici — Linee guida MIM
   sull'IA (2025), Raccomandazione UE sulle competenze chiave (2018),
   Raccomandazione UE sull'EQF (2008) — più un `LEGGIMI.md` con l'argomento
@@ -514,7 +515,7 @@ Karpathy descrive un modello, non detta un formato.
 ## Ora 6 — Usare e comprendere le skill
 
 L'ora **non ha demo**: è teoria e un unico laboratorio dei partecipanti
-(`consegne/ora-06-lab-installare-skill.md`). Non si lavora sulla cartella di
+(`consegne/lezione-06-lab-installare-skill.md`). Non si lavora sulla cartella di
 prova: ognuno apre una cartella nuova, perché la skill costruisce lì dentro il
 proprio spazio di lavoro.
 
@@ -625,7 +626,7 @@ skill: fatelo notare, è informazione utile quanto il successo.
 
 - **L'accesso a internet è il punto fragile, come nell'ora 5.** Qui serve due
   volte: per scaricare la skill e perché la skill stessa cerca fonti. Il piano B
-  è pronto in `materiali/ora-06-skill-teach/`: si distribuisce la cartella
+  è pronto in `materiali/lezione-06-skill-teach/`: si distribuisce la cartella
   `teach/` e il prompt del passo 1 diventa «installa come skill di questo
   progetto la cartella `teach` che trovi qui». Va verificato nei tre prodotti
   prima della lezione, con le impostazioni predefinite dei piani gratuiti.
@@ -660,6 +661,9 @@ skill: fatelo notare, è informazione utile quanto il successo.
 - L'argomento che ciascuno sceglie è roba sua e resta sul suo computer. Non c'è
   niente da caricare da nessuna parte, e nessun dato di studenti entra in gioco
   in quest'ora.
+- **In chiusura, chiedete di portare all'ora 7 la programmazione di
+  dipartimento** della propria materia, in un file. Il laboratorio dell'ora 7
+  lavora su quella, e senza il file non parte. Lo dice anche l'ultima slide.
 
 ---
 
@@ -701,17 +705,184 @@ debole della verifica 2. Scrivila seguendo lo stile e la struttura di
 
 L'ultima riga è un esempio dato con un file invece che incollato nel prompt.
 
-*Da scrivere:* l'intervista che porta dalla procedura del docente a una skill
-per verifiche e rubriche.
+Nel deck la prima richiesta è la demo della slide 15
+(`demo/lezione-07-demo-indicatore-debole.md`); la scheda di recupero passa all'ora 10.
+
+### La skill di un docente: btc-task
+
+Demo della slide 5 (`demo/lezione-07-demo-btc-task.md`). La skill è
+[btc-task](https://github.com/mporfido/skills/tree/main/teaching/btc-task): un solo
+`SKILL.md`, circa 500 parole, in inglese. Va installata prima della lezione nella
+cartella di prova. Si chiama per nome:
+
+```
+Usa la skill btc-task. Argomento: dal grafico di una parabola all'insieme
+delle soluzioni di una disequazione di secondo grado. Classe terza di un
+istituto tecnico.
+```
+
+Deve uscire solo argomento, aggancio e sequenza di passi, in italiano, senza domande
+preliminari. Una sezione in più vuol dire che il confine non ha tenuto.
+
+### Il caso vero e la demo — prima si fa, poi si scrive
+
+La slide 7 riassume una conversazione vera di chi conduce il corso (settembre 2026, in un
+altro progetto): programmazione di dipartimento di matematica per le prime di un istituto
+tecnico, contenuti minimi segnati con ★, PDF della tassonomia di Bloom. Quattro richieste
+in ordine a ritroso: obiettivi per bimestre, come usare obiettivi e griglia, la verifica,
+la scaletta delle lezioni. I dettagli da avere pronti se qualcuno chiede:
+
+- **gli obiettivi**: 12 unità, 72 obiettivi sui sei livelli, solo sui contenuti minimi.
+  L'agente ha fatto una sola domanda prima di partire: come trattare le unità senza
+  nessuna ★;
+- **le correzioni del docente**: i criteri di congruenza fra i minimi, anche se il
+  dipartimento non li stella; i contenuti senza ★ elencati come opzionali, non come
+  esclusi; la verifica in due parti indipendenti, ognuna con esercizi facili e difficili;
+  la prima parte somministrabile a metà bimestre;
+- **la scoperta dell'agente**: la griglia di dipartimento (Comprendere, Individuare,
+  Sviluppare il processo risolutivo, Argomentare, 2,5 punti ciascuno) non ha un indicatore
+  per il ricordare, e il livello 2 su tutti e quattro fa esattamente 6/10. Ne segue che
+  gli obiettivi di conoscenza vanno dentro compiti più ampi, e che un quarto del voto sta
+  nel giustificare;
+- **un autocontrollo**: l'agente ha corretto da solo una sua affermazione (un indicatore
+  della seconda parte aveva evidenze da due esercizi, non da tre).
+
+Il punto da far passare: ognuna delle correzioni è una regola che una skill dovrebbe
+contenere, e nessuna sarebbe uscita da un'intervista a freddo.
+
+La demo della slide 8 (`demo/lezione-07-demo-dalla-procedura-alla-skill.md`) fa lo stesso ciclo in
+piccolo sulla 3ª B: obiettivi della U2, una correzione (al massimo sei obiettivi, ciascuno
+con l'indicatore della griglia), la skill `obiettivi-unita`, la prova sulla U3 in una
+sessione nuova. Dopo la lezione la skill va cancellata dalla cartella di prova.
+
+### Il laboratorio — dalla vostra programmazione a una skill
+
+Consegna: `consegne/lezione-07-lab-skill-verifica.md`. Ciascuno lavora sulla **programmazione
+del proprio dipartimento**, in una cartella nuova che contiene solo quel file. Niente dati
+di studenti. Quattro passi: obiettivi di un'unità (6 minuti), tabella di specificazione e
+verifica (7), distillazione della skill (4), prova in una sessione nuova su un'altra unità
+(3).
+
+**Va annunciato alla fine dell'ora 6**: senza il file della programmazione il laboratorio
+non parte. Chi non ce l'ha può usare `cartella-di-prova/02-programmazione/`, ma perde il
+motivo per farlo.
+
+Non ci sono numeri di controllo: ogni programmazione è diversa. Si controlla il processo.
+
+**Che cosa controllare girando fra i banchi:**
+
+- **hanno corretto qualcosa?** È l'errore più frequente: accettano gli obiettivi come
+  vengono, e la skill che ne esce è quella media dell'agente, non la loro. Se uno dice «va
+  tutto bene», chiedete: il vostro dipartimento li scriverebbe così? Con questi verbi? Tutti
+  e sei i livelli, su ogni unità?
+- **la correzione è scritta come regola?** «Togli il terzo obiettivo» non diventa una
+  regola utile; «niente obiettivi sugli argomenti facoltativi» sì. Nella consegna c'è il
+  suggerimento di cominciare con «d'ora in poi»;
+- **l'agente ha fatto tutta la verifica già al passo 1?** Capita con le programmazioni
+  lunghe. Fatela fermare: il punto è vedere i passi separati;
+- **la programmazione non ha una griglia?** Capita. La richiesta del passo 2 prevede la
+  rubrica A-B-C-D: controllate che i livelli siano nell'ordine giusto. Nel documento reale
+  da cui viene l'esempio della slide 13 (l'UdA «A caccia di spot», in
+  `wiki-didattica-scuola/fonti/`) C e D sono invertiti;
+- **nella tabella quasi tutto sta su «applicare»?** Succede spesso, ed è un buon aggancio
+  per una correzione;
+- **il passo 4 è in una sessione nuova?** Nella stessa conversazione l'agente ricorda le
+  correzioni comunque, e la prova non dice niente.
+
+**Programmazioni lunghe.** Un documento di dipartimento di trenta pagine si legge in un
+minuto o due. Se l'agente si perde, dite di indicare nel prompt la pagina o il titolo esatto
+dell'unità.
+
+**Chi finisce prima** può chiedere la stessa verifica senza la skill, in una sessione
+nuova, e confrontare le due uscite: le differenze sono le correzioni.
 
 ---
 
-## Ore 8-13
+## Ora 8 — Dalla programmazione al calendario delle lezioni
+
+Nuovo file nella cartella: `02-programmazione/calendario-scolastico-2025-26.md`.
+È coerente con il diario delle lezioni svolte: le stesse feste, l'uscita del
+17/10, il rientro di mercoledì 7/01. Per tutta l'ora si **finge di essere a
+inizio settembre 2025**, e ogni richiesta dice all'agente di ignorare il diario.
+
+### I numeri di controllo
+
+La 3ª B ha matematica lunedì, mercoledì e venerdì, dal 15/09/2025 al 05/06/2026.
+
+| | 1° quad. | 2° quad. | Anno |
+|---|---:|---:|---:|
+| Lunedì, mercoledì e venerdì | 60 | 54 | 114 |
+| Giorni persi | 9 | 7 | 16 |
+| **Lezioni** | **51** | **47** | **98** |
+| Ore delle unità | 48 | 42 | 90 |
+| Unità + 3 verifiche (+ 3 ore di pausa didattica) | 51 | 48 | 99 |
+
+I giorni persi sono elencati nel copione della demo. Sabato 1/11, martedì 17/02,
+sabato 25/04 e martedì 2/06 **non** tolgono niente alla 3ª B: chi li sottrae
+conta per settimane, non per giorni.
+
+La programmazione dichiara «99 ore annue previste» ma le unità sommano 90. Se
+le verifiche si considerano comprese nelle unità, il calendario «ci sta» con 5
+ore libere, tolta la pausa didattica; se sono in più, manca un'ora prima ancora di correggere o
+interrogare. È la prima ipotesi che l'agente deve dichiarare.
+
+### Il calendario, chiesto e basta
+
+Demo della slide 6 (`demo/lezione-08-demo-mani-nude.md`):
+
+```
+Siamo a inizio settembre 2025 e devo pianificare l'anno della 3ª B:
+ignora il diario delle lezioni svolte. A partire dalla programmazione
+annuale e dal calendario scolastico, fammi il calendario delle lezioni
+di tutto l'anno, lezione per lezione.
+```
+
+Non si sa in anticipo che cosa sceglierà: è il punto. Si guardano le ore
+contate, le verifiche (dentro o fuori), la pausa didattica di febbraio, le
+assemblee (le date non ci sono, e nemmeno l'ora del giorno in cui la 3ª B ha
+matematica) e i tagli.
+
+### Il laboratorio — la prima versione di `calendario-lezioni`
+
+Consegna: `consegne/lezione-08-lab-skill-calendario.md`. Tre passi: ore e ipotesi
+prima del calendario (5 minuti), la skill scritta con le regole (6), la skill
+usata in una sessione nuova (7).
+
+**Il passo 1** è la modalità piano chiesta a parole: «non scrivere ancora il
+calendario … poi fermati». Le risposte alle ipotesi le danno i corsisti, e sono
+le decisioni che la skill dovrà chiedere ogni volta.
+
+**Il passo 2** aggiunge le regole che dal passo 1 non escono da sole: il
+conteggio con un programma, lo stop sulle ipotesi, le alternative quando le ore
+non bastano, il margine, una riga per lezione, il rispetto del file corretto a
+mano.
+
+**Che cosa controllare girando fra i banchi:**
+
+- le ore sono contate con un programma? Se il totale è 99 o «circa 99», ha
+  moltiplicato 33 per 3;
+- chi ha 97 o meno ha probabilmente tolto anche le feste che cadono di sabato o
+  di martedì;
+- nel passo 3 la skill si ferma sulle ipotesi? È la regola che si perde più
+  spesso: chiamata con il nome della classe, l'agente tende a partire;
+- se il calendario non ha margine, qualcosa è stato compresso: chiedete dove.
+
+**Il calendario pronto** è in `materiali/lezione-08-calendario-pronto/`: 98 righe,
+le ipotesi dichiarate, U0 ridotta a 3 ore e U6 a 6, sei ore di margine. Si
+distribuisce alla fine dell'ora (zip su Classroom) e serve come punto di
+partenza dell'ora 9. Non va messo dentro `cartella-di-prova/` prima del
+laboratorio: l'agente lo troverebbe e lo copierebbe.
+
+Le verifiche pianificate (27/10, 01/12, 23/01, 11/03, 10/04, 27/05) sono
+diverse da quelle del diario (16/10, 27/11, 22/01): è voluto, è il materiale
+del confronto nell'ora 9.
+
+---
+
+## Ore 9-13
 
 *Da scrivere.*
 
-- **Ora 8** — dalla programmazione annuale e dal calendario scolastico alla
-  prima versione della skill `calendario-lezioni`.
 - **Ora 9** — dal PDF fittizio del registro al piano aggiornato. Il diario
   `02-programmazione/argomenti-svolti.md` contiene già verifiche spostate, fasci
   di rette fatti «per cenni» e interrogazioni da completare.
