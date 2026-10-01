@@ -1,21 +1,21 @@
-# Scaletta del corso - 13 ore
+# Scaletta del corso - 13 lezioni
 
 ## Stato e struttura
 
-Questa e la programmazione di riferimento del corso. Le 13 ore sono organizzate come
-moduli autonomi da un'ora, pause comprese, in modo da poter definire successivamente il
+Questa e la programmazione di riferimento del corso. Le 13 lezioni sono
+autonome, da un'ora ciascuna, pause comprese, in modo da poter definire successivamente il
 numero e la durata degli incontri.
 
-I moduli 1-3 costituiscono il primo incontro di tre ore, in presenza. Gli altri moduli
-possono essere aggregati quando sara disponibile il calendario definitivo.
+Le lezioni 1-3 costituiscono il primo incontro di tre ore, in presenza. Le altre lezioni
+possono essere aggregate quando sara disponibile il calendario definitivo.
 
-Indicazione temporale flessibile: ogni modulo prevede circa 50-55 minuti di attivita e
-5-10 minuti di pausa, transizione o recupero tecnico. Quando piu moduli sono consecutivi,
+Indicazione temporale flessibile: ogni lezione prevede circa 50-55 minuti di attivita e
+5-10 minuti di pausa, transizione o recupero tecnico. Quando piu lezioni sono consecutive,
 i minuti possono essere accumulati in una pausa unica.
 
-## Programma ora per ora
+## Programma lezione per lezione
 
-### Ora 1 - Dal chatbot all'agente
+### Lezione 1 - Dal chatbot all'agente
 
 **Argomenti**
 
@@ -30,7 +30,7 @@ i minuti possono essere accumulati in una pausa unica.
 Riconoscere che cosa rende agentico un sistema e distinguere le attivita professionali
 adatte all'automazione da quelle che richiedono un controllo umano stretto.
 
-### Ora 2 - Orientarsi negli ambienti agentici
+### Lezione 2 - Orientarsi negli ambienti agentici
 
 **Argomenti**
 
@@ -45,7 +45,7 @@ adatte all'automazione da quelle che richiedono un controllo umano stretto.
 Aprire un ambiente agentico e acquisire il modello mentale dell'agente che opera in una
 cartella di progetto.
 
-### Ora 3 - Il primo workflow controllato
+### Lezione 3 - Il primo workflow controllato
 
 **Argomenti**
 
@@ -61,7 +61,7 @@ cartella di progetto.
 Portare a termine un piccolo compito agentico mantenendo controllo, tracciabilita e
 possibilita di correzione.
 
-### Ora 4 - Context engineering e memoria permanente
+### Lezione 4 - Context engineering e memoria permanente
 
 **Argomenti**
 
@@ -77,7 +77,7 @@ possibilita di correzione.
 Costruire un contesto permanente, sintetico e riutilizzabile, riducendo la necessita di
 ripetere istruzioni a ogni conversazione.
 
-### Ora 5 - Knowledge base: file, wiki e RAG
+### Lezione 5 - Knowledge base: file, wiki e RAG
 
 **Argomenti**
 
@@ -93,7 +93,7 @@ ripetere istruzioni a ogni conversazione.
 Organizzare una piccola knowledge base disciplinare e scegliere consapevolmente quando
 usare file navigabili dall'agente o un sistema RAG.
 
-### Ora 6 - Usare e comprendere le skill
+### Lezione 6 - Usare e comprendere le skill
 
 **Argomenti**
 
@@ -110,7 +110,7 @@ usare file navigabili dall'agente o un sistema RAG.
 Comprendere quando una procedura merita di diventare una skill e saper adattare una
 procedura esistente senza partire da zero.
 
-### Ora 7 - Creare skill fondate sulla pedagogia
+### Lezione 7 - Creare skill fondate sulla pedagogia
 
 **Argomenti**
 
@@ -127,126 +127,112 @@ procedura esistente senza partire da zero.
 Trasformare una pratica professionale in una procedura agentica ripetibile, fondata su
 obiettivi e criteri pedagogici espliciti.
 
-### Ora 8 - Dalla programmazione al calendario delle lezioni
+### Lezioni 8-10 - Rassegna di un lavoro gia fatto
+
+Queste tre lezioni non hanno slide ne laboratori. Sono un racconto a voce: il docente
+mostra, a partire da un lavoro realizzato l'anno scorso, che cosa si puo costruire
+combinando le basi viste nelle lezioni 1-7.
 
 **Argomenti**
 
-- Analisi della programmazione annuale.
-- Prerequisiti, vincoli, festivita e ore disponibili.
-- Sequenziamento delle unita e milestone.
-- Margini di recupero e gestione delle ipotesi mancanti.
-- Definizione di un output strutturato e modificabile.
-- Prima versione della skill per il calendario delle lezioni.
+- Esempi tratti dal lavoro dell'anno scorso, da scegliere secondo il tempo: la
+  pianificazione di un calendario a partire dalla programmazione, l'aggiornamento del piano
+  sulla base di quanto realmente svolto, flussi in cui piu agenti si dividono un compito.
+- Quali ingredienti rendono possibile ciascun esempio: file guida, fonti, skill, controllo
+  umano delle decisioni.
+- Quanto lavoro di correzione e di verifica e servito prima di fidarsi del risultato.
 
 **Obiettivo**
 
-Generare un calendario didattico motivato e modificabile a partire dalla programmazione
-del docente.
+Vedere in azione, su un caso reale e senza doverlo rifare, il metodo costruito nelle prime
+sette lezioni, e capire che cosa serve per portarlo sul proprio lavoro.
 
-### Ora 9 - Dal registro alle prossime lezioni
+### Lezione 11 - Come funziona math-rocks
 
 **Argomenti**
 
-- Uso esclusivo di una classe inventata e di dati sintetici.
-- Lettura del PDF fittizio esportato dal registro elettronico.
-- Confronto tra calendario pianificato e argomenti svolti.
-- Individuazione di ritardi, anticipi e argomenti incompleti.
-- Proposta motivata delle lezioni successive.
-- Incertezze, minimizzazione dei dati e approvazione del docente.
+- `math-rocks` come esempio avanzato: che cosa fa una lezione interattiva e che cosa vede
+  lo studente.
+- Distinzione tra motore, configurazione e contenuti: il motore non si tocca, il sito del
+  docente sta in `content/`, `site.yaml` e nel tema grafico.
+- Corso, lezioni e passi descritti in Markdown: domande aperte, scelte multiple, slider,
+  contenuti che si rivelano a obiettivi completati, formule, grafici e animazioni.
+- Dal testo al sito: anteprima in locale, compilazione, pubblicazione come sito statico;
+  che cosa viene salvato nel browser dello studente e quali servizi esterni sono coinvolti.
+- Il minimo di Python: a che cosa serve in questo progetto, che cosa lascia fare
+  all'agente, come riconoscere un errore di installazione.
+- Il minimo di Git e GitHub: repository, salvataggio come fotografia del lavoro, copia
+  propria e copia pubblica, differenza tra Git (sul computer) e GitHub (online).
+- Definire l'obiettivo pedagogico di una breve attivita interattiva prima di pensare alla
+  soluzione tecnica; esempi per materie scientifiche, umanistiche, linguistiche e tecniche.
 
 **Obiettivo**
 
-Costruire un secondo passaggio del workflow che aggiorni il piano sulla base dello stato
-reale senza delegare all'agente la decisione finale.
+Capire quali parti del progetto spettano al docente e quali al motore, e arrivare alla
+lezione 12 con il computer pronto e con l'idea di una breve attivita da realizzare.
 
-### Ora 10 - Piu agenti per produrre e controllare materiali
+### Lezione 12 - Creare la propria istanza di Geode
 
 **Argomenti**
 
-- Quando conviene dividere un lavoro e quando non conviene.
-- Ruoli: ricercatore, progettista didattico, autore e revisore.
-- Lavoro parallelo e lavoro sequenziale.
-- Isolamento del contesto e sintesi del coordinatore.
-- Controllo delle fonti e risoluzione dei risultati discordanti.
-- Costi, quote e confronto operativo tra le piattaforme.
+- Verifica dei prerequisiti: Python, Git e l'assistente scelto.
+- Copia indipendente del repository barebones `Geode` in una cartella vuota, con storia
+  propria e senza collegamenti per pubblicare nel progetto originale.
+- Lettura guidata delle istruzioni (`AGENTS.md`) e delle skill incluse.
+- Onboarding con la skill di avvio: nome del sito, materia, veste grafica scelta su
+  un'anteprima.
+- Prima lezione della propria disciplina a partire dalla scheda di progetto; anteprima
+  locale e controllo dell'interattivita.
+- Correzione tramite dialogo con l'agente e salvataggio del lavoro con Git.
+- Confronto tra piattaforme: onboarding con Claude Desktop, Codex e Antigravity.
 
 **Obiettivo**
 
-Scomporre un compito complesso e coordinare piu agenti per ottenere un materiale unico,
-coerente e verificato.
+Ottenere un'istanza propria e funzionante, con almeno una lezione della propria disciplina
+visibile in anteprima, senza dover conoscere i dettagli tecnici del motore.
 
-### Ora 11 - Progettare una lezione interattiva
+### Lezione 13 - Personalizzare e pubblicare
 
 **Argomenti**
 
-- `math-rocks` come esempio avanzato e il repository barebones come punto di partenza.
-- Distinzione tra motore, configurazione e contenuti.
-- Corso e lezioni descritti mediante Markdown.
-- Esercizi, scelte multiple, slider, contenuti progressivi e visualizzazioni.
-- Definizione dell'obiettivo pedagogico prima della soluzione tecnica.
-- Esempi per materie scientifiche, umanistiche, linguistiche e tecniche.
+- Personalizzazione di aspetto, testi e contenuti del sito.
+- Prosecuzione libera del lavoro: nuove lezioni, uso di propri appunti e documenti come
+  fonte, nuovi componenti interattivi.
+- Checklist di correttezza disciplinare, pedagogia, privacy, copyright e accessibilita.
+- Pubblicazione su GitHub Pages: account GitHub, GitHub CLI, accesso dal browser e
+  permessi richiesti; un sito pubblicato e pubblico per natura.
+- Aggiornamenti successivi del sito e del motore; conservazione del progetto per il lavoro
+  futuro.
+- Chiusura del corso: che cosa portarsi a casa e da dove ripartire.
 
 **Obiettivo**
 
-Progettare una breve attivita interattiva pertinente alla propria disciplina prima di
-affidarne la realizzazione all'agente.
-
-### Ora 12 - Laboratorio sul repository barebones
-
-**Argomenti**
-
-- Download e apertura del repository distribuito tramite GitHub.
-- Lettura delle istruzioni e delle skill incluse.
-- Generazione o adattamento dei contenuti.
-- Anteprima HTML e controllo dell'interattivita.
-- Correzione tramite dialogo con l'agente.
-- Personalizzazione disciplinare e confronto tra piattaforme.
-
-**Obiettivo**
-
-Produrre una lezione interattiva funzionante senza dover conoscere i dettagli tecnici
-del motore.
-
-### Ora 13 - Laboratorio aperto, revisione e pubblicazione facoltativa
-
-**Argomenti**
-
-- Scelta libera di un'attivita utile al partecipante.
-- Prosecuzione di una lezione interattiva oppure lavoro su calendario, knowledge base,
-  verifica, rubrica o skill.
-- Confronto informale tra gruppi e piattaforme.
-- Checklist di correttezza, pedagogia, privacy, copyright e accessibilita.
-- Dimostrazione della pubblicazione su GitHub Pages o Netlify.
-- Pubblicazione facoltativa e conservazione del progetto per il lavoro futuro.
-
-**Obiettivo**
-
-Applicare il metodo a un'esigenza professionale reale e consolidare un progetto o un
-workflow riutilizzabile, senza trasformare l'attivita in una prova finale.
+Completare, controllare e se si vuole pubblicare un'attivita interattiva della propria
+disciplina, e portare a casa un progetto riutilizzabile, senza trasformare l'attivita in
+una prova finale.
 
 ## Fili conduttori
 
 ### Sicurezza applicata
 
-- Ora 1: limiti, allucinazioni e responsabilita.
-- Ora 3: permessi, backup e azioni distruttive.
-- Ora 4: dati personali e contesto permanente.
-- Ora 5: fonti, citazioni e copyright.
-- Ora 7: valutazione assistita e responsabilita del docente.
-- Ora 9: dati sintetici, minimizzazione e controllo umano.
-- Ora 10: permessi e controllo dei sub-agenti.
-- Ora 13: verifica prima della pubblicazione.
+- Lezione 1: limiti, allucinazioni e responsabilita.
+- Lezione 3: permessi, backup e azioni distruttive.
+- Lezione 4: dati personali e contesto permanente.
+- Lezione 5: fonti, citazioni e copyright.
+- Lezione 7: valutazione assistita e responsabilita del docente.
+- Lezione 11: servizi esterni e dati degli studenti in un sito pubblicato.
+- Lezione 12: comandi eseguiti dall'agente, dipendenze installate e salvataggi con Git.
+- Lezione 13: verifica prima della pubblicazione e permessi concessi a GitHub.
 
 ### Confronto tra piattaforme
 
 Il confronto tra Codex, Claude Code e Antigravity non costituisce un modulo separato.
 Viene inserito nei momenti in cui emergono differenze rilevanti:
 
-- ora 2: accesso, interfaccia e configurazione;
-- ora 4: file guida e memoria di progetto;
-- ora 6: collocazione e attivazione delle skill;
-- ora 10: agenti paralleli e coordinamento;
-- ora 12: esperienza pratica nello stesso tipo di progetto.
+- lezione 2: accesso, interfaccia e configurazione;
+- lezione 4: file guida e memoria di progetto;
+- lezione 6: collocazione e attivazione delle skill;
+- lezione 12: onboarding dello stesso progetto con Claude Desktop, Codex e Antigravity.
 
 Ogni scheda deve distinguere tra concetto stabile, nome usato dal prodotto, disponibilita
 nel piano gratuito o a pagamento e stato della funzionalita alla data della lezione.
@@ -266,6 +252,7 @@ nel piano gratuito o a pagamento e stato della funzionalita alla data della lezi
 ## Riferimenti principali
 
 - [math-rocks](https://github.com/mporfido/math-rocks)
+- [Geode](https://github.com/mporfido/geode), il repository barebones delle lezioni 11-13
 - [skill teach](https://github.com/mattpocock/skills/tree/main/skills/productivity/teach)
 - [OECD Digital Education Outlook 2026](https://www.oecd.org/en/publications/oecd-digital-education-outlook-2026_062a7394-en.html)
 - `C:\Users\mikil\Progetti\wiki-ia-agenti`
