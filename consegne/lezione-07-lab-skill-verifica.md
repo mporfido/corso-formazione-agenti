@@ -136,7 +136,7 @@ attenzione, è il risultato che conta. La prova in una sessione nuova potete far
   non cambia, quella regola non stava facendo niente. È la prova della cancellazione vista
   nell'ora 6.
 - **Il passo che manca.** Nella progettazione a ritroso, dopo la verifica vengono le
-  lezioni. È il lavoro dell'ora 8: se volete arrivarci preparati, tenete la cartella.
+  lezioni. Resta al vostro lavoro, con la stessa procedura.
 
 ## Quando avete finito
 

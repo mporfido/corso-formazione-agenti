@@ -1,7 +1,7 @@
 # Laboratorio — prompt e note per chi conduce
 
-Prompt esatti, numeri di controllo e note di conduzione, divisi per ora secondo la
-[scaletta](scaletta-corso-13-ore.md). Quasi tutto lavora sulla `cartella-di-prova/`: una 3ª B
+Prompt esatti, numeri di controllo e note di conduzione, divisi per lezione secondo la
+[scaletta](scaletta-corso-10-ore.md). Quasi tutto lavora sulla `cartella-di-prova/`: una 3ª B
 di matematica a fine gennaio 2026, 21 studenti, tutto inventato.
 
 Una premessa che vale per tutto il laboratorio: **non stiamo cercando errori di
@@ -24,7 +24,7 @@ rimandano dal piè di pagina:
 - `demo/`: il copione di ogni dimostrazione, **per chi conduce**. Contiene
   prompt, passi, cosa deve succedere e il piano B.
 
-| Ora | Prove |
+| Lezione | Prove |
 |---|---|
 | 1 | La stessa domanda a chat e agente · A mani nude: l'invenzione |
 | 2 | Fatti guardare intorno · Cambia motore |
@@ -32,12 +32,11 @@ rimandano dal piè di pagina:
 | 4 | La scelta silenziosa · Il vuoto riempito · Trenta secondi · Il profilo disciplinare · La regola che manca (facoltativa) |
 | 5 | Navigare una wiki vera · La wiki costruita da una descrizione |
 | 7 | Con i dati strutturati |
-| 8 | Il calendario, chiesto e basta · La prima versione di calendario-lezioni |
-| 6, 9-13 | da scrivere |
+| 6, 8-10 | da scrivere |
 
 ---
 
-## Ora 1 — Dal chatbot all'agente
+## Lezione 1 — Dal chatbot all'agente
 
 ### La stessa domanda a chat e agente
 
@@ -62,13 +61,13 @@ interrogazioni del secondo giro.
 - In tutto **9 voti insufficienti**, ma **8 studenti**: Esposito compare due volte.
 
 Se l'agente risponde «8» o «9» senza dire quale dei due ha contato, avete
-un'anteprima gratuita della scelta silenziosa dell'ora 4: basta chiedergli
+un'anteprima gratuita della scelta silenziosa della lezione 4: basta chiedergli
 «voti o studenti?».
 
 ### A mani nude: l'invenzione
 
 Da fare **in chat** (ChatGPT, Claude, Gemini), non nella cartella. Se lo fate
-nell'agente, aggiungete «non guardare i file». Nell'ora 1 la conduce il
+nell'agente, aggiungete «non guardare i file». Nella lezione 1 la conduce il
 formatore: ai partecipanti non serve ancora un account.
 
 ```
@@ -79,13 +78,13 @@ studente di terza liceo che ha una media del 6 e mezzo. Scrivimelo.
 **Cosa guardare.** Esce un giudizio che va bene per chiunque, e contiene cose
 che non avete mai detto: «ha mostrato crescente interesse», «partecipa
 attivamente». Nessuno gliele ha dette — le ha inventate. Quando non sa, riempie.
-Tenetelo a mente: torna nell'ora 4, con la cartella davanti.
+Tenetelo a mente: torna nella lezione 4, con la cartella davanti.
 
-La versione costruita bene della stessa richiesta si fa nell'ora 3.
+La versione costruita bene della stessa richiesta si fa nella lezione 3.
 
 ---
 
-## Ora 2 — Orientarsi negli ambienti agentici
+## Lezione 2 — Orientarsi negli ambienti agentici
 
 ### Fatti guardare intorno
 
@@ -123,7 +122,7 @@ sempre il modello di punta.
 
 ---
 
-## Ora 3 — Il primo workflow controllato
+## Lezione 3 — Il primo workflow controllato
 
 L'ora si apre al computer: i corsisti fanno il compito **due volte**, prima chiedendolo
 male e poi con il workflow completo. Non c'è demo del formatore; la conduzione del primo
@@ -178,12 +177,12 @@ annota (senza toccare la tastiera), chi verifica.
 - la regola «chi non la consegna non viene ammesso alla prova di recupero» non
   è un refuso: se l'agente la ammorbidisce o la toglie, ha violato il vincolo;
 - «x2» che diventa «x²», «delta» che diventa «Δ»: forma o contenuto? Nel primo tentativo
-  lo decide l'agente. È una scelta silenziosa in piccolo, e anticipa l'ora 4;
+  lo decide l'agente. È una scelta silenziosa in piccolo, e anticipa la lezione 4;
 - la tabella dell'esercizio 2 ha l'intestazione a tre colonne e la riga di
   separazione a due: dopo la correzione deve vedersi in anteprima con tre
   colonne vuote da riempire, non con le soluzioni già scritte.
 
-### Il giudizio dell'ora 1, chiesto bene
+### Il giudizio della lezione 1, chiesto bene
 
 Non sta più nelle slide, ma resta un buon esempio da tenere in tasca se serve una seconda
 illustrazione del brief:
@@ -214,7 +213,7 @@ Confrontate le domande che vi fa con quelle che vi sareste fatti voi.
 
 ---
 
-## Ora 4 — Context engineering e memoria permanente
+## Lezione 4 — Context engineering e memoria permanente
 
 Le prime tre prove sono **demo condotte dal formatore** (copioni:
 `demo/lezione-04-demo-scelta-silenziosa.md`, `demo/lezione-04-demo-vuoto-riempito.md`,
@@ -389,7 +388,7 @@ resti presa.
 
 ---
 
-## Ora 5 — Knowledge base: file, wiki e RAG
+## Lezione 5 — Knowledge base: file, wiki e RAG
 
 L'ora ha **una demo condotta dal formatore** (navigare una wiki vera) e **un
 laboratorio dei partecipanti** (`consegne/lezione-05-lab-knowledge-base.md`). È
@@ -478,7 +477,7 @@ nomi diversi, campi diversi in testa alle pagine, file-guida più o meno lunghi.
 Se in aula qualcuno se ne accorge, è il momento buono per dirlo: il testo di
 Karpathy descrive un modello, non detta un formato.
 
-### Note di conduzione dell'ora 5
+### Note di conduzione della lezione 5
 
 - **La cosa che può far saltare il laboratorio è l'accesso a internet.** Il
   prompt funziona solo se l'agente sa aprire un URL. Da verificare nei tre
@@ -512,7 +511,7 @@ Karpathy descrive un modello, non detta un formato.
 
 ---
 
-## Ora 6 — Usare e comprendere le skill
+## Lezione 6 — Usare e comprendere le skill
 
 L'ora **non ha demo**: è teoria e un unico laboratorio dei partecipanti
 (`consegne/lezione-06-lab-installare-skill.md`). Non si lavora sulla cartella di
@@ -523,7 +522,7 @@ Il perno dell'ora è che **una skill è un file di testo che si può aprire e
 leggere**. Tre momenti, in quest'ordine: la installo senza sapere com'è fatta,
 scopro dove è finita, la leggo e capisco perché si comporta come si comporta.
 L'adattamento alla propria materia non si fa in aula: è il compito facoltativo
-di chiusura, e diventa lavoro vero nell'ora 7.
+di chiusura, e diventa lavoro vero nella lezione 7.
 
 ### Il laboratorio — installare, trovare, leggere, usare
 
@@ -622,9 +621,9 @@ esercizio o una domanda, e con almeno un link a una fonte esterna. Se è un
 muro di testo senza esercizio e senza citazioni, l'agente sta ignorando la
 skill: fatelo notare, è informazione utile quanto il successo.
 
-### Note di conduzione dell'ora 6
+### Note di conduzione della lezione 6
 
-- **L'accesso a internet è il punto fragile, come nell'ora 5.** Qui serve due
+- **L'accesso a internet è il punto fragile, come nella lezione 5.** Qui serve due
   volte: per scaricare la skill e perché la skill stessa cerca fonti. Il piano B
   è pronto in `materiali/lezione-06-skill-teach/`: si distribuisce la cartella
   `teach/` e il prompt del passo 1 diventa «installa come skill di questo
@@ -649,25 +648,25 @@ skill: fatelo notare, è informazione utile quanto il successo.
   piccole».** È voluto e va detto: `teach` è un metodo di insegnamento intero,
   non una singola operazione, e infatti i suoi quattro file di formato stanno
   fuori dal corpo. Il termine di paragone sono le skill del progetto delle ore
-  11-13, fra 270 e 850 parole (`salva` è la più corta).
+  8-10, fra 270 e 850 parole (`salva` è la più corta).
 - **Il collegamento con la didattica va nominato esplicitamente** (slide 12):
   zona di sviluppo prossimale e scaffolding sono in
   `wiki-didattica-scuola/pagine/`, e in aula ci sarà chi li ha studiati. È il
-  ponte verso l'ora 7: una skill è didattica messa per iscritto.
+  ponte verso la lezione 7: una skill è didattica messa per iscritto.
 - **Sugli studenti (slide 15) non si apre la discussione**, o si mangia il
-  laboratorio. Si nominano le quattro questioni aperte e si rimanda alle ore 7 e
-  9. Se qualcuno insiste, la risposta è: provatelo su voi stessi per un mese,
+  laboratorio. Si nominano le quattro questioni aperte e si rimanda alla lezione 7.
+  Se qualcuno insiste, la risposta è: provatelo su voi stessi per un mese,
   poi ne riparliamo.
 - L'argomento che ciascuno sceglie è roba sua e resta sul suo computer. Non c'è
   niente da caricare da nessuna parte, e nessun dato di studenti entra in gioco
   in quest'ora.
-- **In chiusura, chiedete di portare all'ora 7 la programmazione di
-  dipartimento** della propria materia, in un file. Il laboratorio dell'ora 7
+- **In chiusura, chiedete di portare alla lezione 7 la programmazione di
+  dipartimento** della propria materia, in un file. Il laboratorio della lezione 7
   lavora su quella, e senza il file non parte. Lo dice anche l'ultima slide.
 
 ---
 
-## Ora 7 — Creare skill fondate sulla pedagogia
+## Lezione 7 — Creare skill fondate sulla pedagogia
 
 ### Con i dati strutturati
 
@@ -706,7 +705,7 @@ debole della verifica 2. Scrivila seguendo lo stile e la struttura di
 L'ultima riga è un esempio dato con un file invece che incollato nel prompt.
 
 Nel deck la prima richiesta è la demo della slide 15
-(`demo/lezione-07-demo-indicatore-debole.md`); la scheda di recupero passa all'ora 10.
+(`demo/lezione-07-demo-indicatore-debole.md`).
 
 ### La skill di un docente: btc-task
 
@@ -763,7 +762,7 @@ di studenti. Quattro passi: obiettivi di un'unità (6 minuti), tabella di specif
 verifica (7), distillazione della skill (4), prova in una sessione nuova su un'altra unità
 (3).
 
-**Va annunciato alla fine dell'ora 6**: senza il file della programmazione il laboratorio
+**Va annunciato alla fine della lezione 6**: senza il file della programmazione il laboratorio
 non parte. Chi non ce l'ha può usare `cartella-di-prova/02-programmazione/`, ma perde il
 motivo per farlo.
 
@@ -798,108 +797,104 @@ nuova, e confrontare le due uscite: le differenze sono le correzioni.
 
 ---
 
-## Ora 8 — Dalla programmazione al calendario delle lezioni
+## Lezione 8 — Come funziona math-rocks
 
-Nuovo file nella cartella: `02-programmazione/calendario-scolastico-2025-26.md`.
-È coerente con il diario delle lezioni svolte: le stesse feste, l'uscita del
-17/10, il rientro di mercoledì 7/01. Per tutta l'ora si **finge di essere a
-inizio settembre 2025**, e ogni richiesta dice all'agente di ignorare il diario.
+*Da scrivere: copione della demo, consegna della scheda di progetto, consegna dei prerequisiti.*
 
-### I numeri di controllo
+Prima della lezione:
 
-La 3ª B ha matematica lunedì, mercoledì e venerdì, dal 15/09/2025 al 05/06/2026.
+- far arrivare ai corsisti la consegna dei prerequisiti (Python 3.12, Git, assistente);
+- tenere pronte aperte due finestre: una lezione di math-rocks nel browser e il suo file
+  Markdown;
+- verificare su un PC come quelli dei corsisti che `python --version` e `git --version`
+  rispondano da un terminale nuovo.
 
-| | 1° quad. | 2° quad. | Anno |
-|---|---:|---:|---:|
-| Lunedì, mercoledì e venerdì | 60 | 54 | 114 |
-| Giorni persi | 9 | 7 | 16 |
-| **Lezioni** | **51** | **47** | **98** |
-| Ore delle unità | 48 | 42 | 90 |
-| Unità + 3 verifiche (+ 3 ore di pausa didattica) | 51 | 48 | 99 |
+**Controlli da fare girando fra i banchi** (nei dieci minuti finali, a chi non ha finito
+l'installazione):
 
-I giorni persi sono elencati nel copione della demo. Sabato 1/11, martedì 17/02,
-sabato 25/04 e martedì 2/06 **non** tolgono niente alla 3ª B: chi li sottrae
-conta per settimane, non per giorni.
+- Windows: `python --version` apre il Microsoft Store o dice che Python non è stato trovato?
+  Quasi sempre è la spunta **Add python.exe to PATH** saltata: si riapre l'installatore,
+  *Modify*, *Add Python to environment variables*, poi si chiude e riapre il terminale;
+- `git --version` non risponde subito dopo l'installazione? Basta chiudere e riaprire
+  l'applicazione da cui si lancia il comando;
+- Mac: la comparsa della richiesta di installare i Command Line Tools è normale alla prima
+  chiamata di `git`.
 
-La programmazione dichiara «99 ore annue previste» ma le unità sommano 90. Se
-le verifiche si considerano comprese nelle unità, il calendario «ci sta» con 5
-ore libere, tolta la pausa didattica; se sono in più, manca un'ora prima ancora di correggere o
-interrogare. È la prima ipotesi che l'agente deve dichiarare.
+---
 
-### Il calendario, chiesto e basta
+## Lezione 9 — Creare la propria istanza di Geode
 
-Demo della slide 6 (`demo/lezione-08-demo-mani-nude.md`):
+*Da scrivere: consegna del laboratorio.*
+
+Il messaggio di avvio è quello del `README.md` di Geode, da incollare in una **cartella
+vuota** aperta nell'assistente. Se il README cambia, ricopiare da lì:
 
 ```
-Siamo a inizio settembre 2025 e devo pianificare l'anno della 3ª B:
-ignora il diario delle lezioni svolte. A partire dalla programmazione
-annuale e dal calendario scolastico, fammi il calendario delle lezioni
-di tutto l'anno, lezione per lezione.
+Sono un docente e voglio creare il sito dei miei corsi con Geode.
+Prepara in questa cartella vuota una copia indipendente del progetto
+https://github.com/mporfido/geode, con una nuova storia locale e senza
+collegamenti per pubblicare nel progetto originale. Se la cartella contiene
+già del lavoro, fermati e aiutami a scegliere una cartella vuota.
+Leggi README.md, AGENTS.md e CLAUDE.md, poi segui
+.agents/skills/inizia/SKILL.md. Verifica tu Python, Git e le dipendenze,
+prepara l'ambiente e avvia l'anteprima. Esegui tu i comandi necessari;
+guidami con passaggi grafici solo quando serve il mio intervento.
+Parlami in italiano, senza gergo tecnico.
 ```
 
-Non si sa in anticipo che cosa sceglierà: è il punto. Si guardano le ore
-contate, le verifiche (dentro o fuori), la pausa didattica di febbraio, le
-assemblee (le date non ci sono, e nemmeno l'ora del giorno in cui la 3ª B ha
-matematica) e i tagli.
-
-### Il laboratorio — la prima versione di `calendario-lezioni`
-
-Consegna: `consegne/lezione-08-lab-skill-calendario.md`. Tre passi: ore e ipotesi
-prima del calendario (5 minuti), la skill scritta con le regole (6), la skill
-usata in una sessione nuova (7).
-
-**Il passo 1** è la modalità piano chiesta a parole: «non scrivere ancora il
-calendario … poi fermati». Le risposte alle ipotesi le danno i corsisti, e sono
-le decisioni che la skill dovrà chiedere ogni volta.
-
-**Il passo 2** aggiunge le regole che dal passo 1 non escono da sole: il
-conteggio con un programma, lo stop sulle ipotesi, le alternative quando le ore
-non bastano, il margine, una riga per lezione, il rispetto del file corretto a
-mano.
+Con **Codex** o **Antigravity** si usa prima il prompt di adattamento in `docs/SETUP.md`
+di Geode (sezione «Usare Codex o Antigravity»).
 
 **Che cosa controllare girando fra i banchi:**
 
-- le ore sono contate con un programma? Se il totale è 99 o «circa 99», ha
-  moltiplicato 33 per 3;
-- chi ha 97 o meno ha probabilmente tolto anche le feste che cadono di sabato o
-  di martedì;
-- nel passo 3 la skill si ferma sulle ipotesi? È la regola che si perde più
-  spesso: chiamata con il nome della classe, l'agente tende a partire;
-- se il calendario non ha margine, qualcosa è stato compresso: chiedete dove.
+- la cartella era davvero vuota? Se contiene altro, l'agente si ferma (è voluto);
+- ha creato `venv/` e installato le dipendenze senza errori? È il passaggio che richiede rete;
+- ha mandato **un solo modulo** da compilare (nome, sottotitolo, materia, destinatari,
+  footer, formule)? Se interroga a raffica, non sta seguendo la skill `inizia`;
+- l'anteprima si apre nel browser? Il corso `benvenuto` è visibile?
+- il tema scelto si vede davvero nell'anteprima comparativa (`quaderno`, `salvia`, `sobrio`)?
+- il lavoro è stato salvato con la skill `salva` prima di chiudere?
 
-**Il calendario pronto** è in `materiali/lezione-08-calendario-pronto/`: 98 righe,
-le ipotesi dichiarate, U0 ridotta a 3 ore e U6 a 6, sei ore di margine. Si
-distribuisce alla fine dell'ora (zip su Classroom) e serve come punto di
-partenza dell'ora 9. Non va messo dentro `cartella-di-prova/` prima del
-laboratorio: l'agente lo troverebbe e lo copierebbe.
+**Da non dimenticare:** il `storage_prefix` che l'agente ricava dal nome del sito non va più
+cambiato a sito pubblicato. Dirlo a voce.
 
-Le verifiche pianificate (27/10, 01/12, 23/01, 11/03, 10/04, 27/05) sono
-diverse da quelle del diario (16/10, 27/11, 22/01): è voluto, è il materiale
-del confronto nell'ora 9.
+**Da provare prima:** il percorso completo su Codex e Antigravity; finora è stato provato su
+Claude.
 
 ---
 
-## Ore 9-13
+## Lezione 10 — Personalizzare e pubblicare
 
-*Da scrivere.*
+*Da scrivere: checklist stampabile e consegna della pubblicazione.*
 
-- **Ora 9** — dal PDF fittizio del registro al piano aggiornato. Il diario
-  `02-programmazione/argomenti-svolti.md` contiene già verifiche spostate, fasci
-  di rette fatti «per cenni» e interrogazioni da completare.
-- **Ora 10** — la scheda di recupero dell'ora 7 prodotta da quattro ruoli, con
-  un revisore che deve trovare un'incoerenza.
-- **Ore 11-13** — su Geode.
+La pubblicazione è facoltativa e passa dalla skill `pubblica` di Geode. Tre cose da sapere
+prima di condurla:
+
+- serve `gh` (GitHub CLI) e un account GitHub: l'accesso si fa con `gh auth login -s workflow`
+  dal browser. **Senza il permesso `workflow` il push viene rifiutato**: se l'utente era già
+  autenticato, `gh auth refresh -h github.com -s workflow`;
+- il sito pubblicato è **pubblico**: GitHub
+  Pages gratuito non ha siti privati. Chiedere un consenso esplicito prima di procedere
+  (la skill lo fa);
+- i corsi dimostrativi (`benvenuto`, `esempio-matematica`, `esempi`) vanno tolti o tenuti
+  *prima* della pubblicazione: la skill lo chiede.
+
+**Checklist di revisione** (stampabile, da scrivere): correttezza disciplinare · pedagogia ·
+privacy (nessun dato di studenti; i servizi esterni che vedono l'IP sono GitHub, jsDelivr,
+cdnjs) · copyright (testi, immagini, formule da fonti) · accessibilità (contrasto, testo
+alternativo, uso della tastiera).
 
 ---
+
 
 ## Altre richieste che funzionano bene su questi dati
 
 - «Chi ha valutazioni insufficienti in entrambe le prove scritte più recenti?»
 - «Chi non ha ancora un voto orale nel secondo giro? Fammi una lista da
-  recuperare a febbraio.» (usata nell'ora 2)
+  recuperare a febbraio.» (usata nella lezione 2)
 - «Quali argomenti sono stati svolti prima della seconda verifica?»
 - «Sistema `05-materiali/scheda-recupero-equazioni.md`: è pieno di refusi e
-  c'è una tabella rotta.» (usata nell'ora 3)
+  c'è una tabella rotta.» (usata nella lezione 3)
 
 ---
 
@@ -910,22 +905,20 @@ del confronto nell'ora 9.
   Sonnet. Per questo il laboratorio è costruito sull'ambiguità e
   sull'invenzione, non sull'errore di calcolo — sono fallimenti che non
   dipendono da quanto è bravo il modello.
-- La scelta silenziosa (ora 4) rende al massimo con **due postazioni
+- La scelta silenziosa (lezione 4) rende al massimo con **due postazioni
   affiancate**. Se il gruppo è piccolo, fate girare la stessa domanda due volte
   di seguito in sessioni nuove: la divergenza si vede lo stesso, ma è meno
   teatrale.
-- Nel vuoto riempito (ora 4) il grado di invenzione **varia**: chiedete tutti e
+- Nel vuoto riempito (lezione 4) il grado di invenzione **varia**: chiedete tutti e
   21 i giudizi, non uno solo. È la richiesta di variare a spingere il modello a
   inventare. Se proprio resta prudente, aggiungete «scrivili in modo che si
   distinguano bene l'uno dall'altro».
 - Fra una prova e l'altra la sessione va chiusa davvero, non solo svuotata: è
   anche l'occasione per far vedere il contatore del contesto.
-- Dopo l'ora 4 controllate che `AGENTS.md` sia tornato al suo nome: le ore
+- Dopo la lezione 4 controllate che `AGENTS.md` sia tornato al suo nome: le ore
   successive lo danno per presente.
 - Il dataset **è coerente ovunque**: date, griglie e totali coincidono, e le
-  medie tornano. Se volete mostrare anche l'agente-revisore (ora 10), cambiate a
-  mano un voto in `04-valutazioni/voti-scritti.csv` prima della lezione: senza
-  file-guida lo riporta con sicurezza, con il file-guida lo segnala (c'è la
-  regola che indica le griglie come fonte vera).
+  medie tornano. Se lo modificate a mano (per esempio per una prova diversa), controllate
+  poi che i numeri di controllo nelle sezioni delle lezioni 3, 4 e 7 tornino ancora.
 - Il `README.md` dentro la cartella è stato alleggerito apposta: non contiene
   più gli esercizi né anticipazioni sul PDP.

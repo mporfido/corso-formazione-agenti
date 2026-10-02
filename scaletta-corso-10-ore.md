@@ -1,8 +1,8 @@
-# Scaletta del corso - 13 lezioni
+# Scaletta del corso - 10 lezioni
 
 ## Stato e struttura
 
-Questa e la programmazione di riferimento del corso. Le 13 lezioni sono
+Questa e la programmazione di riferimento del corso. Le 10 lezioni sono
 autonome, da un'ora ciascuna, pause comprese, in modo da poter definire successivamente il
 numero e la durata degli incontri.
 
@@ -127,27 +127,7 @@ procedura esistente senza partire da zero.
 Trasformare una pratica professionale in una procedura agentica ripetibile, fondata su
 obiettivi e criteri pedagogici espliciti.
 
-### Lezioni 8-10 - Rassegna di un lavoro gia fatto
-
-Queste tre lezioni non hanno slide ne laboratori. Sono un racconto a voce: il docente
-mostra, a partire da un lavoro realizzato l'anno scorso, che cosa si puo costruire
-combinando le basi viste nelle lezioni 1-7.
-
-**Argomenti**
-
-- Esempi tratti dal lavoro dell'anno scorso, da scegliere secondo il tempo: la
-  pianificazione di un calendario a partire dalla programmazione, l'aggiornamento del piano
-  sulla base di quanto realmente svolto, flussi in cui piu agenti si dividono un compito.
-- Quali ingredienti rendono possibile ciascun esempio: file guida, fonti, skill, controllo
-  umano delle decisioni.
-- Quanto lavoro di correzione e di verifica e servito prima di fidarsi del risultato.
-
-**Obiettivo**
-
-Vedere in azione, su un caso reale e senza doverlo rifare, il metodo costruito nelle prime
-sette lezioni, e capire che cosa serve per portarlo sul proprio lavoro.
-
-### Lezione 11 - Come funziona math-rocks
+### Lezione 8 - Come funziona math-rocks
 
 **Argomenti**
 
@@ -169,9 +149,9 @@ sette lezioni, e capire che cosa serve per portarlo sul proprio lavoro.
 **Obiettivo**
 
 Capire quali parti del progetto spettano al docente e quali al motore, e arrivare alla
-lezione 12 con il computer pronto e con l'idea di una breve attivita da realizzare.
+lezione 9 con il computer pronto e con l'idea di una breve attivita da realizzare.
 
-### Lezione 12 - Creare la propria istanza di Geode
+### Lezione 9 - Creare la propria istanza di Geode
 
 **Argomenti**
 
@@ -191,7 +171,7 @@ lezione 12 con il computer pronto e con l'idea di una breve attivita da realizza
 Ottenere un'istanza propria e funzionante, con almeno una lezione della propria disciplina
 visibile in anteprima, senza dover conoscere i dettagli tecnici del motore.
 
-### Lezione 13 - Personalizzare e pubblicare
+### Lezione 10 - Personalizzare e pubblicare
 
 **Argomenti**
 
@@ -220,9 +200,9 @@ una prova finale.
 - Lezione 4: dati personali e contesto permanente.
 - Lezione 5: fonti, citazioni e copyright.
 - Lezione 7: valutazione assistita e responsabilita del docente.
-- Lezione 11: servizi esterni e dati degli studenti in un sito pubblicato.
-- Lezione 12: comandi eseguiti dall'agente, dipendenze installate e salvataggi con Git.
-- Lezione 13: verifica prima della pubblicazione e permessi concessi a GitHub.
+- Lezione 8: servizi esterni e dati degli studenti in un sito pubblicato.
+- Lezione 9: comandi eseguiti dall'agente, dipendenze installate e salvataggi con Git.
+- Lezione 10: verifica prima della pubblicazione e permessi concessi a GitHub.
 
 ### Confronto tra piattaforme
 
@@ -232,7 +212,7 @@ Viene inserito nei momenti in cui emergono differenze rilevanti:
 - lezione 2: accesso, interfaccia e configurazione;
 - lezione 4: file guida e memoria di progetto;
 - lezione 6: collocazione e attivazione delle skill;
-- lezione 12: onboarding dello stesso progetto con Claude Desktop, Codex e Antigravity.
+- lezione 9: onboarding dello stesso progetto con Claude Desktop, Codex e Antigravity.
 
 Ogni scheda deve distinguere tra concetto stabile, nome usato dal prodotto, disponibilita
 nel piano gratuito o a pagamento e stato della funzionalita alla data della lezione.
@@ -252,7 +232,7 @@ nel piano gratuito o a pagamento e stato della funzionalita alla data della lezi
 ## Riferimenti principali
 
 - [math-rocks](https://github.com/mporfido/math-rocks)
-- [Geode](https://github.com/mporfido/geode), il repository barebones delle lezioni 11-13
+- [Geode](https://github.com/mporfido/geode), il repository barebones delle lezioni 8-10
 - [skill teach](https://github.com/mattpocock/skills/tree/main/skills/productivity/teach)
 - [OECD Digital Education Outlook 2026](https://www.oecd.org/en/publications/oecd-digital-education-outlook-2026_062a7394-en.html)
 - `C:\Users\mikil\Progetti\wiki-ia-agenti`

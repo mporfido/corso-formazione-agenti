@@ -7,7 +7,7 @@
 - [ ] Una copia pulita di `cartella-di-prova/`, aperta nell'agente, con `AGENTS.md` al suo
       posto.
 - [ ] Controlla che `03-verifiche/griglia-verifica-02.csv` non sia stato modificato (se hai
-      già preparato la demo dell'ora 10 con un voto cambiato a mano, i numeri qui sotto non
+      cambiato a mano un voto della verifica, i numeri qui sotto non
       tornano più).
 
 ## Passi

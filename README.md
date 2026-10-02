@@ -1,9 +1,9 @@
 # Dalla IA generativa alla IA agentica
 
-Materiali di un corso di formazione di **13 ore** sugli agenti AI, rivolto a
+Materiali di un corso di formazione di **10 ore** sugli agenti AI, rivolto a
 **docenti di scuola superiore non tecnici**.
 
-Il corso è organizzato in 13 lezioni da un'ora, pause comprese: le lezioni 1-3
+Il corso è organizzato in 10 lezioni da un'ora, pause comprese: le lezioni 1-3
 formano il primo incontro in presenza, le altre si aggregano secondo il calendario.
 L'impostazione è **agnostica rispetto al prodotto** — si impara l'impalcatura di
 lavoro, non un singolo strumento — e confronta di volta in volta Codex, Claude Code
@@ -11,7 +11,7 @@ e Antigravity, tenendo conto di chi parte dai piani gratuiti.
 
 **I materiali si consultano online: <https://mporfido.github.io/corso-formazione-agenti/>**
 
-> **Lavoro in corso.** Le slide coprono per ora le lezioni 1-7; le lezioni 11-13 sono in preparazione.
+> **Lavoro in corso.** Le slide coprono per ora le lezioni 1-7; le lezioni 8-10 sono in preparazione.
 
 ## Programma
 
@@ -24,25 +24,23 @@ e Antigravity, tenendo conto di chi parte dai piani gratuiti.
 | 5 | Knowledge base: file, wiki e RAG |
 | 6 | Usare e comprendere le skill |
 | 7 | Creare skill fondate sulla pedagogia |
-| 8-10 | Rassegna di un lavoro già fatto (calendario, registro, più agenti), senza slide |
-| 11 | Come funziona math-rocks, più il minimo di Git, GitHub e Python |
-| 12 | Creare la propria istanza di Geode |
-| 13 | Personalizzare e pubblicare |
+| 8 | Come funziona math-rocks, più il minimo di Git, GitHub e Python |
+| 9 | Creare la propria istanza di Geode |
+| 10 | Personalizzare e pubblicare |
 
 Argomenti e obiettivi di ciascuna ora sono in
-[scaletta-corso-13-ore.md](scaletta-corso-13-ore.md), il programma di riferimento.
+[scaletta-corso-10-ore.md](scaletta-corso-10-ore.md), il programma di riferimento.
 
 ## Che cosa c'è nel repository
 
 | Percorso | Contenuto |
 |---|---|
-| [`scaletta-corso-13-ore.md`](scaletta-corso-13-ore.md) | Il programma: argomenti e obiettivo di ogni ora. |
+| [`scaletta-corso-10-ore.md`](scaletta-corso-10-ore.md) | Il programma: argomenti e obiettivo di ogni ora. |
 | [`Struttura.md`](Struttura.md) | Quaderno di regia: fonti, demo, laboratori, materiali da preparare, questioni aperte. |
 | [`LABORATORIO.md`](LABORATORIO.md) | Prompt esatti, numeri di controllo e note per chi conduce. Sta fuori dalla cartella di prova apposta. |
-| [`slides/`](slides/) | Un deck HTML per lezione (`lezione-01.html` … `lezione-13.html`). |
+| [`slides/`](slides/) | Un deck HTML per lezione (`lezione-01.html` … `lezione-10.html`). |
 | [`consegne/`](consegne/) | Una consegna per ogni laboratorio, da distribuire ai corsisti. Senza numeri di controllo. |
 | [`demo/`](demo/) | Il copione di ogni dimostrazione, per chi conduce. |
-| [`archivio/`](archivio/) | Materiali delle vecchie ore 8-9 (calendario, registro), tagliati dal corso e conservati come riferimento. |
 | [`cartella-di-prova/`](cartella-di-prova/) | La classe inventata su cui lavorano demo e laboratori. |
 
 Non è nel repository la cartella `materiali/`: raccoglie documenti di terze parti
