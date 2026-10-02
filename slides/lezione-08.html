@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Lezione 8 — Come funziona math-rocks</title>
+<style>
+:root{
+  --paper:#f2efe9;
+  --card:#fbfaf7;
+  --ink:#1d1c1a;
+  --ink-soft:#5c5850;
+  --line:#ddd7cc;
+  --green:#1a3c3a;
+  --green-soft:#e6ece9;
+  --orange:#c0562f;
+  --orange-soft:#f6e7de;
+  --blue:#2f5a8c;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);font-family:var(--sans);color:var(--ink);
+  -webkit-font-smoothing:antialiased;padding:28px 0}
+
+/* ---------- slide frame ---------- */
+.slide{
+  position:relative;width:1280px;height:720px;margin:0 auto 28px;
+  background:var(--card);border:1px solid var(--line);
+  display:grid;grid-template-columns:56px 1fr;overflow:hidden;
+}
+.rail{
+  background:var(--green);color:#f4f1ea;
+  display:flex;align-items:center;justify-content:center;
+}
+.rail span{
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  white-space:nowrap;opacity:.9;
+}
+.body{padding:52px 60px 64px;display:flex;flex-direction:column;min-width:0}
+.kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--orange);font-weight:600;margin-bottom:14px}
+h1{font-family:var(--serif);font-size:56px;line-height:1.08;font-weight:600;
+  letter-spacing:-.01em}
+h2{font-family:var(--serif);font-size:40px;line-height:1.12;font-weight:600;
+  letter-spacing:-.01em;margin-bottom:26px}
+h2 .sub{display:block;font-family:var(--sans);font-size:15px;font-weight:400;
+  color:var(--ink-soft);letter-spacing:0;margin-top:10px;line-height:1.45}
+p{font-size:17px;line-height:1.55;color:var(--ink)}
+.muted{color:var(--ink-soft)}
+.foot{position:absolute;left:56px;right:0;bottom:0;height:40px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 60px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-soft);border-top:1px solid var(--line)}
+.content{flex:0 1 auto;min-height:0}
+code{font-family:var(--mono);font-size:.9em;background:var(--green-soft);padding:1px 5px}
+
+/* ---------- cover ---------- */
+.cover .body{justify-content:center}
+.cover h1{font-size:72px;max-width:980px}
+.cover .lede{margin-top:26px;font-size:19px;color:var(--ink-soft);max-width:700px}
+.rule{width:72px;height:3px;background:var(--orange);margin:32px 0 0}
+.meta{margin-top:38px;display:flex;gap:44px;font-size:13px;color:var(--ink-soft)}
+.meta b{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--green);margin-bottom:6px}
+
+/* ---------- generic layout helpers ---------- */
+.cols{display:grid;gap:22px}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c4{grid-template-columns:repeat(4,1fr)}
+.box{border:1px solid var(--line);background:#fff;padding:22px 24px;
+  display:flex;flex-direction:column;gap:10px;min-width:0}
+.box h3{font-family:var(--serif);font-size:22px;font-weight:600;line-height:1.2}
+.box .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.box p,.box li{font-size:15px;line-height:1.5;color:var(--ink-soft)}
+.box.green{background:var(--green-soft);border-color:#cbd8d3}
+.box.orange{background:var(--orange-soft);border-color:#ecd4c5}
+ul.clean{list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.clean li{position:relative;padding-left:18px;font-size:16px;line-height:1.5}
+ul.clean li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;
+  background:var(--orange)}
+.box ul.clean li{font-size:15px}
+ol.num{list-style:none;counter-reset:n;display:flex;flex-direction:column;gap:16px}
+ol.num li{counter-increment:n;position:relative;padding-left:46px;font-size:17px;
+  line-height:1.5}
+ol.num li::before{content:counter(n,decimal-leading-zero);position:absolute;left:0;top:1px;
+  font-size:13px;font-weight:600;color:var(--green);letter-spacing:.06em}
+ol.num li b{display:block;font-family:var(--serif);font-size:20px;font-weight:600;
+  margin-bottom:4px;color:var(--ink)}
+
+/* ---------- tabella ---------- */
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:12px 16px;font-size:15px;line-height:1.45;
+  border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);
+  font-weight:600;border-bottom:2px solid var(--green)}
+td:first-child{font-weight:600;width:30%}
+td.o{color:var(--orange)}
+td.g{color:var(--green)}
+td.n{font-family:var(--serif);font-size:24px;font-weight:600;white-space:nowrap}
+
+/* ---------- prompt / badge ---------- */
+.prompt{background:var(--green);color:#eef2f0;padding:20px 24px;font-family:var(--sans);
+  font-size:15px;line-height:1.6}
+.prompt .lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;margin-bottom:8px}
+.prompt.plain{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.prompt.plain .lbl{color:var(--orange)}
+.badge{display:inline-block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  background:var(--green);color:#fff;padding:4px 9px;align-self:flex-start}
+.badge.o{background:var(--orange)}
+
+/* ---------- barra contesto ---------- */
+.gauge{height:30px;background:#fff;border:1px solid var(--line);display:flex;
+  overflow:hidden}
+.gauge i{display:block;height:100%}
+.g-legend{display:flex;gap:22px;font-size:13px;color:var(--ink-soft);margin-top:10px;
+  flex-wrap:wrap}
+.g-legend span{display:flex;align-items:center;gap:7px}
+.g-legend b{width:10px;height:10px;display:inline-block}
+
+/* ---------- sorgente Markdown ---------- */
+.src{background:#1f2624;color:#dfe6e3;font-family:var(--mono);font-size:13.5px;
+  line-height:1.65;padding:18px 22px;white-space:pre-wrap;overflow-wrap:anywhere}
+.src .h{color:#f1b28f}
+.src .k{color:#9fd3c2}
+.src .dim{color:#7f8c87}
+.src .hl{background:#3b4f3c;color:#fff;display:block;margin:0 -22px;padding:0 22px;
+  border-left:4px solid #f1b28f}
+.src .hl.o{background:#4d3a30}
+.src .hd{display:block;margin:-18px -22px 12px;padding:8px 22px;background:#161c1a;
+  font-family:var(--sans);font-size:12px;letter-spacing:.04em;color:#9fbdb4}
+
+/* ---------- la mappa e i file di dettaglio ---------- */
+.files{display:flex;flex-direction:column;gap:12px}
+.file{border:1px solid var(--line);background:#fff;padding:14px 18px;
+  display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline}
+.file .ic{grid-row:1/3;font-family:var(--mono);font-size:12px;color:#fff;
+  background:var(--green);padding:3px 7px;align-self:start;margin-top:2px}
+.file b{font-family:var(--mono);font-size:14px;font-weight:600;overflow-wrap:anywhere}
+.file span{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+.steps .box{padding:14px 20px;gap:8px}
+.file:not(.main){margin-left:34px;position:relative}
+.file:not(.main)::before{content:"";position:absolute;left:-22px;top:-13px;width:16px;
+  height:calc(50% + 13px);border-left:2px solid #cbd8d3;border-bottom:2px solid #cbd8d3}
+.file.main{background:var(--green-soft);border-color:#cbd8d3}
+.file.main .ic{background:var(--orange)}
+
+/* ---------- scheda piattaforma ---------- */
+.scheda{border:1px solid #cbd8d3;background:#fff}
+.scheda .concept{background:var(--green);color:#eef2f0;padding:14px 20px;
+  display:grid;grid-template-columns:170px 1fr;gap:16px;align-items:baseline}
+.scheda .concept b{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;font-weight:600}
+.scheda .concept span{font-size:16px;line-height:1.45}
+.scheda table th{padding:11px 16px}
+.scheda table td{padding:10px 16px;font-size:14px;line-height:1.4}
+.scheda table td:first-child{width:18%;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--green);padding-top:13px}
+.scheda .stamp{display:flex;justify-content:space-between;gap:20px;padding:9px 16px;
+  font-size:11px;letter-spacing:.08em;color:var(--ink-soft);background:#f7f5f0}
+.check{color:var(--orange);border-bottom:1px dashed var(--orange)}
+
+/* ---------- tipi di slide: dimostrazione e laboratorio ----------
+   Basta aggiungere .demo o .lab alla <section class="slide">: cambiano rail,
+   fondo, kicker e compare il timbro. Il link al file sta nel piè di pagina. */
+.slide.demo{background:#eef2f7}
+.slide.lab{background:#fcf2ea}
+.slide.demo .rail{background:var(--blue)}
+.slide.lab .rail{background:var(--orange)}
+.slide.demo .rail span,.slide.lab .rail span{display:none}
+.slide.demo .rail::before,.slide.lab .rail::before{
+  writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;
+  font-size:14px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:#fff}
+.slide.demo .rail::before{content:"Dimostrazione"}
+.slide.lab .rail::before{content:"Laboratorio"}
+.slide.demo::after,.slide.lab::after{
+  position:absolute;top:18px;right:22px;padding:7px 14px;color:#fff;
+  font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase}
+.slide.demo::after{content:"◉\00a0\00a0Guardate lo schermo";background:var(--blue)}
+.slide.lab::after{content:"✎\00a0\00a0Tocca a voi";background:var(--orange)}
+.slide.demo .kicker{color:var(--blue)}
+.slide.demo .foot,.slide.lab .foot{border-top-color:rgba(0,0,0,.08)}
+.foot a.task{display:inline-flex;align-items:center;gap:10px;margin-left:-12px;
+  padding:6px 12px;color:#fff;text-decoration:none;font-weight:700;letter-spacing:.12em}
+.foot a.task b{font-family:var(--mono);font-weight:400;font-size:12px;letter-spacing:0;
+  text-transform:none;opacity:.95}
+.slide.demo .foot a.task{background:var(--blue)}
+.slide.lab .foot a.task{background:var(--orange)}
+.foot a.task:hover{filter:brightness(1.1)}
+
+/* ---------- print ---------- */
+.slide{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:13.333in 7.5in;margin:0}
+@media print{
+  body{background:#fff;padding:0}
+  .slide{margin:0;border:none;page-break-after:always;box-shadow:none}
+  .slide:last-child{page-break-after:auto}
+}
+
+/* ---------- presentation mode ---------- */
+body.present{padding:0;overflow:hidden;background:#000}
+body.present .slide{
+  display:none;margin:0;border:none;
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(var(--scale,1));
+  transform-origin:center center;
+}
+body.present .slide.active{display:grid}
+.present-hint{
+  position:fixed;bottom:14px;right:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.present-hint.show{opacity:1}
+.present-counter{
+  position:fixed;bottom:14px;left:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  display:none;
+}
+body.present .present-counter{display:block}
+
+/* ---------- controllo dimensione testo ---------- */
+:root{--content-zoom:1}
+.body{zoom:var(--content-zoom)}
+.zoom-ctrl{
+  position:fixed;top:14px;right:18px;z-index:60;
+  display:flex;align-items:center;gap:2px;
+  background:rgba(29,28,26,.88);border-radius:4px;padding:4px;
+  font-family:var(--sans);
+}
+.zoom-ctrl button{
+  width:28px;height:28px;border:none;border-radius:3px;background:transparent;
+  color:#f4f1ea;font-size:14px;font-weight:600;cursor:pointer;line-height:1;
+}
+.zoom-ctrl button:hover{background:rgba(255,255,255,.15)}
+.zoom-ctrl .val{
+  min-width:38px;text-align:center;font-size:11px;letter-spacing:.04em;
+  color:#cfcabf;user-select:none;
+}
+body.present .zoom-ctrl{display:none}
+@media print{.zoom-ctrl{display:none}}
+
+
+/* ---------- due colonne a confronto ---------- */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:stretch}
+.duo .side{border:1px solid var(--line);background:#fff;padding:20px 22px;
+  display:flex;flex-direction:column;gap:12px;min-width:0}
+.duo .side.g{background:var(--green-soft);border-color:#cbd8d3}
+.duo .side .lbl{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.duo .side h3{font-family:var(--serif);font-size:23px;font-weight:600;line-height:1.2}
+.duo .side p,.duo .side li{font-size:14.5px;line-height:1.5;color:var(--ink-soft)}
+
+/* ---------- lezione 8: motore e contenuti ---------- */
+.sep{display:grid;grid-template-columns:1fr 54px 1fr;align-items:stretch}
+.sep .pane{padding:22px 26px;display:flex;flex-direction:column;gap:12px;min-width:0;
+  border:1px solid var(--line)}
+.sep .pane.engine{background:#ebe9e3}
+.sep .pane.mine{background:var(--green-soft);border-color:#cbd8d3}
+.sep .pane .lbl{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.sep .pane h3{font-family:var(--serif);font-size:26px;font-weight:600;line-height:1.15}
+.sep .pane p{font-size:15px;line-height:1.5;color:var(--ink-soft)}
+.sep .pane .names{font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--ink);
+  overflow-wrap:anywhere}
+.sep .pane .rule2{font-size:13px;font-weight:600;color:var(--green);border-top:1px solid
+  rgba(0,0,0,.12);padding-top:10px;margin-top:auto}
+.sep .plus{display:flex;align-items:center;justify-content:center;font-family:var(--serif);
+  font-size:38px;color:var(--orange)}
+
+/* ---------- flusso a tre e a cinque passi ---------- */
+.trail{display:grid;grid-template-columns:1fr 36px 1fr 36px 1fr;align-items:stretch}
+.trail.t5{grid-template-columns:1fr 26px 1fr 26px 1fr 26px 1fr 26px 1fr}
+.trail .step{border:1px solid var(--line);background:#fff;padding:16px 18px;
+  display:flex;flex-direction:column;gap:8px;min-width:0}
+.trail .step .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--green)}
+.trail .step h3{font-family:var(--serif);font-size:21px;font-weight:600;line-height:1.2}
+.trail .step p{font-size:14px;line-height:1.45;color:var(--ink-soft)}
+.trail.t5 .step{padding:14px 14px}
+.trail.t5 .step h3{font-size:18px}
+.trail.t5 .step p{font-size:13px}
+.trail .arrow{display:flex;align-items:center;justify-content:center;
+  color:var(--orange);font-size:22px}
+.trail .step.src-step{background:var(--green-soft);border-color:#cbd8d3}
+.trail .step.o{background:var(--orange-soft);border-color:#ecd4c5}
+.trail .step .who{font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  font-weight:600;color:var(--orange);margin-top:auto}
+
+/* ---------- scheda di progetto ---------- */
+.fm{display:flex;flex-direction:column;gap:9px}
+.fm > div{display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:baseline;
+  border-bottom:1px solid var(--line);padding-bottom:9px}
+.fm b{font-family:var(--serif);font-size:17px;color:var(--green);overflow-wrap:anywhere}
+.fm span{font-size:14px;line-height:1.45;color:var(--ink-soft)}
+.fm.big > div{grid-template-columns:150px 1fr}
+.fm.big b{font-size:19px}
+.fm.big span{font-size:15px}
+</style>
+</head>
+<body>
+<div class="present-counter" id="presentCounter"></div>
+<div class="present-hint" id="presentHint">Premi P per entrare in modalità presentazione · frecce/spazio per avanzare · Esc per uscire</div>
+<div class="zoom-ctrl">
+  <button id="zoomOut" title="Riduci testo" aria-label="Riduci testo">A−</button>
+  <span class="val" id="zoomVal">100%</span>
+  <button id="zoomIn" title="Aumenta testo" aria-label="Aumenta testo">A+</button>
+</div>
+
+<!-- 01 COVER -->
+<section class="slide cover">
+  <div class="rail"><span>Lezione 8 · Come funziona math-rocks</span></div>
+  <div class="body">
+    <div class="kicker">Dalla IA generativa alla IA agentica · Lezione 8</div>
+    <h1>Come funziona<br>math-rocks</h1>
+    <div class="rule"></div>
+    <p class="lede">Una lezione interattiva è un file di testo. Oggi vedete come nasce, che cosa
+      fa il motore e che cosa resta a voi, e come il testo arriva online. Nelle ultime due
+      lezioni costruite e pubblicate la vostra.</p>
+    <div class="meta">
+      <div><b>Destinatari</b>Docenti di scuola superiore</div>
+      <div><b>Serve</b>Carta e penna; il computer solo per guardare</div>
+      <div><b>Durata</b>Un'ora, pausa compresa</div>
+      <div><b>Modulo</b>8 di 10</div>
+    </div>
+  </div>
+  <div class="foot"><span>Corso agenti IA</span><span>01</span></div>
+</section>
+
+<!-- 02 OBIETTIVI E MAPPA -->
+<section class="slide">
+  <div class="rail"><span>Lezione 8 · Come funziona math-rocks</span></div>
+  <div class="body">
+    <div class="kicker">Obiettivi e mappa</div>
+    <h2>Alla fine di quest'ora<span class="sub">Non serve capire come è fatto il motore. Serve
+      sapere che cosa è vostro e che cosa no, e in quali passi un'idea diventa una lezione.</span></h2>
+    <ol class="num" style="margin-bottom:26px">
+      <li><b>Sapete spiegare la separazione fra contenuto e motore</b>
+        E perché è proprio quella che permette di lavorare con un agente.</li>
+      <li><b>Avete una scheda di progetto per una vostra attività interattiva</b>
+        Pronta da dare all'agente nella prossima lezione.</li>
+    </ol>
+    <div class="content cols c4" style="gap:16px">
+      <div class="box">
+        <div class="tag">10 min</div>
+        <h3>Vederla</h3>
+        <p>Una lezione vera, dalla parte dello studente e da quella di chi la scrive</p>
+      </div>
+      <div class="box">
+        <div class="tag">12 min</div>
+        <h3>Contenuto e motore</h3>
+        <p>Che cosa è vostro, che cosa no, e gli ingredienti a disposizione</p>
+      </div>
+      <div class="box">
+        <div class="tag">16 min</div>
+        <h3>Dall'idea al sito</h3>
+        <p>Il metodo di lavoro, gli strumenti, la pubblicazione online</p>
+      </div>
+      <div class="box orange">
+        <div class="tag">22 min</div>
+        <h3>Laboratorio</h3>
+        <p>La scheda di progetto, su carta. Poi che cosa fare a casa</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Obiettivi e mappa</span><span>02</span></div>
+</section>
+
+<!-- 03 DEMO: DUE VISTE -->
+<section class="slide demo">
+  <div class="rail"><span>Lezione 8 · Come funziona math-rocks</span></div>
+  <div class="body">
+    <div class="kicker">Dimostrazione · 10 minuti</div>
+    <h2>La stessa lezione, vista da due parti<span class="sub">Si apre una lezione di
+      math-rocks nel browser e, accanto, il file di testo da cui nasce.</span></h2>
+    <div class="content duo">
+      <div class="side">
+        <div class="lbl">Dalla parte dello studente</div>
+        <h3>Una pagina che risponde</h3>
+        <ul class="clean">
+          <li>Si risponde a una domanda e il sistema dice se è giusta</li>
+          <li>Uno slider cambia un numero nel testo, dal vivo</li>
+          <li>Il passo successivo compare quando quello corrente è finito</li>
+          <li>I progressi restano nel browser: niente account</li>
+        </ul>
+      </div>
+      <div class="side g">
+        <div class="lbl">Dalla parte di chi scrive</div>
+        <h3>Un file di testo con pochi segni</h3>
+        <ul class="clean">
+          <li>Titoli, paragrafi e formule: il Markdown della lezione 2</li>
+          <li>Un segno speciale per ogni elemento interattivo</li>
+          <li>Tre trattini fra un passo e il successivo</li>
+          <li>Nessuna riga di programma</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:16px">
+      <p><b>Da guardare:</b> quando lo studente muove lo slider, che cosa cambia nel file?
+        Niente. Il file dice <em>che cosa</em> mostrare; come lo si fa funzionare lo sa il motore.</p>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../demo/lezione-08-demo-math-rocks.md" target="_blank">Copione della demo <b>lezione-08-demo-math-rocks.md</b></a><span>03</span></div>
+</section>
+
+<!-- 04 LA FILOSOFIA: CONTENUTO E MOTORE -->
+<section class="slide">
+  <div class="rail"><span>Lezione 8 · Come funziona math-rocks</span></div>
+  <div class="body">
+    <div class="kicker">L'idea di fondo</div>
+    <h2>Il motore e le lezioni stanno in posti diversi<span class="sub">È la scelta di progetto da
+      cui discende tutto il resto: si può cambiare una cosa senza toccare l'altra.</span></h2>
+    <div class="content sep">
+      <div class="pane engine">
+        <div class="lbl">Il motore</div>
+        <h3>Trasforma il testo in pagine che funzionano</h3>
+        <p>Legge le lezioni, disegna le pagine, controlla le risposte, tiene i progressi nel
+          browser dello studente.</p>
+        <div class="names">parser/ · routes/ · templates/<br>static/components/ · tests/</div>
+        <div class="rule2">Non si tocca. Non sa niente della vostra materia.</div>
+      </div>
+      <div class="plus">+</div>
+      <div class="pane mine">
+        <div class="lbl">Il vostro sito</div>
+        <h3>Ciò che insegnate, e come si presenta</h3>
+        <p>Il testo delle lezioni, il nome e la lingua del sito, i colori, le animazioni che
+          disegnate voi.</p>
+        <div class="names">content/ · site.yaml<br>static/theme.css · static/sketches/</div>
+        <div class="rule2">È tutto vostro. È l'unica parte su cui si lavora.</div>
+      </div>
+    </div>
+    <div class="box" style="margin-top:16px">
+      <p><b>Come una stampante e i vostri documenti.</b> Voi scrivete, lei impagina. Se cambiate
+        stampante i documenti restano gli stessi, e i documenti non contengono la stampante.</p>
+    </div>
+  </div>
+  <div class="foot"><span>L'idea di fondo</span><span>04</span></div>
+</section>
+
+<!-- 05 PERCHE CONVIENE -->
+<section class="slide">
+  <div class="rail"><span>Lezione 8 · Come funziona math-rocks</span></div>
+  <div class="body">
+    <div class="kicker">Perché conviene</div>
+    <h2>Tre vantaggi pratici, uno in più con un agente</h2>
+    <div class="content cols c3" style="gap:18px">
+      <div class="box">
+        <div class="tag">Aggiornamenti</div>
+        <h3>Il motore migliora, le lezioni restano</h3>
+        <p>Si aggiorna il motore e le vostre lezioni non si toccano: sono in un'altra parte
+          del progetto.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Riuso</div>
+        <h3>Lo stesso motore, materie diverse</h3>
+        <p>math-rocks ha lezioni di matematica. Geode è lo stesso tipo di motore, senza
+          lezioni dentro: ci mettete le vostre, di qualsiasi materia.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Controllo</div>
+        <h3>Le lezioni sono testo</h3>
+        <p>Si leggono, si correggono, si confrontano, si salvano. Come i file delle lezioni
+          da 2 a 7.</p>
+      </div>
+    </div>
+    <div class="box green" style="margin-top:20px">
+      <p><b>Con un agente, la separazione diventa una regola di sicurezza.</b> Il file
+        <code>AGENTS.md</code> di Geode dice all'agente che il suo lavoro sta in
+        <code>content/</code>, in <code>site.yaml</code> e nel tema grafico, e che il motore
+        non si modifica. L'agente lavora in uno spazio piccolo, e quello che fa si controlla.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Perché conviene</span><span>05</span></div>
+</section>
+
+<!-- 06 UN CORSO E UNA CARTELLA -->
+<section class="slide">
+  <div class="rail"><span>Lezione 8 · Come funziona math-rocks</span></div>
+  <div class="body">
+    <div class="kicker">Come sono fatte le lezioni</div>
+    <h2>Un corso è una cartella, una lezione è un file<span class="sub">Dentro il file, un
+      passo è il pezzo di testo fra due righe di tre trattini: un'idea alla volta.</span></h2>
+    <div class="content cols" style="grid-template-columns:1fr 1.25fr;gap:22px;align-items:start">
+      <div>
+        <div class="src"><span class="hd">content/ · i corsi del vostro sito</span>content/
+└── frazioni/
+    ├── metadata.yaml  <span class="dim">titolo e colore del corso</span>
+    ├── content-1.md   <span class="dim">lezione 1</span>
+    └── content-2.md   <span class="dim">lezione 2</span></div>
+        <div class="box green" style="margin-top:14px">
+          <p><b>Corso → lezione → passo.</b> Quando lo studente ha completato gli esercizi di
+            un passo, compare il contenuto che ne dipende e si va avanti.</p>
+        </div>
+      </div>
+      <div class="src"><span class="hd">content-1.md · un passo, con uno slider</span><span class="dim">&gt; id: slider
+&gt; title: Gli slider</span>
+
+<span class="h"># Numeri che si muovono</span>
+
+Trascina: <span class="hl o">${n}{n|5|0,10,1}</span>
+Il valore scelto è **${n}**.
+
+Portalo al massimo e scrivilo qui: <span class="hl o">[[10]]</span>
+
+<span class="k">:::div.reveal</span>
+Bene! Ora il passo successivo.
+<span class="k">:::</span></div>
+    </div>
+  </div>
+  <div class="foot"><span>Come sono fatte le lezioni</span><span>06</span></div>
+</section>
+
+<!-- 07 GLI INGREDIENTI -->
+<section class="slide">
+  <div class="rail"><span>Lezione 8 · Come funziona math-rocks</span></div>
+  <div class="body">
+    <div class="kicker">Gli ingredienti</div>
+    <h2>Sei cose che lo studente può fare<span class="sub">Si progetta una lezione scegliendo,
+      per ogni passo, che cosa deve fare lo studente. Il resto è testo.</span></h2>
+    <div class="content">
+      <table>
+        <tr><th>Ingrediente</th><th>Che cosa fa fare allo studente</th><th>Un'idea</th></tr>
+        <tr><td>Domande</td><td>Sceglie fra più risposte, completa uno spazio, scrive la risposta</td><td>Un test di ingresso su un testo letto</td></tr>
+        <tr><td>Slider e verifiche</td><td>Muove un valore e guarda che cosa cambia; porta lo slider su un valore</td><td>«Che cosa succede se raddoppio?»</td></tr>
+        <tr><td>Contenuto che si rivela</td><td>Dopo aver provato, legge la spiegazione</td><td>Prima si tenta, poi si guarda la regola</td></tr>
+        <tr><td>Classificare</td><td>Trascina espressioni nei gruppi giusti</td><td>Figure retoriche, tipi di fonti, reazioni</td></tr>
+        <tr><td>Formule e grafici</td><td>Legge e usa formule, esplora una curva</td><td>Una funzione con un parametro mobile</td></tr>
+        <tr><td>Animazioni</td><td>Manipola una piccola figura o simulazione scritta ad hoc</td><td>Un fenomeno che si guarda e si ferma</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="foot"><span>Gli ingredienti</span><span>07</span></div>
+</section>
+
+<!-- 08 IL METODO -->
+<section class="slide">
+  <div class="rail"><span>Lezione 8 · Come funziona math-rocks</span></div>
+  <div class="body">
+    <div class="kicker">Il metodo di lavoro</div>
+    <h2>Dall'idea alla lezione, in tre passi<span class="sub">Lo stesso schema delle lezioni
+      precedenti: l'agente fa, voi decidete e controllate.</span></h2>
+    <div class="content trail">
+      <div class="step">
+        <div class="tag">Passo 1</div>
+        <h3>L'idea</h3>
+        <p>Che cosa deve saper fare lo studente, in quali passi, con quale ingrediente per
+          ciascuno. Si scrive su una scheda, prima di aprire l'agente.</p>
+        <div class="who">Tocca a voi</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step src-step">
+        <div class="tag">Passo 2</div>
+        <h3>La bozza</h3>
+        <p>L'agente legge le istruzioni del progetto, sceglie i componenti e scrive i file di
+          testo della lezione.</p>
+        <div class="who">Tocca all'agente</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step o">
+        <div class="tag">Passo 3</div>
+        <h3>Il lavoro sui file</h3>
+        <p>Aprite i file di testo, verificate che cosa dicono, correggete a mano o dialogando
+          con l'agente, guardate l'anteprima.</p>
+        <div class="who">Tocca a voi</div>
+      </div>
+    </div>
+    <div class="box" style="margin-top:20px">
+      <p><b>Non è una catena a senso unico.</b> Dall'anteprima si torna al passo 2 («cambia questa
+        domanda, è troppo facile») o si ritocca direttamente il file. Quello che non si salta
+        mai è il passo 1: senza un'idea chiara, l'agente produce una lezione generica.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Il metodo di lavoro</span><span>08</span></div>
+</section>
+
+<!-- 09 PASSO 1: L'IDEA -->
+<section class="slide">
+  <div class="rail"><span>Lezione 8 · Come funziona math-rocks</span></div>
+  <div class="body">
+    <div class="kicker">Passo 1 · L'idea</div>
+    <h2>Prima l'obiettivo pedagogico, poi la tecnica<span class="sub">La scheda di progetto ha
+      quattro campi. Se non riuscite a riempirne uno, non è ancora il momento dell'agente.</span></h2>
+    <div class="content cols" style="grid-template-columns:1fr 1fr;gap:22px;align-items:start">
+      <div class="fm big">
+        <div><b>Obiettivo</b><span>Che cosa deve saper fare lo studente alla fine, con un verbo osservabile?</span></div>
+        <div><b>Sequenza</b><span>Da tre a cinque passi, una sola idea per passo.</span></div>
+        <div><b>Interazione</b><span>Per ogni passo, quale ingrediente, e perché serve proprio quello.</span></div>
+        <div><b>Criterio</b><span>Come capite, dalle risposte, che ha funzionato?</span></div>
+      </div>
+      <div class="box">
+        <div class="tag">Un esempio · analisi di un testo</div>
+        <p><b>Obiettivo:</b> riconoscere come una scelta di parole cambia il tono di un brano.</p>
+        <p><b>Sequenza:</b> 1 si legge il brano · 2 si sceglie fra tre versioni · 3 si spiega la
+          differenza · 4 si legge il commento.</p>
+        <p><b>Interazione:</b> scelta multipla · risposta aperta · contenuto che si rivela dopo
+          la risposta.</p>
+        <p><b>Criterio:</b> la risposta aperta nomina almeno una parola e il suo effetto.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Passo 1 · L'idea</span><span>09</span></div>
+</section>
+
+<!-- 10 PASSO 2: LA BOZZA -->
+<section class="slide">
+  <div class="rail"><span>Lezione 8 · Come funziona math-rocks</span></div>
+  <div class="body">
+    <div class="kicker">Passo 2 · La bozza</div>
+    <h2>Si dà all'agente la scheda, non l'argomento<span class="sub">Con un argomento
+      («una lezione sul Risorgimento») si ottiene una lezione generica. Con la scheda,
+      l'agente sa che cosa costruire.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.25fr 1fr;gap:22px;align-items:start">
+      <div class="prompt">
+        <div class="lbl">Un messaggio di questo tipo, con la vostra scheda incollata</div>
+        Questa è la mia scheda di progetto: [obiettivo, sequenza, interazioni, criterio].
+        Crea il corso e la prima lezione seguendo le istruzioni del progetto. Per ogni
+        passo dimmi quale elemento interattivo hai scelto e perché. Se qualcosa non è chiaro,
+        chiedimelo prima di scrivere.
+      </div>
+      <div class="box green">
+        <div class="tag">Che cosa fa l'agente</div>
+        <ul class="clean">
+          <li>Legge <code>AGENTS.md</code> e le procedure di Geode</li>
+          <li>Segue le skill per creare un corso e una bozza di lezione</li>
+          <li>Scrive i file <code>content-N.md</code> in <code>content/</code></li>
+          <li>Non tocca il motore</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:16px">
+      <p><b>Lo ritrovate: è il metodo della lezione 7.</b> Un'idea precisa in ingresso, la richiesta
+        di dichiarare le scelte, la domanda prima di scrivere. Nella lezione 9 lo fate davvero.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Passo 2 · La bozza</span><span>10</span></div>
+</section>
+
+<!-- 11 PASSO 3: IL LAVORO A MANO -->
+<section class="slide">
+  <div class="rail"><span>Lezione 8 · Come funziona math-rocks</span></div>
+  <div class="body">
+    <div class="kicker">Passo 3 · Il lavoro sui file</div>
+    <h2>La bozza è un punto di partenza: il file è vostro<span class="sub">L'agente scrive
+      bene e in fretta. Che cosa è vero, che cosa è giusto, che cosa è adatto ai vostri
+      studenti lo decidete voi.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.1fr 1fr;gap:22px;align-items:start">
+      <div class="src"><span class="hd">content-1.md · una domanda, come l'ha scritta l'agente</span><span class="h">## Domanda 2</span>
+
+Il campo viene diviso tra 4 eredi: ognuno possiede 1/4 del
+terreno. È sempre vero?
+
+<span class="hl">[[<b>*</b>Falso, solo se le 4 parti hanno la stessa area|Vero, sono 4 parti]]</span>
+
+<span class="dim">L'asterisco segna la risposta giusta. Se è sul
+posto sbagliato, lo studente impara il contrario.</span></div>
+      <div class="cols" style="gap:10px">
+        <div class="box">
+          <div class="tag">Da controllare a mano</div>
+          <ul class="clean">
+            <li>La risposta segnata come giusta lo è davvero?</li>
+            <li>Le risposte sbagliate sono plausibili, non assurde?</li>
+            <li>Il testo dice solo cose vere, senza esempi inventati?</li>
+            <li>La difficoltà e il tono vanno bene per quella classe?</li>
+          </ul>
+        </div>
+        <div class="box green">
+          <p><b>A mano o con l'agente?</b> Una parola, un numero, una risposta: a mano. Una
+            struttura da rifare: all'agente. Poi si guarda l'anteprima.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Passo 3 · Il lavoro sui file</span><span>11</span></div>
+</section>
+
+<!-- 12 LA SKILL VALUTA-LEZIONE -->
+<section class="slide">
+  <div class="rail"><span>Lezione 8 · Come funziona math-rocks</span></div>
+  <div class="body">
+    <div class="kicker">Un aiuto per il controllo · la skill valuta-lezione</div>
+    <h2>Una skill che legge la lezione e la valuta con una griglia<span class="sub">È un esempio mio, nel
+      repository di math-rocks. Una rubrica con criteri osservabili, come quelle della
+      lezione 7, applicata a un file di testo.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.5fr 1fr;gap:22px;align-items:start">
+      <table>
+        <tr><th>Che cosa guarda</th><th>Come lo misura</th></tr>
+        <tr><td>1 · Numero di passi</td><td>Da 6 a 8 è l'ideale; meno di 4 o più di 8 fa perdere punti</td></tr>
+        <tr><td>2 · Lunghezza dei passi</td><td>Quanti passi stanno fra 10 e 45 righe</td></tr>
+        <tr><td>3 · Un concetto alla volta</td><td>Quanti passi ne introducono più di uno, o senza ponte con i precedenti</td></tr>
+        <tr><td>4 · Suggerimenti</td><td>Ci sono, sono specifici, stanno prima delle risposte difficili</td></tr>
+        <tr><td>5 · Interattività</td><td>Quanti passi sono solo da leggere; bonus per le animazioni</td></tr>
+        <tr><td>6 · Prerequisiti</td><td>Nei primi due passi c'è una domanda su ciò che lo studente sa già</td></tr>
+      </table>
+      <div class="cols" style="gap:12px">
+        <div class="prompt plain">
+          <div class="lbl">Che cosa restituisce</div>
+          Un punteggio in decimi, una riga per criterio con il motivo, e un suggerimento
+          concreto, riferito al passo, solo dove il punteggio non è pieno.
+        </div>
+        <div class="box orange">
+          <p><b>Misura la forma, non la verità.</b> Conta passi e domande; non sa se la
+            risposta segnata come giusta lo è. Quel controllo resta a voi.</p>
+        </div>
+        <div class="box green">
+          <p><b>Non ve la do: è tarata sulle mie preferenze.</b> Ne potete fare una simile, con i vostri criteri: lo stesso metodo della lezione 7, si fa fare, si corregge, si distilla.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Un aiuto per il controllo</span><span>12</span></div>
+</section>
+
+<!-- 13 GLI STRUMENTI -->
+<section class="slide">
+  <div class="rail"><span>Lezione 8 · Come funziona math-rocks</span></div>
+  <div class="body">
+    <div class="kicker">Gli strumenti, in breve</div>
+    <h2>Tre nomi da sapere, e a che cosa servono<span class="sub">Non vanno imparati a fondo:
+      l'agente li usa per voi. Serve capire che cosa stanno facendo.</span></h2>
+    <div class="content cols c3" style="gap:18px">
+      <div class="box">
+        <div class="tag">Python</div>
+        <h3>Fa girare il motore</h3>
+        <p>È il linguaggio in cui è scritto il motore. Si installa una volta; poi l'agente
+          prepara l'ambiente e avvia l'anteprima sul vostro computer.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Git</div>
+        <h3>Le fotografie del lavoro</h3>
+        <p>Sta sul vostro computer. Ogni «salvataggio» è una fotografia a cui si può
+          tornare: è la rete di sicurezza della lezione 3.</p>
+      </div>
+      <div class="box">
+        <div class="tag">GitHub</div>
+        <h3>La copia online</h3>
+        <p>È un sito che ospita il progetto. Serve per pubblicare, e per non perdere il lavoro
+          se il computer si rompe.</p>
+      </div>
+    </div>
+    <div class="cols c2" style="margin-top:20px;gap:18px">
+      <div class="box orange">
+        <p><b>Git e GitHub non sono la stessa cosa.</b> Il primo è un programma sul computer,
+          il secondo è un sito. Il primo si può usare senza il secondo.</p>
+      </div>
+      <div class="box green">
+        <p><b>Vi servono due gesti.</b> «Salva il lavoro» e «metti il sito online». Le skill
+          di Geode, <code>salva</code> e <code>pubblica</code>, fanno il resto, in italiano,
+          senza gergo.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Gli strumenti, in breve</span><span>13</span></div>
+</section>
+
+<!-- 14 LA PUBBLICAZIONE -->
+<section class="slide">
+  <div class="rail"><span>Lezione 8 · Come funziona math-rocks</span></div>
+  <div class="body">
+    <div class="kicker">La pubblicazione online</div>
+    <h2>Dal file di testo a un indirizzo web<span class="sub">Una volta impostato, si pubblica
+      con un gesto. Il lavoro pesante lo fa GitHub, da solo.</span></h2>
+    <div class="content trail t5">
+      <div class="step">
+        <div class="tag">1 · Sul computer</div>
+        <h3>La cartella</h3>
+        <p>Le lezioni in <code>content/</code>, scritte e controllate.</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="tag">2 · Git</div>
+        <h3>Si salva</h3>
+        <p>Una fotografia del progetto, con una frase che dice che cosa è cambiato.</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="tag">3 · GitHub</div>
+        <h3>Si invia</h3>
+        <p>La copia del computer viene caricata sul repository online.</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step src-step">
+        <div class="tag">4 · Automatico</div>
+        <h3>Si costruisce</h3>
+        <p>GitHub trasforma il testo in pagine web. Voi non fate niente.</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step o">
+        <div class="tag">5 · GitHub Pages</div>
+        <h3>Il sito</h3>
+        <p>Un indirizzo pubblico, del tipo <code>utente.github.io/nome</code>.</p>
+      </div>
+    </div>
+    <div class="content cols c3" style="margin-top:20px;gap:16px">
+      <div class="box">
+        <p><b>Aggiornare è lo stesso giro.</b> Si cambia una lezione, si salva, si invia: il sito
+          si ricostruisce da solo.</p>
+      </div>
+      <div class="box orange">
+        <p><b>Il sito è pubblico.</b> Chiunque abbia il link può aprirlo, e GitHub Pages gratuito
+          non ha siti privati. Pubblicare è sempre una scelta, mai un obbligo.</p>
+      </div>
+      <div class="box green">
+        <p><b>Gli studenti non hanno account.</b> I progressi restano nel loro browser e non
+          arrivano a voi né a nessun altro.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>La pubblicazione online</span><span>14</span></div>
+</section>
+
+<!-- 15 LABORATORIO -->
+<section class="slide lab">
+  <div class="rail"><span>Lezione 8 · Come funziona math-rocks</span></div>
+  <div class="body">
+    <div class="kicker">Laboratorio · 20 minuti · su carta, da soli</div>
+    <h2>La scheda di progetto di una vostra attività<span class="sub">Una cosa che spiegate
+      davvero nelle prossime settimane, e che con un'interazione guadagnerebbe qualcosa.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.1fr 1fr;gap:22px;align-items:start">
+      <div class="fm big">
+        <div><b>Obiettivo</b><span>Un verbo osservabile: «distinguere», «calcolare», «confrontare»…</span></div>
+        <div><b>Sequenza</b><span>Da tre a cinque passi, una sola idea per passo.</span></div>
+        <div><b>Interazione</b><span>Un ingrediente per passo, scelto fra i sei visti. Perché quello?</span></div>
+        <div><b>Criterio</b><span>Che risposta mi dice che ha funzionato?</span></div>
+      </div>
+      <div class="cols steps" style="gap:8px">
+        <div class="box">
+          <span class="badge">3 min</span>
+          <p>Scegliete l'argomento. Una classe e un momento dell'anno precisi.</p>
+        </div>
+        <div class="box">
+          <span class="badge">9 min</span>
+          <p>Compilate i quattro campi. Se uno resta vuoto, annotate perché.</p>
+        </div>
+        <div class="box">
+          <span class="badge">6 min</span>
+          <p>Scambiate la scheda con un vicino, che prova a fare lo studente. Dove si
+            blocca?</p>
+        </div>
+        <div class="box orange">
+          <span class="badge o">2 min</span>
+          <p>Correggete la scheda. Fotografatela: serve nella lezione 9.</p>
+        </div>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:14px">
+      <p><b>Nessun computer.</b> Se vi viene da aprire l'agente, fermatevi: il punto di oggi è
+        l'idea. Nessun dato di studenti, nemmeno nell'esempio.</p>
+    </div>
+  </div>
+  <div class="foot"><a class="task" href="../consegne/lezione-08-lab-scheda-progetto.md" target="_blank">Consegna su Classroom <b>lezione-08-lab-scheda-progetto.md</b></a><span>15</span></div>
+</section>
+
+<!-- 16 A CASA -->
+<section class="slide">
+  <div class="rail"><span>Lezione 8 · Come funziona math-rocks</span></div>
+  <div class="body">
+    <div class="kicker">Prima della prossima lezione</div>
+    <h2>Preparate il computer, a casa<span class="sub">Due installazioni, una volta sola, e un
+      controllo. Se non riesce, venite lo stesso: ci si aiuta all'inizio dell'ora.</span></h2>
+    <div class="content cols c3" style="gap:18px">
+      <div class="box">
+        <div class="tag">1 · Python 3.12</div>
+        <h3>Da python.org</h3>
+        <p>Su Windows, nella prima schermata dell'installazione, spuntate <b>Add python.exe to
+          PATH</b>. Sul Mac si usa il pacchetto «universal2».</p>
+      </div>
+      <div class="box">
+        <div class="tag">2 · Git</div>
+        <h3>Dal sito ufficiale</h3>
+        <p>Su Windows, «Git for Windows» con le opzioni proposte. Sul Mac, gli strumenti da
+          riga di comando di Apple.</p>
+      </div>
+      <div class="box">
+        <div class="tag">3 · Il controllo</div>
+        <h3>Due risposte</h3>
+        <p>In un terminale nuovo, <code>python --version</code> e <code>git --version</code>
+          devono rispondere con un numero di versione.</p>
+      </div>
+    </div>
+    <div class="cols c2" style="margin-top:20px;gap:18px">
+      <div class="box orange">
+        <p><b>Non serve ancora un account GitHub.</b> Servirà solo nell'ultima lezione, se
+          deciderete di pubblicare.</p>
+      </div>
+      <div class="box green">
+        <p><b>Servono anche l'agente e la scheda.</b> L'applicazione scelta nella lezione 2 e
+          la scheda di progetto di oggi.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Guida passo passo in consegna: lezione-08-prerequisiti.md</span><span>16</span></div>
+</section>
+
+<!-- 17 CHIUSURA -->
+<section class="slide">
+  <div class="rail"><span>Lezione 8 · Come funziona math-rocks</span></div>
+  <div class="body">
+    <div class="kicker">Chiusura</div>
+    <h2>Quattro cose da portare a casa</h2>
+    <div class="content">
+      <ol class="num">
+        <li><b>Il motore non si tocca, le lezioni sono vostre.</b>
+          Contenuto e motore stanno in posti diversi: è questo che rende il lavoro sicuro e
+          controllabile.</li>
+        <li><b>Una lezione è un file di testo con pochi segni.</b>
+          Si legge, si corregge, si salva. Se sapete usare il Markdown, la sapete già scrivere.</li>
+        <li><b>L'idea viene prima della bozza.</b>
+          L'agente scrive; l'obiettivo, la sequenza e il criterio di riuscita sono vostri.</li>
+        <li><b>Pubblicare è un gesto, e una scelta.</b>
+          Salvare e inviare; GitHub costruisce e mette online. Il sito è pubblico, quindi si
+          controlla prima.</li>
+      </ol>
+      <div class="box orange" style="margin-top:24px">
+        <p><b>Prossima lezione: la vostra copia di Geode.</b> Partite da una cartella vuota,
+          fate preparare il progetto all'agente e arrivate a una prima lezione in anteprima,
+          con la scheda di oggi.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Chiusura</span><span>17</span></div>
+</section>
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var body = document.body;
+  var counter = document.getElementById('presentCounter');
+  var hint = document.getElementById('presentHint');
+  var idx = 0;
+  var presenting = false;
+
+  function fitScale(){
+    var s = Math.min(window.innerWidth/1280, window.innerHeight/720);
+    document.documentElement.style.setProperty('--scale', s);
+  }
+
+  function render(){
+    slides.forEach(function(s,i){ s.classList.toggle('active', i===idx); });
+    counter.textContent = (idx+1) + ' / ' + slides.length;
+  }
+
+  function enter(){
+    presenting = true;
+    body.classList.add('present');
+    fitScale();
+    render();
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(function(){});
+    }
+  }
+
+  function exit(){
+    presenting = false;
+    body.classList.remove('present');
+    if (document.fullscreenElement) document.exitFullscreen().catch(function(){});
+  }
+
+  function next(){ if (idx < slides.length-1){ idx++; render(); } }
+  function prev(){ if (idx > 0){ idx--; render(); } }
+
+  document.addEventListener('keydown', function(e){
+    if (!presenting){
+      if (e.key === 'p' || e.key === 'P') enter();
+      return;
+    }
+    switch(e.key){
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown':
+        e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+        e.preventDefault(); prev(); break;
+      case 'Home':
+        e.preventDefault(); idx = 0; render(); break;
+      case 'End':
+        e.preventDefault(); idx = slides.length-1; render(); break;
+      case 'Escape':
+        exit(); break;
+    }
+  });
+
+  document.addEventListener('click', function(e){
+    if (!presenting) return;
+    if (e.target.closest('a')) return;
+    if (e.clientX > window.innerWidth/2) next(); else prev();
+  });
+
+  document.addEventListener('fullscreenchange', function(){
+    if (!document.fullscreenElement && presenting) exit();
+  });
+
+  window.addEventListener('resize', fitScale);
+
+  hint.classList.add('show');
+  setTimeout(function(){ hint.classList.remove('show'); }, 4000);
+
+  // ---- controllo dimensione testo ----
+  var ZOOM_MIN = 0.8, ZOOM_MAX = 1.4, ZOOM_STEP = 0.1;
+  var zoomVal = document.getElementById('zoomVal');
+  var zoomIn = document.getElementById('zoomIn');
+  var zoomOut = document.getElementById('zoomOut');
+  var zoom = 1;
+  try { zoom = parseFloat(localStorage.getItem('slideZoom')) || 1; } catch(e){}
+
+  function applyZoom(){
+    zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom));
+    document.documentElement.style.setProperty('--content-zoom', zoom);
+    zoomVal.textContent = Math.round(zoom * 100) + '%';
+    try { localStorage.setItem('slideZoom', zoom); } catch(e){}
+  }
+
+  zoomIn.addEventListener('click', function(){ zoom += ZOOM_STEP; applyZoom(); });
+  zoomOut.addEventListener('click', function(){ zoom -= ZOOM_STEP; applyZoom(); });
+
+  document.addEventListener('keydown', function(e){
+    if (presenting) return;
+    if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '=')){
+      e.preventDefault(); zoom += ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '-'){
+      e.preventDefault(); zoom -= ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '0'){
+      e.preventDefault(); zoom = 1; applyZoom();
+    }
+  });
+
+  applyZoom();
+})();
+</script>
+
+</body>
+</html>

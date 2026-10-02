@@ -11,7 +11,7 @@ e Antigravity, tenendo conto di chi parte dai piani gratuiti.
 
 **I materiali si consultano online: <https://mporfido.github.io/corso-formazione-agenti/>**
 
-> **Lavoro in corso.** Le slide coprono per ora le lezioni 1-7; le lezioni 8-10 sono in preparazione.
+> **Lavoro in corso.** Le slide coprono per ora le lezioni 1-8; le lezioni 9-10 sono in preparazione.
 
 ## Programma
 

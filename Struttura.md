@@ -58,7 +58,7 @@ aperte.
 | 5 | Knowledge base: file, wiki e RAG | Navigare una LLM wiki · l'agente monta la wiki dal testo di Karpathy | bozza: `slides/lezione-05.html` |
 | 6 | Usare e comprendere le skill | Skill `teach` · adattare una skill | bozza: `slides/lezione-06.html` |
 | 7 | Creare skill fondate sulla pedagogia | Griglia a 4 indicatori · skill verifica/rubrica | bozza: `slides/lezione-07.html` |
-| 8 | Come funziona math-rocks | Demo: lezione e Markdown affiancati · scheda di progetto · prerequisiti a casa | da fare |
+| 8 | Come funziona math-rocks | Demo: lezione e Markdown affiancati · scheda di progetto · prerequisiti a casa | bozza: `slides/lezione-08.html` |
 | 9 | Creare la propria istanza di Geode | Messaggio di avvio · onboarding `inizia` · prima lezione in anteprima | da fare |
 | 10 | Personalizzare e pubblicare | Checklist · GitHub Pages (facoltativa) | da fare |
 
@@ -410,14 +410,14 @@ did:scaffolding, did:obiettivo-di-apprendimento.
   (vedi la scaletta, «Esempi interdisciplinari»).
 
 **Demo:** aprire una lezione di math-rocks e il suo file Markdown; poi il corso `esempi` di
-Geode, costrutto per costrutto. Copione da scrivere in `demo/lezione-08-demo-math-rocks.md`.
+Geode, costrutto per costrutto. Copione in `demo/lezione-08-demo-math-rocks.md`.
 
 **Laboratorio:** scheda di progetto su carta — obiettivo, sequenza di passi, interazione
-scelta, criterio di riuscita — prima di aprire l'agente. Consegna da scrivere:
+scelta, criterio di riuscita — prima di aprire l'agente. Consegna:
 `consegne/lezione-08-lab-scheda-progetto.md`.
 
 **Prerequisiti, da far installare a casa prima della lezione:** Python 3.12, Git, e
-l'assistente scelto (Codex, Antigravity o Claude Desktop). Consegna da scrivere:
+l'assistente scelto (Codex, Antigravity o Claude Desktop). Consegna:
 `consegne/lezione-08-prerequisiti.md`, con la guida per Windows e per Mac e due comandi di
 verifica (`python --version`, `git --version`). Fonte: `docs/SETUP.md` di Geode.
 - Windows: Python da python.org con la spunta **Add python.exe to PATH**; Git for Windows con
@@ -430,8 +430,8 @@ verifica (`python --version`, `git --version`). Fonte: `docs/SETUP.md` di Geode.
 - GitHub Desktop **non** sostituisce Git: lo porta con sé ma non lo mette nel PATH, e non
   include `gh`; l'agente da terminale non lo vedrebbe.
 
-**Materiali da preparare:** scheda di progetto; un esempio per ciascuna area disciplinare; la
-consegna dei prerequisiti.
+**Deck:** `slides/lezione-08.html`, 17 slide. La scheda di progetto e la consegna dei prerequisiti sono scritte.
+**Da preparare:** un esempio di scheda per ciascuna area disciplinare; prova del copione della demo con la copia locale di math-rocks.
 
 ## Lezione 9 — Creare la propria istanza di Geode
 

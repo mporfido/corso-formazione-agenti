@@ -32,7 +32,8 @@ rimandano dal piè di pagina:
 | 4 | La scelta silenziosa · Il vuoto riempito · Trenta secondi · Il profilo disciplinare · La regola che manca (facoltativa) |
 | 5 | Navigare una wiki vera · La wiki costruita da una descrizione |
 | 7 | Con i dati strutturati |
-| 6, 8-10 | da scrivere |
+| 8 | La scheda di progetto, su carta |
+| 6, 9-10 | da scrivere |
 
 ---
 
@@ -799,7 +800,7 @@ nuova, e confrontare le due uscite: le differenze sono le correzioni.
 
 ## Lezione 8 — Come funziona math-rocks
 
-*Da scrivere: copione della demo, consegna della scheda di progetto, consegna dei prerequisiti.*
+Demo: `demo/lezione-08-demo-math-rocks.md`. Consegne: `consegne/lezione-08-lab-scheda-progetto.md` e `consegne/lezione-08-prerequisiti.md`. Deck: `slides/lezione-08.html`, 17 slide.
 
 Prima della lezione:
 
