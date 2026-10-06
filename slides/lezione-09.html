@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Lezione 9 — Creare la propria istanza di Geode</title>
+<style>
+:root{
+  --paper:#f2efe9;
+  --card:#fbfaf7;
+  --ink:#1d1c1a;
+  --ink-soft:#5c5850;
+  --line:#ddd7cc;
+  --green:#1a3c3a;
+  --green-soft:#e6ece9;
+  --orange:#c0562f;
+  --orange-soft:#f6e7de;
+  --blue:#2f5a8c;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);font-family:var(--sans);color:var(--ink);
+  -webkit-font-smoothing:antialiased;padding:28px 0}
+
+/* ---------- slide frame ---------- */
+.slide{
+  position:relative;width:1280px;height:720px;margin:0 auto 28px;
+  background:var(--card);border:1px solid var(--line);
+  display:grid;grid-template-columns:56px 1fr;overflow:hidden;
+}
+.rail{
+  background:var(--green);color:#f4f1ea;
+  display:flex;align-items:center;justify-content:center;
+}
+.rail span{
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  white-space:nowrap;opacity:.9;
+}
+.body{padding:52px 60px 64px;display:flex;flex-direction:column;min-width:0}
+.kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--orange);font-weight:600;margin-bottom:14px}
+h1{font-family:var(--serif);font-size:56px;line-height:1.08;font-weight:600;
+  letter-spacing:-.01em}
+h2{font-family:var(--serif);font-size:40px;line-height:1.12;font-weight:600;
+  letter-spacing:-.01em;margin-bottom:26px}
+h2 .sub{display:block;font-family:var(--sans);font-size:15px;font-weight:400;
+  color:var(--ink-soft);letter-spacing:0;margin-top:10px;line-height:1.45}
+p{font-size:17px;line-height:1.55;color:var(--ink)}
+.muted{color:var(--ink-soft)}
+.foot{position:absolute;left:56px;right:0;bottom:0;height:40px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 60px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-soft);border-top:1px solid var(--line)}
+.content{flex:0 1 auto;min-height:0}
+code{font-family:var(--mono);font-size:.9em;background:var(--green-soft);padding:1px 5px}
+
+/* ---------- cover ---------- */
+.cover .body{justify-content:center}
+.cover h1{font-size:72px;max-width:980px}
+.cover .lede{margin-top:26px;font-size:19px;color:var(--ink-soft);max-width:700px}
+.rule{width:72px;height:3px;background:var(--orange);margin:32px 0 0}
+.meta{margin-top:38px;display:flex;gap:44px;font-size:13px;color:var(--ink-soft)}
+.meta b{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--green);margin-bottom:6px}
+
+/* ---------- generic layout helpers ---------- */
+.cols{display:grid;gap:22px}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c4{grid-template-columns:repeat(4,1fr)}
+.box{border:1px solid var(--line);background:#fff;padding:22px 24px;
+  display:flex;flex-direction:column;gap:10px;min-width:0}
+.box h3{font-family:var(--serif);font-size:22px;font-weight:600;line-height:1.2}
+.box .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.box p,.box li{font-size:15px;line-height:1.5;color:var(--ink-soft)}
+.box.green{background:var(--green-soft);border-color:#cbd8d3}
+.box.orange{background:var(--orange-soft);border-color:#ecd4c5}
+ul.clean{list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.clean li{position:relative;padding-left:18px;font-size:16px;line-height:1.5}
+ul.clean li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;
+  background:var(--orange)}
+.box ul.clean li{font-size:15px}
+ol.num{list-style:none;counter-reset:n;display:flex;flex-direction:column;gap:16px}
+ol.num li{counter-increment:n;position:relative;padding-left:46px;font-size:17px;
+  line-height:1.5}
+ol.num li::before{content:counter(n,decimal-leading-zero);position:absolute;left:0;top:1px;
+  font-size:13px;font-weight:600;color:var(--green);letter-spacing:.06em}
+ol.num li b{display:block;font-family:var(--serif);font-size:20px;font-weight:600;
+  margin-bottom:4px;color:var(--ink)}
+
+/* ---------- tabella ---------- */
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:12px 16px;font-size:15px;line-height:1.45;
+  border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);
+  font-weight:600;border-bottom:2px solid var(--green)}
+td:first-child{font-weight:600;width:30%}
+td.o{color:var(--orange)}
+td.g{color:var(--green)}
+td.n{font-family:var(--serif);font-size:24px;font-weight:600;white-space:nowrap}
+
+/* ---------- prompt / badge ---------- */
+.prompt{background:var(--green);color:#eef2f0;padding:20px 24px;font-family:var(--sans);
+  font-size:15px;line-height:1.6}
+.prompt .lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;margin-bottom:8px}
+.prompt.plain{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.prompt.plain .lbl{color:var(--orange)}
+.badge{display:inline-block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  background:var(--green);color:#fff;padding:4px 9px;align-self:flex-start}
+.badge.o{background:var(--orange)}
+
+/* ---------- barra contesto ---------- */
+.gauge{height:30px;background:#fff;border:1px solid var(--line);display:flex;
+  overflow:hidden}
+.gauge i{display:block;height:100%}
+.g-legend{display:flex;gap:22px;font-size:13px;color:var(--ink-soft);margin-top:10px;
+  flex-wrap:wrap}
+.g-legend span{display:flex;align-items:center;gap:7px}
+.g-legend b{width:10px;height:10px;display:inline-block}
+
+/* ---------- sorgente Markdown ---------- */
+.src{background:#1f2624;color:#dfe6e3;font-family:var(--mono);font-size:13.5px;
+  line-height:1.65;padding:18px 22px;white-space:pre-wrap;overflow-wrap:anywhere}
+.src .h{color:#f1b28f}
+.src .k{color:#9fd3c2}
+.src .dim{color:#7f8c87}
+.src .hl{background:#3b4f3c;color:#fff;display:block;margin:0 -22px;padding:0 22px;
+  border-left:4px solid #f1b28f}
+.src .hl.o{background:#4d3a30}
+.src .hd{display:block;margin:-18px -22px 12px;padding:8px 22px;background:#161c1a;
+  font-family:var(--sans);font-size:12px;letter-spacing:.04em;color:#9fbdb4}
+
+/* ---------- la mappa e i file di dettaglio ---------- */
+.files{display:flex;flex-direction:column;gap:12px}
+.file{border:1px solid var(--line);background:#fff;padding:14px 18px;
+  display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline}
+.file .ic{grid-row:1/3;font-family:var(--mono);font-size:12px;color:#fff;
+  background:var(--green);padding:3px 7px;align-self:start;margin-top:2px}
+.file b{font-family:var(--mono);font-size:14px;font-weight:600;overflow-wrap:anywhere}
+.file span{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+.steps .box{padding:14px 20px;gap:8px}
+.file:not(.main){margin-left:34px;position:relative}
+.file:not(.main)::before{content:"";position:absolute;left:-22px;top:-13px;width:16px;
+  height:calc(50% + 13px);border-left:2px solid #cbd8d3;border-bottom:2px solid #cbd8d3}
+.file.main{background:var(--green-soft);border-color:#cbd8d3}
+.file.main .ic{background:var(--orange)}
+
+/* ---------- scheda piattaforma ---------- */
+.scheda{border:1px solid #cbd8d3;background:#fff}
+.scheda .concept{background:var(--green);color:#eef2f0;padding:14px 20px;
+  display:grid;grid-template-columns:170px 1fr;gap:16px;align-items:baseline}
+.scheda .concept b{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;font-weight:600}
+.scheda .concept span{font-size:16px;line-height:1.45}
+.scheda table th{padding:11px 16px}
+.scheda table td{padding:10px 16px;font-size:14px;line-height:1.4}
+.scheda table td:first-child{width:18%;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--green);padding-top:13px}
+.scheda .stamp{display:flex;justify-content:space-between;gap:20px;padding:9px 16px;
+  font-size:11px;letter-spacing:.08em;color:var(--ink-soft);background:#f7f5f0}
+.check{color:var(--orange);border-bottom:1px dashed var(--orange)}
+
+/* ---------- tipi di slide: dimostrazione e laboratorio ----------
+   Basta aggiungere .demo o .lab alla <section class="slide">: cambiano rail,
+   fondo, kicker e compare il timbro. Il link al file sta nel piè di pagina. */
+.slide.demo{background:#eef2f7}
+.slide.lab{background:#fcf2ea}
+.slide.demo .rail{background:var(--blue)}
+.slide.lab .rail{background:var(--orange)}
+.slide.demo .rail span,.slide.lab .rail span{display:none}
+.slide.demo .rail::before,.slide.lab .rail::before{
+  writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;
+  font-size:14px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:#fff}
+.slide.demo .rail::before{content:"Dimostrazione"}
+.slide.lab .rail::before{content:"Laboratorio"}
+.slide.demo::after,.slide.lab::after{
+  position:absolute;top:18px;right:22px;padding:7px 14px;color:#fff;
+  font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase}
+.slide.demo::after{content:"◉\00a0\00a0Guardate lo schermo";background:var(--blue)}
+.slide.lab::after{content:"✎\00a0\00a0Tocca a voi";background:var(--orange)}
+.slide.demo .kicker{color:var(--blue)}
+.slide.demo .foot,.slide.lab .foot{border-top-color:rgba(0,0,0,.08)}
+.foot a.task{display:inline-flex;align-items:center;gap:10px;margin-left:-12px;
+  padding:6px 12px;color:#fff;text-decoration:none;font-weight:700;letter-spacing:.12em}
+.foot a.task b{font-family:var(--mono);font-weight:400;font-size:12px;letter-spacing:0;
+  text-transform:none;opacity:.95}
+.slide.demo .foot a.task{background:var(--blue)}
+.slide.lab .foot a.task{background:var(--orange)}
+.foot a.task:hover{filter:brightness(1.1)}
+
+/* ---------- print ---------- */
+.slide{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:13.333in 7.5in;margin:0}
+@media print{
+  body{background:#fff;padding:0}
+  .slide{margin:0;border:none;page-break-after:always;box-shadow:none}
+  .slide:last-child{page-break-after:auto}
+}
+
+/* ---------- presentation mode ---------- */
+body.present{padding:0;overflow:hidden;background:#000}
+body.present .slide{
+  display:none;margin:0;border:none;
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(var(--scale,1));
+  transform-origin:center center;
+}
+body.present .slide.active{display:grid}
+.present-hint{
+  position:fixed;bottom:14px;right:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.present-hint.show{opacity:1}
+.present-counter{
+  position:fixed;bottom:14px;left:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  display:none;
+}
+body.present .present-counter{display:block}
+
+/* ---------- controllo dimensione testo ---------- */
+:root{--content-zoom:1}
+.body{zoom:var(--content-zoom)}
+.zoom-ctrl{
+  position:fixed;top:14px;right:18px;z-index:60;
+  display:flex;align-items:center;gap:2px;
+  background:rgba(29,28,26,.88);border-radius:4px;padding:4px;
+  font-family:var(--sans);
+}
+.zoom-ctrl button{
+  width:28px;height:28px;border:none;border-radius:3px;background:transparent;
+  color:#f4f1ea;font-size:14px;font-weight:600;cursor:pointer;line-height:1;
+}
+.zoom-ctrl button:hover{background:rgba(255,255,255,.15)}
+.zoom-ctrl .val{
+  min-width:38px;text-align:center;font-size:11px;letter-spacing:.04em;
+  color:#cfcabf;user-select:none;
+}
+body.present .zoom-ctrl{display:none}
+@media print{.zoom-ctrl{display:none}}
+
+
+/* ---------- due colonne a confronto ---------- */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:stretch}
+.duo .side{border:1px solid var(--line);background:#fff;padding:20px 22px;
+  display:flex;flex-direction:column;gap:12px;min-width:0}
+.duo .side.g{background:var(--green-soft);border-color:#cbd8d3}
+.duo .side .lbl{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.duo .side h3{font-family:var(--serif);font-size:23px;font-weight:600;line-height:1.2}
+.duo .side p,.duo .side li{font-size:14.5px;line-height:1.5;color:var(--ink-soft)}
+
+/* ---------- lezione 8: motore e contenuti ---------- */
+.sep{display:grid;grid-template-columns:1fr 54px 1fr;align-items:stretch}
+.sep .pane{padding:22px 26px;display:flex;flex-direction:column;gap:12px;min-width:0;
+  border:1px solid var(--line)}
+.sep .pane.engine{background:#ebe9e3}
+.sep .pane.mine{background:var(--green-soft);border-color:#cbd8d3}
+.sep .pane .lbl{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.sep .pane h3{font-family:var(--serif);font-size:26px;font-weight:600;line-height:1.15}
+.sep .pane p{font-size:15px;line-height:1.5;color:var(--ink-soft)}
+.sep .pane .names{font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--ink);
+  overflow-wrap:anywhere}
+.sep .pane .rule2{font-size:13px;font-weight:600;color:var(--green);border-top:1px solid
+  rgba(0,0,0,.12);padding-top:10px;margin-top:auto}
+.sep .plus{display:flex;align-items:center;justify-content:center;font-family:var(--serif);
+  font-size:38px;color:var(--orange)}
+
+/* ---------- flusso a tre e a cinque passi ---------- */
+.trail{display:grid;grid-template-columns:1fr 36px 1fr 36px 1fr;align-items:stretch}
+.trail.t5{grid-template-columns:1fr 26px 1fr 26px 1fr 26px 1fr 26px 1fr}
+.trail .step{border:1px solid var(--line);background:#fff;padding:16px 18px;
+  display:flex;flex-direction:column;gap:8px;min-width:0}
+.trail .step .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--green)}
+.trail .step h3{font-family:var(--serif);font-size:21px;font-weight:600;line-height:1.2}
+.trail .step p{font-size:14px;line-height:1.45;color:var(--ink-soft)}
+.trail.t5 .step{padding:14px 14px}
+.trail.t5 .step h3{font-size:18px}
+.trail.t5 .step p{font-size:13px}
+.trail .arrow{display:flex;align-items:center;justify-content:center;
+  color:var(--orange);font-size:22px}
+.trail .step.src-step{background:var(--green-soft);border-color:#cbd8d3}
+.trail .step.o{background:var(--orange-soft);border-color:#ecd4c5}
+.trail .step .who{font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  font-weight:600;color:var(--orange);margin-top:auto}
+
+/* ---------- scheda di progetto ---------- */
+.fm{display:flex;flex-direction:column;gap:9px}
+.fm > div{display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:baseline;
+  border-bottom:1px solid var(--line);padding-bottom:9px}
+.fm b{font-family:var(--serif);font-size:17px;color:var(--green);overflow-wrap:anywhere}
+.fm span{font-size:14px;line-height:1.45;color:var(--ink-soft)}
+.fm.big > div{grid-template-columns:150px 1fr}
+.fm.big b{font-size:19px}
+.fm.big span{font-size:15px}
+</style>
+</head>
+<body>
+<div class="present-counter" id="presentCounter"></div>
+<div class="present-hint" id="presentHint">Premi P per entrare in modalità presentazione · frecce/spazio per avanzare · Esc per uscire</div>
+<div class="zoom-ctrl">
+  <button id="zoomOut" title="Riduci testo" aria-label="Riduci testo">A−</button>
+  <span class="val" id="zoomVal">100%</span>
+  <button id="zoomIn" title="Aumenta testo" aria-label="Aumenta testo">A+</button>
+</div>
+
+<!-- 01 COVER -->
+<section class="slide cover">
+  <div class="rail"><span>Lezione 9 · La propria istanza di Geode</span></div>
+  <div class="body">
+    <div class="kicker">Dalla IA generativa alla IA agentica · Lezione 9</div>
+    <h1>Creare la propria<br>istanza di Geode</h1>
+    <div class="rule"></div>
+    <p class="lede">Oggi si lavora al computer. Partite da una cartella vuota, fate preparare il
+      progetto all'agente e arrivate a una prima lezione della vostra materia, visibile in
+      anteprima, partendo dalla scheda della lezione scorsa.</p>
+    <div class="meta">
+      <div><b>Destinatari</b>Docenti di scuola superiore</div>
+      <div><b>Serve</b>Computer pronto, assistente, scheda di progetto</div>
+      <div><b>Durata</b>Un'ora, pausa compresa</div>
+      <div><b>Modulo</b>9 di 10</div>
+    </div>
+  </div>
+  <div class="foot"><span>Corso agenti IA</span><span>01</span></div>
+</section>
+
+<!-- 02 OBIETTIVI E MAPPA -->
+<section class="slide">
+  <div class="rail"><span>Lezione 9 · La propria istanza di Geode</span></div>
+  <div class="body">
+    <div class="kicker">Obiettivi e mappa</div>
+    <h2>Alla fine di quest'ora<span class="sub">Non serve conoscere i dettagli tecnici del
+      motore. Serve avere un sito vostro, che funziona, con dentro qualcosa che è vostro.</span></h2>
+    <ol class="num" style="margin-bottom:26px">
+      <li><b>Avete un'istanza propria e funzionante</b>
+        Una cartella con la vostra copia di Geode, la vostra storia di salvataggi e un sito
+        che si apre in anteprima sul vostro computer.</li>
+      <li><b>C'è almeno una lezione della vostra disciplina</b>
+        Nata dalla vostra scheda di progetto e controllata da voi.</li>
+    </ol>
+    <div class="content cols c4" style="gap:16px">
+      <div class="box">
+        <div class="tag">8 min</div>
+        <h3>Prima di partire</h3>
+        <p>Il controllo dei programmi, la cartella vuota, il messaggio di avvio</p>
+      </div>
+      <div class="box">
+        <div class="tag">12 min</div>
+        <h3>Come lavora l'agente</h3>
+        <p>Le istruzioni che legge, le fasi dell'avvio, come si passa dalla scheda alla lezione</p>
+      </div>
+      <div class="box orange">
+        <div class="tag">30 min</div>
+        <h3>Laboratorio</h3>
+        <p>La vostra istanza: avvio, aspetto, prima lezione, salvataggio</p>
+      </div>
+      <div class="box">
+        <div class="tag">10 min</div>
+        <h3>Confronto e chiusura</h3>
+        <p>Le tre piattaforme a confronto, e che cosa resta da fare a casa</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Obiettivi e mappa</span><span>02</span></div>
+</section>
+
+<!-- 03 PREREQUISITI -->
+<section class="slide">
+  <div class="rail"><span>Lezione 9 · La propria istanza di Geode</span></div>
+  <div class="body">
+    <div class="kicker">Prima di partire · 3 minuti</div>
+    <h2>Tre controlli, prima di toccare Geode<span class="sub">Se uno fallisce, non si va avanti:
+      meglio sistemarlo ora, con aiuto, che a metà dell'avvio.</span></h2>
+    <div class="content">
+      <table>
+        <tr><th>Che cosa</th><th>Come si controlla</th><th>Se non va</th></tr>
+        <tr><td>Python 3.12</td><td>In un terminale nuovo, <code>python --version</code> risponde con un numero</td><td>Windows: si apre il Microsoft Store o «Python non è stato trovato». Quasi sempre manca la spunta <b>Add python.exe to PATH</b>: si riapre l'installatore, <i>Modify</i>, poi si chiude e riapre il terminale</td></tr>
+        <tr><td>Git</td><td><code>git --version</code> risponde con un numero</td><td>Chiudere e riaprire l'applicazione da cui si lancia il comando. Sul Mac, la richiesta di installare gli strumenti di Apple alla prima chiamata è normale</td></tr>
+        <tr><td>L'assistente</td><td>Aperto, con l'accesso fatto, in una modalità che legge e scrive file sul computer</td><td>Allegare file a una chat non basta: serve una sessione che lavora su una cartella</td></tr>
+      </table>
+    </div>
+    <div class="box orange" style="margin-top:18px">
+      <p><b>Chi resta indietro non resta fermo.</b> Guarda a coppie lo schermo di un vicino e
+        recupera l'installazione a fine ora. Il lavoro di oggi si può rifare a casa.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Prima di partire</span><span>03</span></div>
+</section>
+
+<!-- 04 COPIA INDIPENDENTE -->
+<section class="slide">
+  <div class="rail"><span>Lezione 9 · La propria istanza di Geode</span></div>
+  <div class="body">
+    <div class="kicker">Prima di partire · 3 minuti</div>
+    <h2>Una copia vostra, non un collegamento<span class="sub">Geode è un progetto pubblico che
+      voi non modificate. Quello che nasce oggi è una copia a sé.</span></h2>
+    <div class="content trail">
+      <div class="step">
+        <div class="tag">Passo 1</div>
+        <h3>Si scarica il progetto</h3>
+        <p>L'agente porta nella vostra cartella i file di Geode: motore, istruzioni, skill,
+          corsi dimostrativi.</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step src-step">
+        <div class="tag">Passo 2</div>
+        <h3>Si azzera la storia</h3>
+        <p>La copia riparte da zero, con una storia di salvataggi tutta vostra, firmata a
+          vostro nome.</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step o">
+        <div class="tag">Passo 3</div>
+        <h3>Si tolgono i collegamenti</h3>
+        <p>Niente che permetta di pubblicare per sbaglio nel progetto originale. La
+          pubblicazione, se vorrete, sarà sul vostro account.</p>
+      </div>
+    </div>
+    <div class="cols c2" style="margin-top:20px;gap:18px">
+      <div class="box">
+        <p><b>Perché una cartella vuota.</b> L'agente prepara il progetto dentro la cartella in
+          cui lavora. Se ci sono già altri file, si ferma e vi aiuta a sceglierne un'altra: è
+          voluto, per non mescolare il lavoro.</p>
+      </div>
+      <div class="box green">
+        <p><b>Dove metterla.</b> Una cartella nuova e con un nome chiaro, ad esempio
+          <code>i-miei-corsi</code>, in un posto che ritrovate: Documenti va bene.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Prima di partire</span><span>04</span></div>
+</section>
+
+<!-- 05 MESSAGGIO DI AVVIO -->
+<section class="slide">
+  <div class="rail"><span>Lezione 9 · La propria istanza di Geode</span></div>
+  <div class="body">
+    <div class="kicker">Prima di partire · 2 minuti</div>
+    <h2>Un solo messaggio per cominciare<span class="sub">È quello scritto nel README di Geode.
+      Si incolla nella cartella vuota, così com'è.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.4fr 1fr;gap:22px;align-items:start">
+      <div class="prompt">
+        <div class="lbl">Il messaggio di avvio</div>
+        Sono un docente e voglio creare il sito dei miei corsi con Geode.
+        Prepara in questa cartella vuota una copia indipendente del progetto
+        https://github.com/mporfido/geode, con una nuova storia locale e senza
+        collegamenti per pubblicare nel progetto originale. Se la cartella contiene
+        già del lavoro, fermati e aiutami a scegliere una cartella vuota.
+        Leggi README.md, AGENTS.md e CLAUDE.md, poi segui
+        .agents/skills/inizia/SKILL.md. Verifica tu Python, Git e le dipendenze,
+        prepara l'ambiente e avvia l'anteprima. Esegui tu i comandi necessari;
+        guidami con passaggi grafici solo quando serve il mio intervento.
+        Parlami in italiano, senza gergo tecnico.
+      </div>
+      <div class="cols" style="gap:12px">
+        <div class="box">
+          <div class="tag">Che cosa chiede</div>
+          <ul class="clean">
+            <li>La copia indipendente</li>
+            <li>La lettura delle istruzioni</li>
+            <li>I controlli tecnici, fatti dall'agente</li>
+            <li>Un linguaggio senza gergo</li>
+          </ul>
+        </div>
+        <div class="box green">
+          <p><b>Voi non aprite il terminale.</b> I comandi li esegue l'agente: voi leggete
+            che cosa fa e intervenite quando ve lo chiede.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Il messaggio sta nel README di Geode, sezione «Inizia qui»</span><span>05</span></div>
+</section>
+
+<!-- 06 DEMO: LEGGERE LE ISTRUZIONI -->
+<section class="slide demo">
+  <div class="rail"><span>Lezione 9 · La propria istanza di Geode</span></div>
+  <div class="body">
+    <div class="kicker">Dimostrazione · 8 minuti</div>
+    <h2>Che cosa legge l'agente, prima di fare qualcosa<span class="sub">Si apre il progetto e si
+      guardano, nell'ordine in cui li legge, i tre file che gli dicono come lavorare.</span></h2>
+    <div class="content files">
+      <div class="file main"><span class="ic">1</span><b>README.md</b>
+        <span>La presentazione del progetto e il messaggio di avvio. Scritto per voi, in italiano.</span></div>
+      <div class="file main"><span class="ic">2</span><b>AGENTS.md</b>
+        <span>Le istruzioni per l'agente: il suo ruolo, quale skill usare quando, il confine da
+          rispettare (il motore non si tocca), come si avvia l'anteprima.</span></div>
+      <div class="file main"><span class="ic">3</span><b>.agents/skills/inizia/SKILL.md</b>
+        <span>La procedura di avvio, in quattro fasi. È un file di testo, come le skill della
+          lezione 6: si legge, e si potrebbe cambiare.</span></div>
+    </div>
+    <div class="box orange" style="margin-top:18px">
+      <p><b>Da notare:</b> è lo stesso schema dei file-guida della lezione 4. Non c'è codice
+        nascosto: l'agente fa ciò che è scritto in questi file, e voi potete leggerlo.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Si guarda il repository di Geode in locale</span><span>06</span></div>
+</section>
+
+<!-- 07 LE SKILL -->
+<section class="slide">
+  <div class="rail"><span>Lezione 9 · La propria istanza di Geode</span></div>
+  <div class="body">
+    <div class="kicker">Le skill incluse</div>
+    <h2>Otto procedure già scritte<span class="sub">Si chiamano a parole («voglio pubblicare il
+      sito»). Oggi ne usate quattro, in questo ordine.</span></h2>
+    <div class="content">
+      <table>
+        <tr><th>Skill</th><th>A che cosa serve</th><th>Quando</th></tr>
+        <tr><td>inizia</td><td>Primo avvio: controlli, dati del sito, veste grafica, anteprima</td><td class="o">Oggi</td></tr>
+        <tr><td>nuovo-corso</td><td>Crea la cartella di un corso con una prima lezione di prova</td><td class="o">Oggi</td></tr>
+        <tr><td>bozza-lezione</td><td>Scrive una lezione da un argomento, una scheda o dai vostri appunti</td><td class="o">Oggi</td></tr>
+        <tr><td>salva</td><td>Una fotografia del lavoro, in locale</td><td class="o">Oggi</td></tr>
+        <tr><td>app-interattiva</td><td>Una simulazione o animazione dentro una lezione</td><td class="muted">Lezione 10</td></tr>
+        <tr><td>pubblica</td><td>Mette il sito online su GitHub Pages</td><td class="muted">Lezione 10</td></tr>
+        <tr><td>aggiorna</td><td>Porta nel vostro sito le novità del motore, senza toccare i corsi</td><td class="muted">Più avanti</td></tr>
+        <tr><td>nuovo-componente</td><td>Aggiunge un nuovo tipo di interazione: tocca il motore, solo su richiesta consapevole</td><td class="muted">Di solito mai</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="foot"><span>Le skill incluse</span><span>07</span></div>
+</section>
+
+<!-- 08 ONBOARDING IN QUATTRO FASI -->
+<section class="slide">
+  <div class="rail"><span>Lezione 9 · La propria istanza di Geode</span></div>
+  <div class="body">
+    <div class="kicker">L'avvio · la skill inizia</div>
+    <h2>Quattro fasi, e voi intervenite in due<span class="sub">L'ordine è fisso. Le fasi 1 e 4
+      le fa l'agente da solo; nelle altre due serve una vostra scelta.</span></h2>
+    <div class="content cols c4" style="gap:16px">
+      <div class="box">
+        <div class="tag">Fase 1 · l'agente</div>
+        <h3>L'ambiente</h3>
+        <p>Controlla Python e Git, prepara uno spazio isolato per il progetto, installa quanto
+          serve (qui serve la rete), imposta nome ed email per firmare i salvataggi.</p>
+      </div>
+      <div class="box orange">
+        <div class="tag">Fase 2 · voi</div>
+        <h3>Il modulo</h3>
+        <p>Un solo messaggio con i dati del sito: nome, materia, destinatari. Rispondete tutto
+          insieme, anche a grandi linee.</p>
+      </div>
+      <div class="box orange">
+        <div class="tag">Fase 3 · voi</div>
+        <h3>La veste grafica</h3>
+        <p>Guardate un'anteprima comparativa di più temi e scegliete quello che preferite.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Fase 4 · l'agente</div>
+        <h3>Il primo avvio</h3>
+        <p>Compila i corsi, apre il sito nel browser e vi invita a fare il giro del corso di
+          benvenuto.</p>
+      </div>
+    </div>
+    <div class="box green" style="margin-top:20px">
+      <p><b>Se l'agente vi interroga a raffica,</b> con venti domande una dopo l'altra, non sta
+        seguendo la procedura: ditegli di seguire la skill <code>inizia</code>.</p>
+    </div>
+  </div>
+  <div class="foot"><span>L'avvio</span><span>08</span></div>
+</section>
+
+<!-- 09 FASE 2: IL MODULO -->
+<section class="slide">
+  <div class="rail"><span>Lezione 9 · La propria istanza di Geode</span></div>
+  <div class="body">
+    <div class="kicker">Fase 2 · Il modulo</div>
+    <h2>Una sola risposta, e un'etichetta che non si cambia<span class="sub">Il modulo è una guida,
+      non un vincolo: si può rispondere anche con un paragrafo libero.</span></h2>
+    <div class="content cols" style="grid-template-columns:1.1fr 1fr;gap:22px;align-items:start">
+      <div class="fm big">
+        <div><b>Nome del sito</b><span>«Le lezioni della prof.ssa Rossi»</span></div>
+        <div><b>Sottotitolo</b><span>Facoltativo: «Matematica per il biennio»</span></div>
+        <div><b>Materia, destinatari</b><span>Servono all'agente per scegliere il tono dei testi</span></div>
+        <div><b>Footer</b><span>Facoltativo: «© Prof.ssa Maria Rossi»</span></div>
+        <div><b>Formule</b><span>Le usate spesso nei corsi? Sì, no, dipende</span></div>
+      </div>
+      <div class="cols" style="gap:12px">
+        <div class="box orange">
+          <div class="tag">Da decidere adesso</div>
+          <h3>L'etichetta dei progressi</h3>
+          <p>Dal nome del sito l'agente ricava una sigla breve, per esempio
+            <code>lezioni-rossi</code>. È l'etichetta con cui i browser degli studenti
+            salvano i progressi. <b>Dopo la pubblicazione non si cambia più:</b> chi ha già
+            svolto le lezioni li perderebbe.</p>
+        </div>
+        <div class="box green">
+          <p><b>Prima di scrivere, l'agente vi fa un riepilogo.</b> Controllatelo: un
+            fraintendimento si corregge in un attimo, dopo si trascina.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Fase 2 · Il modulo</span><span>09</span></div>
+</section>
+
+<!-- 10 FASI 3 E 4: TEMA E PRIMO AVVIO -->
+<section class="slide">
+  <div class="rail"><span>Lezione 9 · La propria istanza di Geode</span></div>
+  <div class="body">
+    <div class="kicker">Fasi 3 e 4 · Aspetto e primo avvio</div>
+    <h2>Si sceglie guardando, non a parole<span class="sub">L'agente prepara una pagina che mostra
+      lo stesso campione con più temi. Voi indicate quello che vi piace.</span></h2>
+    <div class="content cols c3" style="gap:18px">
+      <div class="box">
+        <div class="tag">Tema</div>
+        <h3>Quaderno</h3>
+        <p>Carta a quadretti, inchiostro blu notte, accento rosso penna, caratteri con carattere.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Tema</div>
+        <h3>Salvia</h3>
+        <p>Carta calda con velature verdi ai margini, accento terracotta, forme morbide.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Tema</div>
+        <h3>Sobrio</h3>
+        <p>Carta piena, colori e tipografia essenziali, nessun motivo di sfondo.</p>
+      </div>
+    </div>
+    <div class="cols c2" style="margin-top:20px;gap:18px">
+      <div class="box green">
+        <p><b>Le proposte possono essere di più.</b> L'agente può aggiungerne una o due su misura
+          della vostra materia e dell'età degli studenti. Il tema scelto diventa quello del
+          sito; la pagina di confronto viene poi cancellata.</p>
+      </div>
+      <div class="box">
+        <p><b>Poi il primo avvio.</b> Il sito si apre nel browser, all'indirizzo
+          <code>localhost:5000</code>: è sul vostro computer, non è online. Provate il corso
+          <b>benvenuto</b>: è il giro delle cose che la piattaforma sa fare.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Fasi 3 e 4</span><span>10</span></div>
+</section>
+
+<!-- 11 DALLA SCHEDA ALLA LEZIONE -->
+<section class="slide">
+  <div class="rail"><span>Lezione 9 · La propria istanza di Geode</span></div>
+  <div class="body">
+    <div class="kicker">La prima lezione</div>
+    <h2>Dalla scheda alla lezione, con una pausa nel mezzo<span class="sub">Il metodo della lezione
+      8 diventa una conversazione, con due skill e un punto di controllo.</span></h2>
+    <div class="content trail">
+      <div class="step">
+        <div class="tag">Skill nuovo-corso</div>
+        <h3>Il corso</h3>
+        <p>Una breve intervista: titolo, descrizione, ordine delle lezioni. Nasce la cartella del
+          corso, con una lezione di prova.</p>
+        <div class="who">Rispondete voi</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step o">
+        <div class="tag">Skill bozza-lezione</div>
+        <h3>La scaletta</h3>
+        <p>Prima di scrivere, l'agente propone i passi: titolo, obiettivo e interazione per
+          ciascuno. È il punto in cui si cambia rotta a poco prezzo.</p>
+        <div class="who">Decidete voi</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step src-step">
+        <div class="tag">Skill bozza-lezione</div>
+        <h3>La lezione</h3>
+        <p>Scrive i file, compila il sito, prova la lezione con l'occhio dello studente e vi
+          invita ad aprirla.</p>
+        <div class="who">Scrive l'agente</div>
+      </div>
+    </div>
+    <div class="box" style="margin-top:20px">
+      <p><b>Incollate la scheda, tutta.</b> Obiettivo, sequenza, interazione e criterio sono ciò
+        che distingue la vostra lezione da una generica. Se l'agente propone una scaletta che
+        non corrisponde alla scheda, dite quale passo è sbagliato e perché.</p>
+    </div>
+  </div>
+  <div class="foot"><span>La prima lezione</span><span>11</span></div>
+</section>
+
+<!-- 12 CONTROLLARE E CORREGGERE -->
+<section class="slide">
+  <div class="rail"><span>Lezione 9 · La propria istanza di Geode</span></div>
+  <div class="body">
+    <div class="kicker">Il controllo</div>
+    <h2>L'anteprima si prova, non si guarda<span class="sub">Aprite la lezione e fate voi lo
+      studente: è il modo più rapido per accorgersi di che cosa non va.</span></h2>
+    <div class="content cols" style="grid-template-columns:1fr 1fr;gap:22px;align-items:start">
+      <div class="box">
+        <div class="tag">Da provare nel browser</div>
+        <ul class="clean">
+          <li>Rispondete giusto e sbagliato a ogni domanda: la risposta segnata come giusta lo è?</li>
+          <li>Il passo successivo compare quando deve?</li>
+          <li>Lo slider o l'animazione fanno ciò che la scheda prevedeva?</li>
+          <li>Il testo dice solo cose vere, senza esempi inventati?</li>
+          <li>Il tono va bene per quella classe?</li>
+        </ul>
+      </div>
+      <div class="cols" style="gap:12px">
+        <div class="prompt plain">
+          <div class="lbl">Correggere dialogando</div>
+          Nel passo 3 la domanda è troppo facile: le due risposte sbagliate si scartano
+          subito. Riscrivile in modo che siano errori tipici di uno studente di terza.
+        </div>
+        <div class="box green">
+          <p><b>Indicate il passo e il motivo.</b> «Non mi piace» non dice all'agente che cosa
+            cambiare. Se invece è una parola o un numero, si corregge direttamente nel file.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Il controllo</span><span>12</span></div>
+</section>
+
+<!-- 13 SALVARE -->
+<section class="slide">
+  <div class="rail"><span>Lezione 9 · La propria istanza di Geode</span></div>
+  <div class="body">
+    <div class="kicker">Il salvataggio</div>
+    <h2>Una fotografia del lavoro, quando lo decidete voi<span class="sub">Si chiede a parole:
+      «salva il lavoro». L'agente non salva mai di sua iniziativa.</span></h2>
+    <div class="content trail">
+      <div class="step">
+        <div class="tag">1</div>
+        <h3>Guarda che cosa è cambiato</h3>
+        <p>E ve lo riassume in una riga: «Da salvare: la nuova lezione e un ritocco ai colori».</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step src-step">
+        <div class="tag">2</div>
+        <h3>Scatta la fotografia</h3>
+        <p>Con una frase in italiano che dice che cosa avete fatto, non con una sigla.</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step o">
+        <div class="tag">3</div>
+        <h3>Conferma</h3>
+        <p>«Lavoro salvato». Non va online: resta sul vostro computer.</p>
+      </div>
+    </div>
+    <div class="cols c2" style="margin-top:20px;gap:18px">
+      <div class="box">
+        <p><b>È la rete di sicurezza della lezione 3.</b> Salvate dopo ogni passo che vi
+          soddisfa, prima di chiedere all'agente un cambiamento grande: se non vi piace, si
+          torna indietro.</p>
+      </div>
+      <div class="box orange">
+        <p><b>Salvare non è pubblicare.</b> Le due cose sono separate: la pubblicazione è la
+          lezione 10, ed è una scelta a parte.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Il salvataggio</span><span>13</span></div>
+</section>
+
+<!-- 14 LABORATORIO -->
+<section class="slide lab">
+  <div class="rail"><span>Lezione 9 · La propria istanza di Geode</span></div>
+  <div class="body">
+    <div class="kicker">Laboratorio · 30 minuti · al computer, da soli</div>
+    <h2>La vostra istanza, dalla cartella vuota alla prima lezione<span class="sub">Con la scheda della lezione scorsa. Se vi bloccate, la slide 15
+      elenca i guai più frequenti.</span></h2>
+    <div class="content cols" style="grid-template-columns:1fr 1fr;gap:12px 18px;align-items:start">
+      <div class="box">
+        <span class="badge">5 min</span>
+        <p><b>Cartella e messaggio.</b> Cartella vuota aperta nell'assistente; incollate il
+          messaggio di avvio. Controllate che l'agente prepari l'ambiente senza errori.</p>
+      </div>
+      <div class="box">
+        <span class="badge">8 min</span>
+        <p><b>Modulo e tema.</b> Un solo messaggio con i dati del sito, il riepilogo, la scelta
+          del tema sull'anteprima. Annotate l'etichetta dei progressi.</p>
+      </div>
+      <div class="box">
+        <span class="badge">10 min</span>
+        <p><b>La prima lezione.</b> Corso e lezione dalla vostra scheda, con la scaletta da
+          approvare. Aprite l'anteprima.</p>
+      </div>
+      <div class="box">
+        <span class="badge">5 min</span>
+        <p><b>Provare e correggere.</b> Fate lo studente. Cambiate almeno una cosa, dialogando o
+          nel file.</p>
+      </div>
+      <div class="box orange" style="grid-column:1/-1">
+        <span class="badge o">2 min</span>
+        <p><b>Salvate il lavoro.</b> «Salva il lavoro»; controllate che la frase del salvataggio
+          dica quello che avete fatto.</p>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:14px">
+      <p><b>Nessun dato di studenti,</b> nemmeno negli esempi. Una lezione di tre passi che
+        funziona vale più di una completa che non si apre.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Consegna su Classroom: lezione-09-lab-istanza-geode.md</span><span>14</span></div>
+</section>
+
+<!-- 15 SE QUALCOSA NON VA -->
+<section class="slide">
+  <div class="rail"><span>Lezione 9 · La propria istanza di Geode</span></div>
+  <div class="body">
+    <div class="kicker">Durante il laboratorio</div>
+    <h2>Cinque guai frequenti, e che cosa fare<span class="sub">Quasi sempre basta descrivere il
+      problema all'agente, o incollargli il messaggio di errore.</span></h2>
+    <div class="content">
+      <table>
+        <tr><th>Che cosa succede</th><th>Che cosa significa</th><th>Che cosa fare</th></tr>
+        <tr><td>L'agente si ferma: la cartella non è vuota</td><td>È il controllo previsto</td><td>Create una cartella nuova e riaprite l'assistente lì</td></tr>
+        <tr><td>«Python non è stato trovato»</td><td>Manca il PATH, o è l'alias del Microsoft Store</td><td>Riaprite l'installatore di Python, <i>Modify</i>; riaprite l'assistente</td></tr>
+        <tr><td>L'installazione dei pacchetti non finisce</td><td>La rete non lascia uscire il computer, o è lenta</td><td>Aspettate; poi provate un'altra rete (hotspot del telefono) e ditelo all'agente</td></tr>
+        <tr><td>L'agente fa molte domande una dopo l'altra</td><td>Non sta seguendo la skill <code>inizia</code></td><td>«Segui la skill inizia: manda un solo modulo»</td></tr>
+        <tr><td>Il sito non si apre nel browser</td><td>L'anteprima non è partita</td><td>Chiedete: «Avvia l'anteprima e dimmi l'indirizzo»</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="foot"><span>Durante il laboratorio</span><span>15</span></div>
+</section>
+
+<!-- 16 CONFRONTO PIATTAFORME -->
+<section class="slide">
+  <div class="rail"><span>Lezione 9 · La propria istanza di Geode</span></div>
+  <div class="body">
+    <div class="kicker">Confronto · le tre piattaforme</div>
+    <h2>Stessa cartella, assistenti diversi<span class="sub">Le istruzioni stanno in
+      <code>AGENTS.md</code> e nelle skill, che i tre assistenti sanno leggere. Cambia come si
+      parte.</span></h2>
+    <div class="content scheda">
+      <div class="concept"><b>Che cosa serve</b><span>Una sessione che lavora su una cartella del
+        vostro computer, non una chat con file allegati.</span></div>
+      <table>
+        <tr><th></th><th>Claude Desktop</th><th>Codex</th><th>Antigravity</th></tr>
+        <tr><td>Dove si lavora</td><td>Scheda <b>Code</b>, modalità <i>Local</i>, cartella scelta</td><td>Progetto aggiunto nell'app, conversazione locale</td><td>Progetto aggiunto nell'app, modalità locale</td></tr>
+        <tr><td>Account</td><td>Piano che include Claude Code (Pro o Max)</td><td>Account ChatGPT</td><td>Account Google</td></tr>
+        <tr><td>Come si parte</td><td>Messaggio di avvio nella cartella vuota</td><td>Messaggio di avvio, poi il prompt di adattamento</td><td>Messaggio di avvio, poi il prompt di adattamento</td></tr>
+        <tr><td>Provato</td><td>È il percorso su cui il materiale è stato provato</td><td class="o"><span class="check">Da verificare in aula</span></td><td class="o"><span class="check">Da verificare in aula</span></td></tr>
+      </table>
+      <div class="stamp"><span>Piani e requisiti cambiano: controllate sul sito di ciascuno.</span><span>Il prompt di adattamento è in docs/SETUP.md di Geode</span></div>
+    </div>
+  </div>
+  <div class="foot"><span>Confronto fra piattaforme</span><span>16</span></div>
+</section>
+
+<!-- 17 CHIUSURA -->
+<section class="slide">
+  <div class="rail"><span>Lezione 9 · La propria istanza di Geode</span></div>
+  <div class="body">
+    <div class="kicker">Chiusura</div>
+    <h2>Quattro cose da portare a casa</h2>
+    <div class="content">
+      <ol class="num">
+        <li><b>Una cartella vuota e un messaggio bastano per partire.</b>
+          L'agente prepara la copia, la storia e l'ambiente: voi controllate che cosa fa.</li>
+        <li><b>L'avvio è una procedura scritta, e si può leggere.</b>
+          AGENTS.md e le skill dicono all'agente che cosa fare e che cosa non toccare.</li>
+        <li><b>La scheda è il materiale della lezione.</b>
+          Con la scheda l'agente propone, voi correggete: la lezione la provate da studenti.</li>
+        <li><b>Si salva spesso, si pubblica poi.</b>
+          La fotografia del lavoro è un gesto a parte, e non mette niente online.</li>
+      </ol>
+      <div class="box orange" style="margin-top:24px">
+        <p><b>Prossima lezione: personalizzare e pubblicare.</b> Si prosegue con le vostre
+          lezioni, si passa la checklist di revisione e, se lo vorrete, si mette il sito online
+          su GitHub Pages. Per pubblicare serve un account GitHub: createlo a casa prima di
+          venire. Il sito sarà pubblico.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Chiusura</span><span>17</span></div>
+</section>
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var body = document.body;
+  var counter = document.getElementById('presentCounter');
+  var hint = document.getElementById('presentHint');
+  var idx = 0;
+  var presenting = false;
+
+  function fitScale(){
+    var s = Math.min(window.innerWidth/1280, window.innerHeight/720);
+    document.documentElement.style.setProperty('--scale', s);
+  }
+
+  function render(){
+    slides.forEach(function(s,i){ s.classList.toggle('active', i===idx); });
+    counter.textContent = (idx+1) + ' / ' + slides.length;
+  }
+
+  function enter(){
+    presenting = true;
+    body.classList.add('present');
+    fitScale();
+    render();
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(function(){});
+    }
+  }
+
+  function exit(){
+    presenting = false;
+    body.classList.remove('present');
+    if (document.fullscreenElement) document.exitFullscreen().catch(function(){});
+  }
+
+  function next(){ if (idx < slides.length-1){ idx++; render(); } }
+  function prev(){ if (idx > 0){ idx--; render(); } }
+
+  document.addEventListener('keydown', function(e){
+    if (!presenting){
+      if (e.key === 'p' || e.key === 'P') enter();
+      return;
+    }
+    switch(e.key){
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown':
+        e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+        e.preventDefault(); prev(); break;
+      case 'Home':
+        e.preventDefault(); idx = 0; render(); break;
+      case 'End':
+        e.preventDefault(); idx = slides.length-1; render(); break;
+      case 'Escape':
+        exit(); break;
+    }
+  });
+
+  document.addEventListener('click', function(e){
+    if (!presenting) return;
+    if (e.target.closest('a')) return;
+    if (e.clientX > window.innerWidth/2) next(); else prev();
+  });
+
+  document.addEventListener('fullscreenchange', function(){
+    if (!document.fullscreenElement && presenting) exit();
+  });
+
+  window.addEventListener('resize', fitScale);
+
+  hint.classList.add('show');
+  setTimeout(function(){ hint.classList.remove('show'); }, 4000);
+
+  // ---- controllo dimensione testo ----
+  var ZOOM_MIN = 0.8, ZOOM_MAX = 1.4, ZOOM_STEP = 0.1;
+  var zoomVal = document.getElementById('zoomVal');
+  var zoomIn = document.getElementById('zoomIn');
+  var zoomOut = document.getElementById('zoomOut');
+  var zoom = 1;
+  try { zoom = parseFloat(localStorage.getItem('slideZoom')) || 1; } catch(e){}
+
+  function applyZoom(){
+    zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom));
+    document.documentElement.style.setProperty('--content-zoom', zoom);
+    zoomVal.textContent = Math.round(zoom * 100) + '%';
+    try { localStorage.setItem('slideZoom', zoom); } catch(e){}
+  }
+
+  zoomIn.addEventListener('click', function(){ zoom += ZOOM_STEP; applyZoom(); });
+  zoomOut.addEventListener('click', function(){ zoom -= ZOOM_STEP; applyZoom(); });
+
+  document.addEventListener('keydown', function(e){
+    if (presenting) return;
+    if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '=')){
+      e.preventDefault(); zoom += ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '-'){
+      e.preventDefault(); zoom -= ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '0'){
+      e.preventDefault(); zoom = 1; applyZoom();
+    }
+  });
+
+  applyZoom();
+})();
+</script>
+
+</body>
+</html>
