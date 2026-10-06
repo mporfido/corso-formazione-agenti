@@ -481,8 +481,10 @@ di avvio e arriva a una lezione visibile in anteprima.
 - aggiornamenti successivi: «aggiorna il sito» e skill `aggiorna` per il motore;
 - conservazione del progetto per il lavoro futuro; chiusura del corso.
 
-**Materiali da preparare:** la checklist, stampabile; una consegna per la pubblicazione,
-`consegne/lezione-10-lab-pubblicazione.md`.
+**Deck:** `slides/lezione-10.html`, 17 slide; la checklist stampabile è la slide 8. Consegna:
+`consegne/lezione-10-lab-pubblicazione.md`. Demo: `demo/lezione-10-demo-pubblicazione.md`.
+**Da preparare:** un account GitHub di servizio e un sito di prova per la demo; prova del flusso
+`pubblica` sulla rete della scuola.
 
 **Aperto:**
 - account GitHub: farlo creare a casa prima della lezione, o in aula;

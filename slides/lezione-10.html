@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Lezione 10 — Personalizzare e pubblicare</title>
+<style>
+:root{
+  --paper:#f2efe9;
+  --card:#fbfaf7;
+  --ink:#1d1c1a;
+  --ink-soft:#5c5850;
+  --line:#ddd7cc;
+  --green:#1a3c3a;
+  --green-soft:#e6ece9;
+  --orange:#c0562f;
+  --orange-soft:#f6e7de;
+  --blue:#2f5a8c;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);font-family:var(--sans);color:var(--ink);
+  -webkit-font-smoothing:antialiased;padding:28px 0}
+
+/* ---------- slide frame ---------- */
+.slide{
+  position:relative;width:1280px;height:720px;margin:0 auto 28px;
+  background:var(--card);border:1px solid var(--line);
+  display:grid;grid-template-columns:56px 1fr;overflow:hidden;
+}
+.rail{
+  background:var(--green);color:#f4f1ea;
+  display:flex;align-items:center;justify-content:center;
+}
+.rail span{
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  white-space:nowrap;opacity:.9;
+}
+.body{padding:52px 60px 64px;display:flex;flex-direction:column;min-width:0}
+.kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--orange);font-weight:600;margin-bottom:14px}
+h1{font-family:var(--serif);font-size:56px;line-height:1.08;font-weight:600;
+  letter-spacing:-.01em}
+h2{font-family:var(--serif);font-size:40px;line-height:1.12;font-weight:600;
+  letter-spacing:-.01em;margin-bottom:26px}
+h2 .sub{display:block;font-family:var(--sans);font-size:15px;font-weight:400;
+  color:var(--ink-soft);letter-spacing:0;margin-top:10px;line-height:1.45}
+p{font-size:17px;line-height:1.55;color:var(--ink)}
+.muted{color:var(--ink-soft)}
+.foot{position:absolute;left:56px;right:0;bottom:0;height:40px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 60px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-soft);border-top:1px solid var(--line)}
+.content{flex:0 1 auto;min-height:0}
+code{font-family:var(--mono);font-size:.9em;background:var(--green-soft);padding:1px 5px}
+
+/* ---------- cover ---------- */
+.cover .body{justify-content:center}
+.cover h1{font-size:72px;max-width:980px}
+.cover .lede{margin-top:26px;font-size:19px;color:var(--ink-soft);max-width:700px}
+.rule{width:72px;height:3px;background:var(--orange);margin:32px 0 0}
+.meta{margin-top:38px;display:flex;gap:44px;font-size:13px;color:var(--ink-soft)}
+.meta b{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--green);margin-bottom:6px}
+
+/* ---------- generic layout helpers ---------- */
+.cols{display:grid;gap:22px}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c4{grid-template-columns:repeat(4,1fr)}
+.box{border:1px solid var(--line);background:#fff;padding:22px 24px;
+  display:flex;flex-direction:column;gap:10px;min-width:0}
+.box h3{font-family:var(--serif);font-size:22px;font-weight:600;line-height:1.2}
+.box .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.box p,.box li{font-size:15px;line-height:1.5;color:var(--ink-soft)}
+.box.green{background:var(--green-soft);border-color:#cbd8d3}
+.box.orange{background:var(--orange-soft);border-color:#ecd4c5}
+ul.clean{list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.clean li{position:relative;padding-left:18px;font-size:16px;line-height:1.5}
+ul.clean li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;
+  background:var(--orange)}
+.box ul.clean li{font-size:15px}
+ol.num{list-style:none;counter-reset:n;display:flex;flex-direction:column;gap:16px}
+ol.num li{counter-increment:n;position:relative;padding-left:46px;font-size:17px;
+  line-height:1.5}
+ol.num li::before{content:counter(n,decimal-leading-zero);position:absolute;left:0;top:1px;
+  font-size:13px;font-weight:600;color:var(--green);letter-spacing:.06em}
+ol.num li b{display:block;font-family:var(--serif);font-size:20px;font-weight:600;
+  margin-bottom:4px;color:var(--ink)}
+
+/* ---------- tabella ---------- */
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:12px 16px;font-size:15px;line-height:1.45;
+  border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);
+  font-weight:600;border-bottom:2px solid var(--green)}
+td:first-child{font-weight:600;width:30%}
+td.o{color:var(--orange)}
+td.g{color:var(--green)}
+td.n{font-family:var(--serif);font-size:24px;font-weight:600;white-space:nowrap}
+
+/* ---------- prompt / badge ---------- */
+.prompt{background:var(--green);color:#eef2f0;padding:20px 24px;font-family:var(--sans);
+  font-size:15px;line-height:1.6}
+.prompt .lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;margin-bottom:8px}
+.prompt.plain{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.prompt.plain .lbl{color:var(--orange)}
+.badge{display:inline-block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  background:var(--green);color:#fff;padding:4px 9px;align-self:flex-start}
+.badge.o{background:var(--orange)}
+
+/* ---------- barra contesto ---------- */
+.gauge{height:30px;background:#fff;border:1px solid var(--line);display:flex;
+  overflow:hidden}
+.gauge i{display:block;height:100%}
+.g-legend{display:flex;gap:22px;font-size:13px;color:var(--ink-soft);margin-top:10px;
+  flex-wrap:wrap}
+.g-legend span{display:flex;align-items:center;gap:7px}
+.g-legend b{width:10px;height:10px;display:inline-block}
+
+/* ---------- sorgente Markdown ---------- */
+.src{background:#1f2624;color:#dfe6e3;font-family:var(--mono);font-size:13.5px;
+  line-height:1.65;padding:18px 22px;white-space:pre-wrap;overflow-wrap:anywhere}
+.src .h{color:#f1b28f}
+.src .k{color:#9fd3c2}
+.src .dim{color:#7f8c87}
+.src .hl{background:#3b4f3c;color:#fff;display:block;margin:0 -22px;padding:0 22px;
+  border-left:4px solid #f1b28f}
+.src .hl.o{background:#4d3a30}
+.src .hd{display:block;margin:-18px -22px 12px;padding:8px 22px;background:#161c1a;
+  font-family:var(--sans);font-size:12px;letter-spacing:.04em;color:#9fbdb4}
+
+/* ---------- la mappa e i file di dettaglio ---------- */
+.files{display:flex;flex-direction:column;gap:12px}
+.file{border:1px solid var(--line);background:#fff;padding:14px 18px;
+  display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline}
+.file .ic{grid-row:1/3;font-family:var(--mono);font-size:12px;color:#fff;
+  background:var(--green);padding:3px 7px;align-self:start;margin-top:2px}
+.file b{font-family:var(--mono);font-size:14px;font-weight:600;overflow-wrap:anywhere}
+.file span{font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+.steps .box{padding:14px 20px;gap:8px}
+.file:not(.main){margin-left:34px;position:relative}
+.file:not(.main)::before{content:"";position:absolute;left:-22px;top:-13px;width:16px;
+  height:calc(50% + 13px);border-left:2px solid #cbd8d3;border-bottom:2px solid #cbd8d3}
+.file.main{background:var(--green-soft);border-color:#cbd8d3}
+.file.main .ic{background:var(--orange)}
+
+/* ---------- scheda piattaforma ---------- */
+.scheda{border:1px solid #cbd8d3;background:#fff}
+.scheda .concept{background:var(--green);color:#eef2f0;padding:14px 20px;
+  display:grid;grid-template-columns:170px 1fr;gap:16px;align-items:baseline}
+.scheda .concept b{font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:#9fbdb4;font-weight:600}
+.scheda .concept span{font-size:16px;line-height:1.45}
+.scheda table th{padding:11px 16px}
+.scheda table td{padding:10px 16px;font-size:14px;line-height:1.4}
+.scheda table td:first-child{width:18%;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--green);padding-top:13px}
+.scheda .stamp{display:flex;justify-content:space-between;gap:20px;padding:9px 16px;
+  font-size:11px;letter-spacing:.08em;color:var(--ink-soft);background:#f7f5f0}
+.check{color:var(--orange);border-bottom:1px dashed var(--orange)}
+
+/* ---------- tipi di slide: dimostrazione e laboratorio ----------
+   Basta aggiungere .demo o .lab alla <section class="slide">: cambiano rail,
+   fondo, kicker e compare il timbro. Il link al file sta nel piè di pagina. */
+.slide.demo{background:#eef2f7}
+.slide.lab{background:#fcf2ea}
+.slide.demo .rail{background:var(--blue)}
+.slide.lab .rail{background:var(--orange)}
+.slide.demo .rail span,.slide.lab .rail span{display:none}
+.slide.demo .rail::before,.slide.lab .rail::before{
+  writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;
+  font-size:14px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:#fff}
+.slide.demo .rail::before{content:"Dimostrazione"}
+.slide.lab .rail::before{content:"Laboratorio"}
+.slide.demo::after,.slide.lab::after{
+  position:absolute;top:18px;right:22px;padding:7px 14px;color:#fff;
+  font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase}
+.slide.demo::after{content:"◉\00a0\00a0Guardate lo schermo";background:var(--blue)}
+.slide.lab::after{content:"✎\00a0\00a0Tocca a voi";background:var(--orange)}
+.slide.demo .kicker{color:var(--blue)}
+.slide.demo .foot,.slide.lab .foot{border-top-color:rgba(0,0,0,.08)}
+.foot a.task{display:inline-flex;align-items:center;gap:10px;margin-left:-12px;
+  padding:6px 12px;color:#fff;text-decoration:none;font-weight:700;letter-spacing:.12em}
+.foot a.task b{font-family:var(--mono);font-weight:400;font-size:12px;letter-spacing:0;
+  text-transform:none;opacity:.95}
+.slide.demo .foot a.task{background:var(--blue)}
+.slide.lab .foot a.task{background:var(--orange)}
+.foot a.task:hover{filter:brightness(1.1)}
+
+/* ---------- print ---------- */
+.slide{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:13.333in 7.5in;margin:0}
+@media print{
+  body{background:#fff;padding:0}
+  .slide{margin:0;border:none;page-break-after:always;box-shadow:none}
+  .slide:last-child{page-break-after:auto}
+}
+
+/* ---------- presentation mode ---------- */
+body.present{padding:0;overflow:hidden;background:#000}
+body.present .slide{
+  display:none;margin:0;border:none;
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(var(--scale,1));
+  transform-origin:center center;
+}
+body.present .slide.active{display:grid}
+.present-hint{
+  position:fixed;bottom:14px;right:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.present-hint.show{opacity:1}
+.present-counter{
+  position:fixed;bottom:14px;left:18px;z-index:50;
+  font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;
+  display:none;
+}
+body.present .present-counter{display:block}
+
+/* ---------- controllo dimensione testo ---------- */
+:root{--content-zoom:1}
+.body{zoom:var(--content-zoom)}
+.zoom-ctrl{
+  position:fixed;top:14px;right:18px;z-index:60;
+  display:flex;align-items:center;gap:2px;
+  background:rgba(29,28,26,.88);border-radius:4px;padding:4px;
+  font-family:var(--sans);
+}
+.zoom-ctrl button{
+  width:28px;height:28px;border:none;border-radius:3px;background:transparent;
+  color:#f4f1ea;font-size:14px;font-weight:600;cursor:pointer;line-height:1;
+}
+.zoom-ctrl button:hover{background:rgba(255,255,255,.15)}
+.zoom-ctrl .val{
+  min-width:38px;text-align:center;font-size:11px;letter-spacing:.04em;
+  color:#cfcabf;user-select:none;
+}
+body.present .zoom-ctrl{display:none}
+@media print{.zoom-ctrl{display:none}}
+
+
+/* ---------- due colonne a confronto ---------- */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:stretch}
+.duo .side{border:1px solid var(--line);background:#fff;padding:20px 22px;
+  display:flex;flex-direction:column;gap:12px;min-width:0}
+.duo .side.g{background:var(--green-soft);border-color:#cbd8d3}
+.duo .side .lbl{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.duo .side h3{font-family:var(--serif);font-size:23px;font-weight:600;line-height:1.2}
+.duo .side p,.duo .side li{font-size:14.5px;line-height:1.5;color:var(--ink-soft)}
+
+/* ---------- lezione 8: motore e contenuti ---------- */
+.sep{display:grid;grid-template-columns:1fr 54px 1fr;align-items:stretch}
+.sep .pane{padding:22px 26px;display:flex;flex-direction:column;gap:12px;min-width:0;
+  border:1px solid var(--line)}
+.sep .pane.engine{background:#ebe9e3}
+.sep .pane.mine{background:var(--green-soft);border-color:#cbd8d3}
+.sep .pane .lbl{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--orange)}
+.sep .pane h3{font-family:var(--serif);font-size:26px;font-weight:600;line-height:1.15}
+.sep .pane p{font-size:15px;line-height:1.5;color:var(--ink-soft)}
+.sep .pane .names{font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--ink);
+  overflow-wrap:anywhere}
+.sep .pane .rule2{font-size:13px;font-weight:600;color:var(--green);border-top:1px solid
+  rgba(0,0,0,.12);padding-top:10px;margin-top:auto}
+.sep .plus{display:flex;align-items:center;justify-content:center;font-family:var(--serif);
+  font-size:38px;color:var(--orange)}
+
+/* ---------- flusso a tre e a cinque passi ---------- */
+.trail{display:grid;grid-template-columns:1fr 36px 1fr 36px 1fr;align-items:stretch}
+.trail.t5{grid-template-columns:1fr 26px 1fr 26px 1fr 26px 1fr 26px 1fr}
+.trail .step{border:1px solid var(--line);background:#fff;padding:16px 18px;
+  display:flex;flex-direction:column;gap:8px;min-width:0}
+.trail .step .tag{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:600;color:var(--green)}
+.trail .step h3{font-family:var(--serif);font-size:21px;font-weight:600;line-height:1.2}
+.trail .step p{font-size:14px;line-height:1.45;color:var(--ink-soft)}
+.trail.t5 .step{padding:14px 14px}
+.trail.t5 .step h3{font-size:18px}
+.trail.t5 .step p{font-size:13px}
+.trail .arrow{display:flex;align-items:center;justify-content:center;
+  color:var(--orange);font-size:22px}
+.trail .step.src-step{background:var(--green-soft);border-color:#cbd8d3}
+.trail .step.o{background:var(--orange-soft);border-color:#ecd4c5}
+.trail .step .who{font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  font-weight:600;color:var(--orange);margin-top:auto}
+
+/* ---------- scheda di progetto ---------- */
+.fm{display:flex;flex-direction:column;gap:9px}
+.fm > div{display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:baseline;
+  border-bottom:1px solid var(--line);padding-bottom:9px}
+.fm b{font-family:var(--serif);font-size:17px;color:var(--green);overflow-wrap:anywhere}
+.fm span{font-size:14px;line-height:1.45;color:var(--ink-soft)}
+.fm.big > div{grid-template-columns:150px 1fr}
+.fm.big b{font-size:19px}
+.fm.big span{font-size:15px}
+
+/* ---------- lezione 10: checklist ---------- */
+ul.ck{list-style:none;display:flex;flex-direction:column;gap:8px}
+ul.ck li{position:relative;padding-left:28px;font-size:14.5px;line-height:1.45;color:var(--ink)}
+ul.ck li::before{content:"";position:absolute;left:0;top:3px;width:15px;height:15px;
+  border:2px solid var(--green);background:#fff}
+.ckgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px 18px}
+.ckgrid .box{padding:16px 18px;gap:9px}
+.ckgrid .box h3{font-size:19px}
+</style>
+</head>
+<body>
+<div class="present-counter" id="presentCounter"></div>
+<div class="present-hint" id="presentHint">Premi P per entrare in modalità presentazione · frecce/spazio per avanzare · Esc per uscire</div>
+<div class="zoom-ctrl">
+  <button id="zoomOut" title="Riduci testo" aria-label="Riduci testo">A−</button>
+  <span class="val" id="zoomVal">100%</span>
+  <button id="zoomIn" title="Aumenta testo" aria-label="Aumenta testo">A+</button>
+</div>
+
+
+<!-- 01 COVER -->
+<section class="slide cover">
+  <div class="rail"><span>Lezione 10 · Personalizzare e pubblicare</span></div>
+  <div class="body">
+    <div class="kicker">Dalla IA generativa alla IA agentica · Lezione 10</div>
+    <h1>Personalizzare<br>e pubblicare</h1>
+    <div class="rule"></div>
+    <p class="lede">Ultima lezione. Si rifinisce il sito, si controlla con una checklist e, solo se
+      lo volete, lo si mette online. Poi si chiude il corso: che cosa portarsi a casa e da dove
+      ripartire.</p>
+    <div class="meta">
+      <div><b>Destinatari</b>Docenti di scuola superiore</div>
+      <div><b>Serve</b>Il sito della lezione 9, aperto nell'assistente</div>
+      <div><b>Durata</b>Un'ora, pausa compresa</div>
+      <div><b>Modulo</b>10 di 10</div>
+    </div>
+  </div>
+  <div class="foot"><span>Corso agenti IA</span><span>01</span></div>
+</section>
+
+<!-- 02 -->
+<section class="slide">
+  <div class="rail"><span>Lezione 10 · Personalizzare e pubblicare</span></div>
+  <div class="body">
+    <div class="kicker">Obiettivi e mappa</div>
+    <h2>Alla fine di quest'ora<span class="sub">Nessuna prova finale: l'attività è vostra e la
+      giudicate voi. Contano un sito controllato e un progetto che potete riprendere.</span></h2>
+    <ol class="num" style="margin-bottom:24px">
+      <li><b>Avete rifinito e controllato un'attività della vostra disciplina</b>
+        Con aspetto e testi ritoccati, e passata alla checklist di revisione.</li>
+      <li><b>Sapete che cosa significa pubblicare e potete decidere se farlo</b>
+        Chi vuole mette il sito online; chi no resta in locale, e il lavoro non vale meno.</li>
+      <li><b>Portate a casa un progetto riutilizzabile</b>
+        Sapete dove sta, come si riprende e da dove si riparte.</li>
+    </ol>
+    <div class="content cols" style="grid-template-columns:repeat(5,1fr);gap:12px">
+      <div class="box"><div class="tag">8 min</div><h3>Personalizzare</h3><p>Che cosa si cambia e come si continua</p></div>
+      <div class="box"><div class="tag">10 min</div><h3>Checklist</h3><p>Cinque controlli prima di mostrare il lavoro</p></div>
+      <div class="box"><div class="tag">13 min</div><h3>Pubblicare</h3><p>Che cosa è pubblico, che cosa serve, il flusso</p></div>
+      <div class="box orange"><div class="tag">20 min</div><h3>Laboratorio</h3><p>Rifinire, controllare, se volete pubblicare</p></div>
+      <div class="box"><div class="tag">9 min</div><h3>Chiusura</h3><p>Conservare il progetto, ripartire</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>Obiettivi e mappa</span><span>02</span></div>
+</section>
+
+<!-- 03 -->
+<section class="slide">
+  <div class="rail"><span>Lezione 10 · Personalizzare e pubblicare</span></div>
+  <div class="body">
+    <div class="kicker">Personalizzare · 4 minuti</div>
+    <h2>Che cosa è vostro, che cosa non si tocca<span class="sub">È la divisione della lezione 8:
+      il motore lavora, voi decidete aspetto, testi e contenuti.</span></h2>
+    <div class="content">
+      <table>
+        <tr><th>Che cosa cambiare</th><th>Dove sta</th><th>Come si chiede</th></tr>
+        <tr><td>Nome, sottotitolo, footer</td><td><code>site.yaml</code></td><td>«Cambia il sottotitolo del sito in …»</td></tr>
+        <tr><td>Colori e caratteri</td><td><code>static/theme.css</code>, o un tema in <code>static/themes/</code></td><td>«Rendi i colori più caldi», «prova il tema salvia»</td></tr>
+        <tr><td>Ordine dei corsi</td><td><code>content/sections.yaml</code></td><td>«Metti il corso di algebra prima di quello di geometria»</td></tr>
+        <tr><td>Testi e interazioni</td><td>le lezioni in <code>content/</code>, in Markdown</td><td>Dialogando con l'agente, o a mano nel file</td></tr>
+        <tr><td class="o">Il motore</td><td class="o"><code>parser/</code>, <code>routes/</code>, <code>templates/</code>…</td><td class="o">Non si tocca. Per le novità c'è la skill <code>aggiorna</code></td></tr>
+      </table>
+    </div>
+    <div class="box orange" style="margin-top:18px">
+      <p><b>Una cosa non si cambia più a sito pubblicato:</b> l'etichetta dei progressi
+        (<code>storage_prefix</code>, lezione 9). Chi ha già svolto le lezioni li perderebbe.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Personalizzare</span><span>03</span></div>
+</section>
+
+<!-- 04 -->
+<section class="slide">
+  <div class="rail"><span>Lezione 10 · Personalizzare e pubblicare</span></div>
+  <div class="body">
+    <div class="kicker">Continuare il lavoro · 4 minuti</div>
+    <h2>Da una lezione a un corso, con le vostre fonti<span class="sub">Le skill di Geode
+      si chiamano a parole. Le tre più utili per proseguire da soli.</span></h2>
+    <div class="content cols c3" style="gap:18px">
+      <div class="box">
+        <div class="tag">Skill bozza-lezione</div>
+        <h3>Nuove lezioni</h3>
+        <p>Si parte da una scheda di progetto, come nella lezione 9. La scaletta approvata prima
+          di scrivere resta il punto in cui si cambia rotta a poco prezzo.</p>
+      </div>
+      <div class="box green">
+        <div class="tag">I vostri documenti come fonte</div>
+        <h3>Appunti e materiali</h3>
+        <p>Fate leggere all'agente i vostri appunti o le vostre schede e chiedete una lezione
+          che resta fedele a quelli. È la logica delle fonti della lezione 5: niente invenzioni.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Skill app-interattiva</div>
+        <h3>Animazioni e simulazioni</h3>
+        <p>Si parte dall'intento didattico: che cosa deve capire lo studente manipolando la
+          cosa? Si approva l'interazione in una frase, poi si scrive il codice.</p>
+      </div>
+    </div>
+    <div class="cols c2" style="margin-top:20px;gap:18px">
+      <div class="box orange">
+        <p><b>Salvate prima di un cambiamento grande.</b> «Salva il lavoro» e poi chiedete: se il
+          risultato non convince, si torna indietro (lezione 3).</p>
+      </div>
+      <div class="box">
+        <p><b>Un nuovo tipo di interazione</b> tocca il motore: la skill
+          <code>nuovo-componente</code> esiste, ma è una scelta consapevole e di solito non serve.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Continuare il lavoro</span><span>04</span></div>
+</section>
+
+<!-- 05 -->
+<section class="slide">
+  <div class="rail"><span>Lezione 10 · Personalizzare e pubblicare</span></div>
+  <div class="body">
+    <div class="kicker">Checklist · 1 di 3 · correttezza e pedagogia</div>
+    <h2>Prima si controlla che sia giusto, e che serva<span class="sub">L'agente scrive bene
+      anche quando sbaglia: la responsabilità del contenuto è vostra (lezioni 1 e 7).</span></h2>
+    <div class="content cols c2" style="gap:20px;align-items:start">
+      <div class="box">
+        <div class="tag">1 · Correttezza disciplinare</div>
+        <ul class="ck">
+          <li>Definizioni, enunciati, date e numeri sono veri, controllati su una fonte vostra.</li>
+          <li>La risposta segnata come giusta lo è. Provata, non supposta.</li>
+          <li>Esempi e citazioni esistono davvero: nulla è inventato per far quadrare.</li>
+          <li>Il linguaggio è quello che usate in classe, non una variante approssimata.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <div class="tag">2 · Pedagogia</div>
+        <ul class="ck">
+          <li>L'obiettivo della scheda si raggiunge davvero con la sequenza dei passi.</li>
+          <li>Gli errori proposti sono quelli tipici degli studenti, non facili da scartare.</li>
+          <li>Il feedback spiega il perché, non dice solo «giusto» o «sbagliato».</li>
+          <li>L'attività non è una prova: non assegna voti né classifica gli studenti.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box green" style="margin-top:18px">
+      <p><b>Si prova da studenti.</b> Rispondete giusto e sbagliato a ogni domanda, in ordine e
+        fuori ordine: molti errori si vedono solo così.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Checklist · correttezza e pedagogia</span><span>05</span></div>
+</section>
+
+<!-- 06 -->
+<section class="slide">
+  <div class="rail"><span>Lezione 10 · Personalizzare e pubblicare</span></div>
+  <div class="body">
+    <div class="kicker">Checklist · 2 di 3 · privacy e copyright</div>
+    <h2>Che cosa può uscire, e che cosa non è vostro<span class="sub">Un sito pubblicato lo vede
+      chiunque abbia il link. Ciò che ci mettete va controllato prima, non dopo.</span></h2>
+    <div class="content cols c2" style="gap:20px;align-items:start">
+      <div class="box">
+        <div class="tag">3 · Privacy</div>
+        <ul class="ck">
+          <li>Nessun dato di studenti: nomi, voti, cognomi nei testi, negli esempi, nei file.</li>
+          <li>Nessun materiale riservato della scuola (documenti, circolari, PDP).</li>
+          <li>Sapete chi vede l'IP dei visitatori: GitHub e, solo dove servono, jsDelivr e
+            cdnjs. L'elenco sta nel README di Geode, utile se la scuola chiede un'informativa.</li>
+          <li>I progressi restano nel browser dello studente: voi non li ricevete.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <div class="tag">4 · Copyright</div>
+        <ul class="ck">
+          <li>Testi, immagini, formule e schemi: sono vostri, liberi o citati con la fonte?</li>
+          <li>Un brano del manuale resta copiato anche se l'agente lo ha riscritto.</li>
+          <li>Immagini prese dal web: licenza controllata, autore indicato.</li>
+          <li>Le fonti usate sono nominate nella lezione, come nella lezione 5.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:18px">
+      <p><b>Una cosa che si dimentica:</b> il nome e l'email con cui l'agente firma i salvataggi
+        (lezione 9) stanno nella storia del progetto, che online è pubblica. Controllate quali
+        avete impostato, prima di pubblicare.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Checklist · privacy e copyright</span><span>06</span></div>
+</section>
+
+<!-- 07 -->
+<section class="slide">
+  <div class="rail"><span>Lezione 10 · Personalizzare e pubblicare</span></div>
+  <div class="body">
+    <div class="kicker">Checklist · 3 di 3 · accessibilità, e chi la fa</div>
+    <h2>Che tutti possano usarla, e un secondo paio d'occhi<span class="sub">Una lezione
+      interattiva che non si legge o non si usa esclude proprio chi ne aveva più bisogno.</span></h2>
+    <div class="content cols" style="grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+      <div class="box">
+        <div class="tag">5 · Accessibilità</div>
+        <ul class="ck">
+          <li>Contrasto sufficiente fra testo e sfondo, anche con il tema scelto.</li>
+          <li>Ogni immagine ha un testo alternativo che dice che cosa mostra: <code>![descrizione](file.png)</code>.</li>
+          <li>Si naviga con la sola tastiera (Tab, Invio): provate senza mouse.</li>
+          <li>Il colore non è l'unico segnale (giusto/sbagliato, legende).</li>
+          <li>Un'animazione o uno slider hanno anche una spiegazione scritta.</li>
+        </ul>
+      </div>
+      <div class="cols" style="gap:12px">
+        <div class="prompt plain">
+          <div class="lbl">Far fare all'agente la prima rilettura</div>
+          Rileggi la lezione «…» con questa checklist (correttezza, pedagogia, privacy,
+          copyright, accessibilità). Elenca i problemi che trovi, con il passo e il motivo.
+          Non correggere niente: decido io.
+        </div>
+        <div class="box green">
+          <p><b>L'agente segnala, voi decidete.</b> Non vede l'aula, non conosce i vostri
+            studenti e può sbagliare anche nel giudicare: è un secondo controllo, non il primo.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Checklist · accessibilità</span><span>07</span></div>
+</section>
+
+<!-- 08 -->
+<section class="slide">
+  <div class="rail"><span>Lezione 10 · Personalizzare e pubblicare</span></div>
+  <div class="body">
+    <div class="kicker">Checklist · da stampare</div>
+    <h2>Cinque controlli, una pagina<span class="sub">Si passa su ogni lezione prima di mostrarla agli
+      studenti o di metterla online. Una spunta per riga, quando l'avete verificato voi.</span></h2>
+    <div class="content ckgrid">
+      <div class="box"><div class="tag">1</div><h3>Correttezza</h3>
+        <ul class="ck"><li>Fatti e numeri controllati su fonte</li><li>Risposte giuste provate</li><li>Nulla di inventato</li></ul></div>
+      <div class="box"><div class="tag">2</div><h3>Pedagogia</h3>
+        <ul class="ck"><li>L'obiettivo si raggiunge</li><li>Errori tipici, feedback con il perché</li><li>Non è una prova</li></ul></div>
+      <div class="box"><div class="tag">3</div><h3>Privacy</h3>
+        <ul class="ck"><li>Nessun dato di studenti</li><li>Nessun materiale riservato</li><li>Email dei salvataggi controllata</li></ul></div>
+      <div class="box"><div class="tag">4</div><h3>Copyright</h3>
+        <ul class="ck"><li>Testi e immagini: vostri o con licenza</li><li>Fonti nominate</li><li>Niente brani copiati</li></ul></div>
+      <div class="box"><div class="tag">5</div><h3>Accessibilità</h3>
+        <ul class="ck"><li>Contrasto e testo alternativo</li><li>Si usa con la tastiera</li><li>Il colore non basta da solo</li></ul></div>
+      <div class="box orange"><div class="tag">Alla fine</div><h3>Provata da studente</h3>
+        <ul class="ck"><li>Passata dall'inizio alla fine</li><li>Con almeno una risposta sbagliata</li><li>Vista anche su telefono</li></ul></div>
+    </div>
+  </div>
+  <div class="foot"><span>Checklist · una pagina</span><span>08</span></div>
+</section>
+
+<!-- 09 -->
+<section class="slide">
+  <div class="rail"><span>Lezione 10 · Personalizzare e pubblicare</span></div>
+  <div class="body">
+    <div class="kicker">Pubblicare · 3 minuti</div>
+    <h2>Pubblicare è una scelta, e il sito diventa pubblico<span class="sub">GitHub Pages gratuito
+      non ha siti privati. Chi non pubblica non ha perso niente.</span></h2>
+    <div class="content duo">
+      <div class="side g">
+        <div class="lbl">Se pubblicate</div>
+        <h3>Il sito ha un indirizzo che chiunque può aprire</h3>
+        <ul class="clean">
+          <li>L'indirizzo è <code>https://&lt;utente&gt;.github.io/&lt;nome&gt;/</code>: il nome
+            utente di GitHub compare nel link.</li>
+          <li>Il progetto su GitHub è pubblico: anche i file delle lezioni e la storia dei
+            salvataggi si possono leggere.</li>
+          <li>Ciò che è online può essere copiato e salvato da altri.</li>
+          <li>Gli studenti aprono un link e basta: nessun account.</li>
+        </ul>
+      </div>
+      <div class="side">
+        <div class="lbl">Se non pubblicate</div>
+        <h3>Il sito resta sul vostro computer</h3>
+        <ul class="clean">
+          <li>Lo mostrate in anteprima, dal vostro computer.</li>
+          <li>Nessun account da creare, nessun dato che esce.</li>
+          <li>Potete decidere in qualsiasi momento: più avanti, con più calma.</li>
+          <li>La checklist vale lo stesso: la qualità non dipende dall'indirizzo.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:18px">
+      <p><b>Prima di dire sì</b> pensate a chi può trovare il link e a che cosa c'è dentro.
+        Con la checklist passata, nessun dato di studenti e le fonti nominate, pubblicare è
+        ragionevole; altrimenti no.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Pubblicare · una scelta</span><span>09</span></div>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <div class="rail"><span>Lezione 10 · Personalizzare e pubblicare</span></div>
+  <div class="body">
+    <div class="kicker">Pubblicare · 2 minuti</div>
+    <h2>Che cosa serve, e un permesso che non si salta<span class="sub">La skill
+      <code>pubblica</code> guida i passi. Voi mettete l'account e confermate nel browser.</span></h2>
+    <div class="content">
+      <table>
+        <tr><th>Che cosa</th><th>A che cosa serve</th><th>Come</th></tr>
+        <tr><td>Account GitHub</td><td>Ospita il progetto e il sito</td><td>Gratuito, su github.com. Il nome utente compare nell'indirizzo del sito</td></tr>
+        <tr><td>GitHub CLI (<code>gh</code>)</td><td>Lo strumento con cui l'agente parla con GitHub</td><td>Se manca, l'agente guida l'installazione (istruzioni in <code>docs/SETUP.md</code>)</td></tr>
+        <tr><td>L'accesso dal browser</td><td>Autorizza il computer a operare sul vostro account</td><td><code>gh auth login -s workflow</code>: si apre il browser, o compare un codice da inserire in una pagina</td></tr>
+        <tr><td class="o">Il permesso <code>workflow</code></td><td>Il sito contiene i file che lo pubblicano. Senza, GitHub rifiuta di riceverli</td><td class="o">Se eravate già collegati senza: <code>gh auth refresh -h github.com -s workflow</code></td></tr>
+      </table>
+    </div>
+    <div class="box green" style="margin-top:18px">
+      <p><b>Leggete che cosa autorizzate.</b> È un permesso dato a un programma sul vostro account:
+        lo concedete voi, nel browser, dopo aver letto la richiesta (lezione 3).
+       </p>
+    </div>
+  </div>
+  <div class="foot"><span>Pubblicare · che cosa serve</span><span>10</span></div>
+</section>
+
+<!-- 11 -->
+<section class="slide demo">
+  <div class="rail"><span>Lezione 10 · Personalizzare e pubblicare</span></div>
+  <div class="body">
+    <div class="kicker">Dimostrazione · 5 minuti</div>
+    <h2>La pubblicazione, passo per passo<span class="sub">Si guarda la skill <code>pubblica</code>
+      lavorare. Si noti dove l'agente si ferma a chiedere.</span></h2>
+    <div class="content trail t5">
+      <div class="step">
+        <div class="tag">1</div><h3>Salva</h3>
+        <p>Se c'è lavoro non salvato, propone di salvarlo prima.</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="tag">2</div><h3>Strumenti e accesso</h3>
+        <p>Controlla <code>gh</code> e l'accesso, con il permesso <code>workflow</code>.</p>
+        <div class="who">Voi nel browser</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step o">
+        <div class="tag">3</div><h3>Corsi dimostrativi</h3>
+        <p>Chiede se <code>benvenuto</code>, <code>esempio-matematica</code> ed <code>esempi</code> devono andare online.</p>
+        <div class="who">Decidete voi</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step o">
+        <div class="tag">4</div><h3>Nome e consenso</h3>
+        <p>Propone il nome, mostra l'indirizzo e chiede il sì esplicito: è pubblico.</p>
+        <div class="who">Decidete voi</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step src-step">
+        <div class="tag">5</div><h3>Online</h3>
+        <p>Crea il progetto su GitHub, attiva Pages e dopo circa due minuti dà il link.</p>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:18px">
+      <p><b>Da notare:</b> l'agente non pubblica mai da solo e non decide al posto vostro. I punti 2, 3 e 4
+        sono quelli in cui si ferma: se non vi chiede il consenso sul
+        punto 4, fermatelo voi.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Si guarda la skill pubblica di Geode</span><span>11</span></div>
+</section>
+
+<!-- 12 -->
+<section class="slide">
+  <div class="rail"><span>Lezione 10 · Personalizzare e pubblicare</span></div>
+  <div class="body">
+    <div class="kicker">Pubblicare · se qualcosa non va</div>
+    <h2>Quattro intoppi, e che cosa fare<span class="sub">Quasi sempre basta incollare il messaggio
+      all'agente. Ma è bene sapere che cosa significa.</span></h2>
+    <div class="content">
+      <table>
+        <tr><th>Che cosa succede</th><th>Che cosa significa</th><th>Che cosa fare</th></tr>
+        <tr><td>Il caricamento è rifiutato: «without <code>workflow</code> scope»</td><td>Manca il permesso <code>workflow</code></td><td><code>gh auth refresh -h github.com -s workflow</code>, conferma nel browser, poi si ripete. Se il progetto online è già nato vuoto, non si ricrea</td></tr>
+        <tr><td>Il caricamento è rifiutato per autenticazione</td><td>L'accesso è scaduto o non è fatto</td><td>Si rifà <code>gh auth login -s workflow</code> e si controlla con <code>gh auth status</code></td></tr>
+        <tr><td>Il sito non compare dopo qualche minuto</td><td>La pubblicazione automatica si è fermata</td><td>L'agente guarda l'ultima esecuzione (<code>gh run list</code>). L'errore tipico è una lezione che non compila: si riproduce in locale e si corregge</td></tr>
+        <tr><td>«Pages già attivo» (errore 409)</td><td>È già stato fatto</td><td>Va bene così, non serve altro</td></tr>
+      </table>
+    </div>
+    <div class="box" style="margin-top:18px">
+      <p><b>Rete della scuola:</b> GitHub deve poter uscire. Se non ci si connette, provate
+        un'altra rete (hotspot del telefono) e ditelo all'agente.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Pubblicare · se va storto</span><span>12</span></div>
+</section>
+
+<!-- 13 -->
+<section class="slide">
+  <div class="rail"><span>Lezione 10 · Personalizzare e pubblicare</span></div>
+  <div class="body">
+    <div class="kicker">Dopo la pubblicazione · 3 minuti</div>
+    <h2>Aggiornare il sito, aggiornare la piattaforma<span class="sub">Sono due cose diverse e si
+      chiedono in modo diverso.</span></h2>
+    <div class="content duo">
+      <div class="side g">
+        <div class="lbl">Le vostre modifiche</div>
+        <h3>«Aggiorna il sito»</h3>
+        <ul class="clean">
+          <li>Prima si salva il lavoro, poi l'agente lo spinge online (skill <code>pubblica</code>).</li>
+          <li>Il sito si aggiorna da solo in circa un minuto: nessun'altra azione.</li>
+          <li>I progressi degli studenti non si cancellano, <b>a patto di non cambiare mai</b>
+            <code>storage_prefix</code> in <code>site.yaml</code>.</li>
+        </ul>
+      </div>
+      <div class="side">
+        <div class="lbl">Le novità di Geode</div>
+        <h3>«Aggiorna la piattaforma»</h3>
+        <ul class="clean">
+          <li>Skill <code>aggiorna</code>: porta le novità del motore senza toccare corsi,
+            lezioni e grafica.</li>
+          <li>Prima salva, poi mostra che cosa cambierebbe e chiede il vostro ok.</li>
+          <li>Alla fine controlla che i corsi si compilino ancora e vi racconta le novità.</li>
+          <li>Per portarle online, serve poi «aggiorna il sito».</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:18px">
+      <p><b>Se i vostri lavori toccano file del motore</b> (per esempio un nuovo componente),
+        l'aggiornamento può trovare un conflitto: lo segnala e non sovrascrive niente.
+        Fermatevi e chiedete all'agente di spiegarlo in termini di risultato, non di codice.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Aggiornamenti</span><span>13</span></div>
+</section>
+
+<!-- 14 -->
+<section class="slide lab">
+  <div class="rail"><span>Lezione 10 · Personalizzare e pubblicare</span></div>
+  <div class="body">
+    <div class="kicker">Laboratorio · 20 minuti · al computer, da soli</div>
+    <h2>Rifinire, controllare, e se volete pubblicare<span class="sub">Il percorso A è per tutti.
+      Il percorso B solo per chi decide di mettere il sito online.</span></h2>
+    <div class="content cols" style="grid-template-columns:1fr 1fr;gap:12px 18px;align-items:start">
+      <div class="box">
+        <span class="badge">A · 5 min</span>
+        <p><b>Rifinire.</b> Cambiate almeno una cosa dell'aspetto o dei testi, chiedendola
+          all'agente. Se serve, aggiungete un passo o una nuova lezione dalle vostre note.</p>
+      </div>
+      <div class="box">
+        <span class="badge">A · 8 min</span>
+        <p><b>Checklist.</b> Passate la vostra lezione sui cinque controlli. Chiedete all'agente
+          la prima rilettura, poi verificate voi i punti che segnala.</p>
+      </div>
+      <div class="box">
+        <span class="badge">A · 2 min</span>
+        <p><b>Salvate.</b> «Salva il lavoro»: la frase del salvataggio deve dire quello che
+          avete fatto.</p>
+      </div>
+      <div class="box orange">
+        <span class="badge o">B · 5 min</span>
+        <p><b>Pubblicare (facoltativo).</b> Solo se la checklist è passata e avete l'account.
+          Dite all'agente «voglio pubblicare il sito» e leggete ogni richiesta prima di rispondere.</p>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:14px">
+      <p><b>Non avere pubblicato non è un fallimento.</b> Chi resta in locale ha un sito
+        controllato e sa come si fa: è l'obiettivo dell'ora. Nessun dato di studenti, nemmeno
+        negli esempi.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Consegna su Classroom: lezione-10-lab-pubblicazione.md</span><span>14</span></div>
+</section>
+
+<!-- 15 -->
+<section class="slide">
+  <div class="rail"><span>Lezione 10 · Personalizzare e pubblicare</span></div>
+  <div class="body">
+    <div class="kicker">Chiusura · conservare il progetto</div>
+    <h2>Il progetto è la cartella, e si riprende da lì<span class="sub">Tutto ciò che serve per
+      ripartire sta in una cartella del vostro computer.</span></h2>
+    <div class="content cols c3" style="gap:18px">
+      <div class="box">
+        <div class="tag">Dove sta</div>
+        <h3>Una cartella, vostra</h3>
+        <p>Corsi, lezioni, configurazione e storia dei salvataggi. Sapete dove si trova e come
+          si chiama, e ne tenete una copia su un altro supporto (disco esterno o spazio
+          personale online).</p>
+      </div>
+      <div class="box green">
+        <div class="tag">Come si riprende</div>
+        <h3>Si riapre e si dice che cosa si vuole</h3>
+        <p>Aprite la cartella nell'assistente. L'agente rilegge <code>AGENTS.md</code> e le skill:
+          ricorda il progetto, non la conversazione di quel giorno.</p>
+      </div>
+      <div class="box">
+        <div class="tag">Con quale cadenza</div>
+        <h3>Salvate, controllate, poi decidete</h3>
+        <p>Un salvataggio dopo ogni passo che vi soddisfa, la checklist prima di mostrare, la
+          pubblicazione quando ne siete convinti.</p>
+      </div>
+    </div>
+    <div class="box orange" style="margin-top:20px">
+      <p><b>Se cambia l'assistente</b> (un piano che finisce, un altro prodotto): la cartella
+        resta e la leggono tutti e tre, perché le istruzioni sono in <code>AGENTS.md</code> e
+        nelle skill (lezione 9). Si perde solo la conversazione.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Chiusura · conservare</span><span>15</span></div>
+</section>
+
+<!-- 16 -->
+<section class="slide">
+  <div class="rail"><span>Lezione 10 · Personalizzare e pubblicare</span></div>
+  <div class="body">
+    <div class="kicker">Chiusura del corso · il filo</div>
+    <h2>Dieci lezioni, un metodo<span class="sub">Ogni lezione ha aggiunto un controllo. Alla fine
+      sono quelli che usate anche per decidere se pubblicare.</span></h2>
+    <div class="content">
+      <table>
+        <tr><th>Lezioni</th><th>Che cosa ha insegnato</th><th>Il controllo che resta</th></tr>
+        <tr><td>1 · 2</td><td>Chat e agente: che cosa sono, come si accede</td><td>Limiti, allucinazioni, responsabilità vostra</td></tr>
+        <tr><td>3 · 4</td><td>Far lavorare l'agente sui file; il contesto permanente</td><td>Permessi, backup, dati personali</td></tr>
+        <tr><td>5 · 6 · 7</td><td>Fonti, skill, verifiche</td><td>Citazioni, copyright, valutazione assistita</td></tr>
+        <tr><td>8 · 9</td><td>Dal piano al sito: motore, contenuti, salvataggi</td><td>Servizi esterni, comandi eseguiti dall'agente</td></tr>
+        <tr class="last"><td class="o">10</td><td class="o">Personalizzare e pubblicare</td><td class="o">Checklist e permessi concessi a GitHub</td></tr>
+      </table>
+    </div>
+    <div class="box green" style="margin-top:18px">
+      <p><b>Il metodo è sempre lo stesso:</b> si dà un obiettivo preciso, l'agente propone, voi
+        controllate e correggete, poi decidete che cosa fare del risultato.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Chiusura · il filo</span><span>16</span></div>
+</section>
+
+<!-- 17 -->
+<section class="slide">
+  <div class="rail"><span>Lezione 10 · Personalizzare e pubblicare</span></div>
+  <div class="body">
+    <div class="kicker">Chiusura</div>
+    <h2>Quattro cose da portare a casa</h2>
+    <div class="content">
+      <ol class="num">
+        <li><b>Personalizzare è chiedere, e il motore non si tocca.</b>
+          Aspetto, testi e ordine dei corsi sono vostri; le novità della piattaforma arrivano
+          con la skill <code>aggiorna</code>.</li>
+        <li><b>Prima la checklist, poi la decisione.</b>
+          Correttezza, pedagogia, privacy, copyright, accessibilità: l'agente segnala, voi
+          verificate.</li>
+        <li><b>Pubblicare è una scelta, e un sito pubblicato è pubblico.</b>
+          Serve l'account, <code>gh</code> e il permesso <code>workflow</code>; non pubblicare
+          non è un fallimento.</li>
+        <li><b>Il progetto è la vostra cartella.</b>
+          Si riapre nell'assistente, qualunque esso sia, e si riparte da dove eravate.</li>
+      </ol>
+      <div class="box orange" style="margin-top:24px">
+        <p><b>Da dove ripartire.</b> Una lezione sola, della vostra materia, provata con una
+          classe. Poi un'altra. Il corso è finito: il vostro sito comincia adesso.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Chiusura</span><span>17</span></div>
+</section>
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var body = document.body;
+  var counter = document.getElementById('presentCounter');
+  var hint = document.getElementById('presentHint');
+  var idx = 0;
+  var presenting = false;
+
+  function fitScale(){
+    var s = Math.min(window.innerWidth/1280, window.innerHeight/720);
+    document.documentElement.style.setProperty('--scale', s);
+  }
+
+  function render(){
+    slides.forEach(function(s,i){ s.classList.toggle('active', i===idx); });
+    counter.textContent = (idx+1) + ' / ' + slides.length;
+  }
+
+  function enter(){
+    presenting = true;
+    body.classList.add('present');
+    fitScale();
+    render();
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(function(){});
+    }
+  }
+
+  function exit(){
+    presenting = false;
+    body.classList.remove('present');
+    if (document.fullscreenElement) document.exitFullscreen().catch(function(){});
+  }
+
+  function next(){ if (idx < slides.length-1){ idx++; render(); } }
+  function prev(){ if (idx > 0){ idx--; render(); } }
+
+  document.addEventListener('keydown', function(e){
+    if (!presenting){
+      if (e.key === 'p' || e.key === 'P') enter();
+      return;
+    }
+    switch(e.key){
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown':
+        e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+        e.preventDefault(); prev(); break;
+      case 'Home':
+        e.preventDefault(); idx = 0; render(); break;
+      case 'End':
+        e.preventDefault(); idx = slides.length-1; render(); break;
+      case 'Escape':
+        exit(); break;
+    }
+  });
+
+  document.addEventListener('click', function(e){
+    if (!presenting) return;
+    if (e.target.closest('a')) return;
+    if (e.clientX > window.innerWidth/2) next(); else prev();
+  });
+
+  document.addEventListener('fullscreenchange', function(){
+    if (!document.fullscreenElement && presenting) exit();
+  });
+
+  window.addEventListener('resize', fitScale);
+
+  hint.classList.add('show');
+  setTimeout(function(){ hint.classList.remove('show'); }, 4000);
+
+  // ---- controllo dimensione testo ----
+  var ZOOM_MIN = 0.8, ZOOM_MAX = 1.4, ZOOM_STEP = 0.1;
+  var zoomVal = document.getElementById('zoomVal');
+  var zoomIn = document.getElementById('zoomIn');
+  var zoomOut = document.getElementById('zoomOut');
+  var zoom = 1;
+  try { zoom = parseFloat(localStorage.getItem('slideZoom')) || 1; } catch(e){}
+
+  function applyZoom(){
+    zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom));
+    document.documentElement.style.setProperty('--content-zoom', zoom);
+    zoomVal.textContent = Math.round(zoom * 100) + '%';
+    try { localStorage.setItem('slideZoom', zoom); } catch(e){}
+  }
+
+  zoomIn.addEventListener('click', function(){ zoom += ZOOM_STEP; applyZoom(); });
+  zoomOut.addEventListener('click', function(){ zoom -= ZOOM_STEP; applyZoom(); });
+
+  document.addEventListener('keydown', function(e){
+    if (presenting) return;
+    if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '=')){
+      e.preventDefault(); zoom += ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '-'){
+      e.preventDefault(); zoom -= ZOOM_STEP; applyZoom();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === '0'){
+      e.preventDefault(); zoom = 1; applyZoom();
+    }
+  });
+
+  applyZoom();
+})();
+</script>
+
+</body>
+</html>
